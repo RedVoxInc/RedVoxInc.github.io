@@ -13078,7 +13078,7 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Reading-Multiple-API-M-Files">Reading Multiple API M Files<a class="anchor-link" href="#Reading-Multiple-API-M-Files">&#182;</a></h3><p>The following examples show how to read multiple API M files.</p>
-<p>Functionality for reading multiple API M files is provided by the <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a1/api_docs/redvox/api1000/io_raw.html">io_raw</a> module.</p>
+<p>Functionality for reading multiple API M files is provided by the <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html">io_raw</a> module.</p>
 
 </div>
 </div>
@@ -13116,7 +13116,7 @@ div#notebook {
 </li>
 </ul>
 <p>Structured layout is preferred as it provides better organization for large amounts of API M files.</p>
-<h3 id="Reading-Unstructured-Data">Reading Unstructured Data<a class="anchor-link" href="#Reading-Unstructured-Data">&#182;</a></h3><p>Reading unstructured data is accomplished with <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.read_unstructured">read_unstructured</a> and returns a <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult">ReadResult</a>. The <code>ReadResult</code> provides summaries for data from each station and provides access to packets from each station. The summaries can be accessed with <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult.get_station_summaries">get_station_summaries</a> which returns a list of <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.StationSummary">StationSummary</a> objects.</p>
+<h3 id="Reading-Unstructured-Data">Reading Unstructured Data<a class="anchor-link" href="#Reading-Unstructured-Data">&#182;</a></h3><p>Reading unstructured data is accomplished with <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.read_unstructured">read_unstructured</a> and returns a <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult">ReadResult</a>. The <code>ReadResult</code> provides summaries for data from each station and provides access to packets from each station. The summaries can be accessed with <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult.get_station_summaries">get_station_summaries</a> which returns a list of <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.StationSummary">StationSummary</a> objects.</p>
 
 </div>
 </div>
@@ -13161,7 +13161,7 @@ StationSummary(station_id=&#39;1637610027&#39;, station_uuid=&#39;633937855&#39;
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Obtaining-the-packets">Obtaining the packets<a class="anchor-link" href="#Obtaining-the-packets">&#182;</a></h3><p>You can use the summary to quickly see which data was read in. To get access to the individual packets, you can call <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult.get_packets_for_station_id">get_packets_for_station_id</a> with either the <code>station_id</code> or with the <code>station_id:station_uuid</code>.</p>
+<h3 id="Obtaining-the-packets">Obtaining the packets<a class="anchor-link" href="#Obtaining-the-packets">&#182;</a></h3><p>You can use the summary to quickly see which data was read in. To get access to the individual packets, you can call <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult.get_packets_for_station_id">get_packets_for_station_id</a> with either the <code>station_id</code> or with the <code>station_id:station_uuid</code>.</p>
 
 </div>
 </div>
@@ -13206,7 +13206,7 @@ read 7 from 1637110001
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Reading-Structured-Data">Reading Structured Data<a class="anchor-link" href="#Reading-Structured-Data">&#182;</a></h3><p>Reading structured data is accomplished with <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.read_structured">read_structured</a> and returns a <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult">ReadResult</a>.</p>
+<h3 id="Reading-Structured-Data">Reading Structured Data<a class="anchor-link" href="#Reading-Structured-Data">&#182;</a></h3><p>Reading structured data is accomplished with <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.read_structured">read_structured</a> and returns a <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadResult">ReadResult</a>.</p>
 
 </div>
 </div>
@@ -13231,7 +13231,7 @@ read 7 from 1637110001
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Filtering-API-M-Data-to-Read">Filtering API M Data to Read<a class="anchor-link" href="#Filtering-API-M-Data-to-Read">&#182;</a></h3><p>When reading multiple API M files, the only filter that is enabled by default checks that the file extension == <code>.rdvxm</code>. This means that by default, the read functions will read <strong>all</strong> <code>.rdvxm</code> files that are discovered. This is often detrimental when loading data from larger data sets.</p>
-<p>The SDK for API M provides a new class, <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadFilter">ReadFilter</a>, which is used by both read methods to filter the data before reading.</p>
+<p>The SDK for API M provides a new class, <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/io_raw.html#redvox.api1000.io_raw.ReadFilter">ReadFilter</a>, which is used by both read methods to filter the data before reading.</p>
 <p>This filter works on the <em>path name</em> of the file to extract the station ID, timestamp, and file extension without opening and reading the file.</p>
 <p>The <code>ReadFilter</code> can filter on any combination of the following attributes:</p>
 <ul>

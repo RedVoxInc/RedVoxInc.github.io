@@ -13079,9 +13079,9 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Working-with-Audio-Data">Working with Audio Data<a class="anchor-link" href="#Working-with-Audio-Data">&#182;</a></h3><p>In this example, we'll access the audio sensor and plot the audio data.</p>
 <ul>
-<li>Get <code>Sensors</code> object: <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/wrapped_redvox_packet/wrapped_packet.html#redvox.api1000.wrapped_redvox_packet.wrapped_packet.WrappedRedvoxPacketM.get_sensors">https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/wrapped_redvox_packet/wrapped_packet.html#redvox.api1000.wrapped_redvox_packet.wrapped_packet.WrappedRedvoxPacketM.get_sensors</a></li>
-<li>Get <code>Audio</code> sensor: <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/sensors.html#redvox.api1000.wrapped_redvox_packet.sensors.sensors.Sensors.get_audio">https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/sensors.html#redvox.api1000.wrapped_redvox_packet.sensors.sensors.Sensors.get_audio</a></li>
-<li><code>Audio</code> sensor API <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/audio.html#redvox.api1000.wrapped_redvox_packet.sensors.audio.Audio">https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/audio.html#redvox.api1000.wrapped_redvox_packet.sensors.audio.Audio</a></li>
+<li>Get <code>Sensors</code> object: <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/wrapped_redvox_packet/wrapped_packet.html#redvox.api1000.wrapped_redvox_packet.wrapped_packet.WrappedRedvoxPacketM.get_sensors">https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/wrapped_redvox_packet/wrapped_packet.html#redvox.api1000.wrapped_redvox_packet.wrapped_packet.WrappedRedvoxPacketM.get_sensors</a></li>
+<li>Get <code>Audio</code> sensor: <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/sensors.html#redvox.api1000.wrapped_redvox_packet.sensors.sensors.Sensors.get_audio">https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/sensors.html#redvox.api1000.wrapped_redvox_packet.sensors.sensors.Sensors.get_audio</a></li>
+<li><code>Audio</code> sensor API <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/audio.html#redvox.api1000.wrapped_redvox_packet.sensors.audio.Audio">https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/wrapped_redvox_packet/sensors/audio.html#redvox.api1000.wrapped_redvox_packet.sensors.audio.Audio</a></li>
 </ul>
 <p>You'll note that the return type of <code>get_audio</code> is <code>Optional&lt;Audio&gt;</code>. In API M, some fields are optional. For instance, not every station has every available sensor, or even if it does, it may not be enabled. Therefore, you should always check that what you're working with is not <code>None</code>.</p>
 
@@ -13149,7 +13149,7 @@ duration timedelta: 0:00:51.200000
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Working-with-SamplePayloads">Working with SamplePayloads<a class="anchor-link" href="#Working-with-SamplePayloads">&#182;</a></h3><p>Now that we've seen all of the top-level metadata in the audio sensor, let's examine how to access the audio samples. Audio samples are stored in a sub-type called a <code>SamplePayload</code>: <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/common/common.html#redvox.api1000.common.common.SamplePayload">https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/common/common.html#redvox.api1000.common.common.SamplePayload</a></p>
+<h3 id="Working-with-SamplePayloads">Working with SamplePayloads<a class="anchor-link" href="#Working-with-SamplePayloads">&#182;</a></h3><p>Now that we've seen all of the top-level metadata in the audio sensor, let's examine how to access the audio samples. Audio samples are stored in a sub-type called a <code>SamplePayload</code>: <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/common/common.html#redvox.api1000.common.common.SamplePayload">https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/common/common.html#redvox.api1000.common.common.SamplePayload</a></p>
 <p>A <code>SamplePayload</code> manages the samples and also provides descriptive statistics on the samples.</p>
 
 </div>
@@ -13199,7 +13199,7 @@ duration timedelta: 0:00:51.200000
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Before we get to making a plot, let's look at the <a href="https://redvoxhi.bitbucket.io/redvox-sdk/v3.0.0a3/api_docs/redvox/api1000/common/common.html#redvox.api1000.common.common.SummaryStatistics">SummaryStatistics</a> provided with each <code>SamplePayload</code>.</p>
+<p>Before we get to making a plot, let's look at the <a href="https://redvoxinc.github.io/redvox-sdk/v3.0.0a14/api_docs/redvox/api1000/common/common.html#redvox.api1000.common.common.SummaryStatistics">SummaryStatistics</a> provided with each <code>SamplePayload</code>.</p>
 
 </div>
 </div>
@@ -13294,32 +13294,6 @@ stddev: 3.895547706633806e-08
 
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-    </div>
 </div>
 </div>
 
