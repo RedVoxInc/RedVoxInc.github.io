@@ -936,7 +936,7 @@ the first timestamp created is 1 sample_interval_s from the start_timestamp
 <dl>
 <dt id="redvox.common.data_window.DataWindow"><code class="flex name class">
 <span>class <span class="ident">DataWindow</span></span>
-<span>(</span><span>input_dir: str, structured_layout: bool = True, start_datetime: typing.Union[datetime.datetime, NoneType] = None, end_datetime: typing.Union[datetime.datetime, NoneType] = None, start_buffer_td: datetime.timedelta = datetime.timedelta(seconds=120), end_buffer_td: datetime.timedelta = datetime.timedelta(seconds=120), gap_time_s: float = 0.25, station_ids: typing.Union[typing.Iterable[str], NoneType] = None, extensions: typing.Union[typing.Set[str], NoneType] = None, api_versions: typing.Union[typing.Set[<a title="redvox.common.versioning.ApiVersion" href="versioning.html#redvox.common.versioning.ApiVersion">ApiVersion</a>], NoneType] = None, apply_correction: bool = True, debug: bool = False)</span>
+<span>(</span><span>input_dir: str, structured_layout: bool = True, start_datetime: typing.Optional[datetime.datetime] = None, end_datetime: typing.Optional[datetime.datetime] = None, start_buffer_td: datetime.timedelta = datetime.timedelta(seconds=120), end_buffer_td: datetime.timedelta = datetime.timedelta(seconds=120), gap_time_s: float = 0.25, station_ids: typing.Optional[typing.Iterable[str]] = None, extensions: typing.Optional[typing.Set[str]] = None, api_versions: typing.Optional[typing.Set[<a title="redvox.common.versioning.ApiVersion" href="versioning.html#redvox.common.versioning.ApiVersion">ApiVersion</a>]] = None, apply_correction: bool = True, debug: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Holds the data for a given time window; adds interpolated timestamps to fill gaps and pad start and end values</p>
@@ -1524,7 +1524,7 @@ outputs a message for each id requested but has no data</p></div>
 </details>
 </dd>
 <dt id="redvox.common.data_window.DataWindow.create_data_window"><code class="name flex">
-<span>def <span class="ident">create_data_window</span></span>(<span>self, pool: typing.Union[multiprocessing.pool.Pool, NoneType] = None)</span>
+<span>def <span class="ident">create_data_window</span></span>(<span>self, pool: typing.Optional[multiprocessing.pool.Pool] = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>updates the data window to contain only the data within the window parameters
@@ -1685,7 +1685,7 @@ returns nothing, updates the station in place
 </details>
 </dd>
 <dt id="redvox.common.data_window.DataWindow.get_station"><code class="name flex">
-<span>def <span class="ident">get_station</span></span>(<span>self, station_id: str) ‑> typing.Union[<a title="redvox.common.station.Station" href="station.html#redvox.common.station.Station">Station</a>, NoneType]</span>
+<span>def <span class="ident">get_station</span></span>(<span>self, station_id: str) ‑> typing.Optional[<a title="redvox.common.station.Station" href="station.html#redvox.common.station.Station">Station</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get a single station from the data window
@@ -1782,7 +1782,7 @@ returns nothing, updates the station in place
 </details>
 </dd>
 <dt id="redvox.common.data_window.DataWindow.serialize"><code class="name flex">
-<span>def <span class="ident">serialize</span></span>(<span>self, base_dir: str = '.', file_name: typing.Union[str, NoneType] = None, compression_factor: int = 4) ‑> pathlib.Path</span>
+<span>def <span class="ident">serialize</span></span>(<span>self, base_dir: str = '.', file_name: typing.Optional[str] = None, compression_factor: int = 4) ‑> pathlib.Path</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Serializes and compresses this DataWindow to a file.
