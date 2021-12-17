@@ -40,6 +40,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # RedVox and Red Pandas modules
+# from redvox.common.data_window import DataWindow
 from redvox.common.data_window import DataWindow
 import redpandas.redpd_datawin as rpd_dw
 import redpandas.redpd_dq as rpd_dq
@@ -103,7 +104,7 @@ def redpd_dataframe(input_dw: DataWindow,
 
     :param input_dw: REQUIRED. Redvox DataWindow
     :param sensor_labels: optional list of strings, list of sensors available [&#39;audio&#39;, &#39;barometer&#39;, &#39;accelerometer&#39;,
-        &#39;gyroscope&#39;, &#39;magnetometer&#39;, &#39;health&#39;, &#39;location&#39;, &#39;synchronization&#39;, &#39;best_location&#39;]. For example: sensor_labels = [&#39;audio&#39;, &#39;accelerometer&#39;].
+        &#39;gyroscope&#39;, &#39;magnetometer&#39;, &#39;health&#39;, &#39;location&#39;, &#39;synchronization&#39;, &#39;clock&#39;, &#39;best_location&#39;]. For example: sensor_labels = [&#39;audio&#39;, &#39;accelerometer&#39;].
         Default is [&#34;audio&#34;]
     :param highpass_type: optional string, type of highpass applied. One of: &#39;obspy&#39;, &#39;butter&#39;, or &#39;rc&#39;. Default is &#39;obspy&#39;
     :param frequency_filter_low: optional float, lowest frequency for highpass filter. Default is 100 second periods
@@ -120,12 +121,12 @@ def redpd_dataframe(input_dw: DataWindow,
     # BEGIN RED PANDAS
     print(&#34;\nInitiating RedVox Redpandas:&#34;)
     df_all_sensors_all_stations = pd.DataFrame([rpd_build_sta.station_to_dict_from_dw(station=station,
-                                                                                      sdk_version=rdvx_data.sdk_version,
+                                                                                      sdk_version=rdvx_data.sdk_version(),
                                                                                       sensor_labels=sensor_labels,
                                                                                       highpass_type=highpass_type,
                                                                                       frequency_filter_low=frequency_filter_low,
                                                                                       filter_order=filter_order)
-                                                for station in rdvx_data.stations])
+                                                for station in rdvx_data.stations()])
     df_all_sensors_all_stations.sort_values(by=&#34;station_id&#34;, ignore_index=True, inplace=True)
 
     # Offer glimpse of what the DataFrame contains
@@ -134,6 +135,101 @@ def redpd_dataframe(input_dw: DataWindow,
     print(f&#34;Total columns in DataFrame: {len(df_all_sensors_all_stations.columns)}&#34;)
 
     return df_all_sensors_all_stations
+
+# def three_step_to_flat(df: pd.DataFrame,
+#                        name_column: str):
+#     &#34;&#34;&#34;
+#
+#     :param df: input pandas DataFrame. REQUIRED
+#     :param name_column: string, name of column
+#     :return: nothing, acts on the df
+#     &#34;&#34;&#34;
+#     # Create new columns with shape tuple for future unflattening/reshaping
+#     df[[f&#39;{name_column}_ndim&#39;]] = df[[f&#39;{name_column}&#39;]].applymap(np.shape)
+#     # Change tuples to 1D np.array to save it to parquet
+#     df[[f&#39;{name_column}_ndim&#39;]] = df[[f&#39;{name_column}_ndim&#39;]].applymap(np.asarray)
+#     # Flatten each row in wf columns
+#     df[[f&#39;{name_column}&#39;]] = df[[f&#39;{name_column}&#39;]].applymap(np.ravel)
+
+
+# def export_df_to_parquet(df: pd.DataFrame,
+#                          output_dir_pqt: str,
+#                          tfr_column_label: Union[List[str], str, None] = None,
+#                          tfr_frequency_label: Union[List[str], str, None] = None,
+#                          tfr_time_label: Union[List[str], str, None] = None,
+#                          output_filename_pqt: Optional[str] = None,
+#                          event_name: Optional[str] = &#34;Redvox&#34;) -&gt; str:
+#     &#34;&#34;&#34;
+#     Export RedPandas DataFrame to parquet
+#
+#     :param df: input pandas DataFrame. REQUIRED
+#     :param output_dir_pqt: string, output directory for parquet. REQUIRED
+#     :param tfr_column_label: string or list of strings, column label with TFR
+#     :param tfr_frequency_label: string or list of strings, column label with TFR frequencies
+#     :param tfr_time_label: string or list of strings, column label with TFR time
+#     :param output_filename_pqt: optional string for parquet filename. Default is None
+#     :param event_name: optional string with name of event. Default is &#34;Redvox&#34;
+#
+#     :return: string with full path (output directory and filename) of parquet
+#     &#34;&#34;&#34;
+#     if not os.path.exists(output_dir_pqt):  # make output directory if it doesn&#39;t exist
+#         print(f&#34;Creating output directory: {output_dir_pqt}...&#34;)
+#         os.mkdir(output_dir_pqt)
+#
+#     key_sensors = {&#39;barometer&#39;, &#39;accelerometer&#39;, &#39;gyroscope&#39;, &#39;magnetometer&#39;}
+#     for label in key_sensors:
+#         # Create new columns with shape tuple for future unflattening/reshaping
+#         if f&#39;{label}_wf_raw&#39; in df.columns:
+#             three_step_to_flat(df=df,
+#                                name_column=f&#39;{label}_wf_raw&#39;)
+#
+#         if f&#39;{label}_wf_highpass&#39; in df.columns:
+#             three_step_to_flat(df=df,
+#                                name_column=f&#39;{label}_wf_highpass&#39;)
+#
+#         if f&#39;{label}_nans&#39; in df.columns:
+#             three_step_to_flat(df=df,
+#                                name_column=f&#39;{label}_nans&#39;)
+#
+#     if not isinstance(tfr_column_label, list):
+#         tfr_column_label = [tfr_column_label]
+#     if not isinstance(tfr_frequency_label, list):
+#         tfr_frequency_label = [tfr_frequency_label]
+#     if not isinstance(tfr_time_label, list):
+#         tfr_time_label = [tfr_time_label]
+#
+#     for index_list, tfr_columns_in_df in enumerate(tfr_column_label):
+#         tfr_frequency_in_df = tfr_frequency_label[index_list]
+#         tfr_time_in_df = tfr_time_label[index_list]
+#
+#         if tfr_columns_in_df is not None:
+#             if tfr_columns_in_df in df.columns:
+#                 three_step_to_flat(df=df,
+#                                    name_column=f&#39;{tfr_columns_in_df}&#39;)
+#
+#         if tfr_frequency_in_df is not None:
+#             if tfr_frequency_in_df in df.columns:
+#                 three_step_to_flat(df=df,
+#                                    name_column=f&#39;{tfr_frequency_in_df}&#39;)
+#
+#         if tfr_time_in_df is not None:
+#             if tfr_time_in_df in df.columns:
+#                 three_step_to_flat(df=df,
+#                                    name_column=f&#39;{tfr_time_in_df}&#39;)
+#
+#     # Make filename if non given
+#     if output_filename_pqt is None:
+#         output_filename_pqt: str = event_name + &#34;_df.parquet&#34;
+#
+#     if output_filename_pqt.find(&#34;.parquet&#34;) == -1 and output_filename_pqt.find(&#34;.pqt&#34;) == -1:
+#         full_output_dir_path_parquet = os.path.join(output_dir_pqt, output_filename_pqt + &#34;.parquet&#34;)
+#     else:
+#         full_output_dir_path_parquet = os.path.join(output_dir_pqt, output_filename_pqt)
+#
+#     df.to_parquet(full_output_dir_path_parquet)
+#     print(f&#34;\nExported Parquet RedPandas DataFrame to {full_output_dir_path_parquet}&#34;)
+#
+#     return full_output_dir_path_parquet
 
 
 def export_df_to_parquet(df: pd.DataFrame,
@@ -150,36 +246,19 @@ def export_df_to_parquet(df: pd.DataFrame,
 
     :return: string with full path (output directory and filename) of parquet
     &#34;&#34;&#34;
-    if not os.path.exists(output_dir_pqt):  # make output directory if it doesn&#39;t exist
-        print(f&#34;Creating output directory: {output_dir_pqt}...&#34;)
-        os.mkdir(output_dir_pqt)
 
-    key_sensors = {&#39;barometer&#39;, &#39;accelerometer&#39;, &#39;gyroscope&#39;, &#39;magnetometer&#39;}
-    for label in key_sensors:
-        # Create new columns with shape tuple for future unflattening/reshaping
-        if f&#39;{label}_wf_raw&#39; in df.columns:
-            # Create new columns with shape tuple for future unflattening/reshaping
-            df[[f&#39;{label}_wf_raw_ndim&#39;]] = df[[f&#39;{label}_wf_raw&#39;]].applymap(np.shape)
-            # Change tuples to 1D np.array to save it to parquet
-            df[[f&#39;{label}_wf_raw_ndim&#39;]] = df[[f&#39;{label}_wf_raw_ndim&#39;]].applymap(np.asarray)
-            # Flatten each row in wf columns
-            df[[f&#39;{label}_wf_raw&#39;]] = df[[f&#39;{label}_wf_raw&#39;]].applymap(np.ravel)
+    for column in df.columns:
+        for row in df.index:  # check it is array by cheking all rows, look into dtypes
+            check = np.shape(df[column][row])
+            if len(check) &gt;= 2:
+                # Create new columns with shape tuple for future unflattening/reshaping
+                df[[f&#39;{column}_ndim&#39;]] = df[[f&#39;{column}&#39;]].applymap(np.shape)
+                # Change tuples to 1D np.array to save it to parquet
+                df[[f&#39;{column}_ndim&#39;]] = df[[f&#39;{column}_ndim&#39;]].applymap(np.asarray)
+                # Flatten each row in wf columns
+                df[[f&#39;{column}&#39;]] = df[[f&#39;{column}&#39;]].applymap(np.ravel)
 
-        if f&#39;{label}_wf_highpass&#39; in df.columns:
-            # Create new columns with shape tuple for future unflattening/reshaping
-            df[[f&#39;{label}_wf_highpass_ndim&#39;]] = df[[f&#39;{label}_wf_highpass&#39;]].applymap(np.shape)
-            # Change tuples to 1D np.array to save it to parquet
-            df[[f&#39;{label}_wf_highpass_ndim&#39;]] = df[[f&#39;{label}_wf_highpass_ndim&#39;]].applymap(np.asarray)
-            # Flatten each row in wf columns
-            df[[f&#39;{label}_wf_highpass&#39;]] = df[[f&#39;{label}_wf_highpass&#39;]].applymap(np.ravel)
-
-        if f&#39;{label}_nans&#39; in df.columns:
-            # Create new columns with shape tuple for future unflattening/reshaping
-            df[[f&#39;{label}_nans_ndim&#39;]] = df[[f&#39;{label}_nans&#39;]].applymap(np.shape)
-            # Change tuples to 1D np.array to save it to parquet
-            df[[f&#39;{label}_nans_ndim&#39;]] = df[[f&#39;{label}_nans_ndim&#39;]].applymap(np.asarray)
-            # Flatten each row in wf columns
-            df[[f&#39;{label}_nans&#39;]] = df[[f&#39;{label}_nans&#39;]].applymap(np.ravel)
+                break
 
     # Make filename if non given
     if output_filename_pqt is None:
@@ -226,36 +305,19 @@ def export_df_to_parquet(df: pd.DataFrame,
 
     :return: string with full path (output directory and filename) of parquet
     &#34;&#34;&#34;
-    if not os.path.exists(output_dir_pqt):  # make output directory if it doesn&#39;t exist
-        print(f&#34;Creating output directory: {output_dir_pqt}...&#34;)
-        os.mkdir(output_dir_pqt)
 
-    key_sensors = {&#39;barometer&#39;, &#39;accelerometer&#39;, &#39;gyroscope&#39;, &#39;magnetometer&#39;}
-    for label in key_sensors:
-        # Create new columns with shape tuple for future unflattening/reshaping
-        if f&#39;{label}_wf_raw&#39; in df.columns:
-            # Create new columns with shape tuple for future unflattening/reshaping
-            df[[f&#39;{label}_wf_raw_ndim&#39;]] = df[[f&#39;{label}_wf_raw&#39;]].applymap(np.shape)
-            # Change tuples to 1D np.array to save it to parquet
-            df[[f&#39;{label}_wf_raw_ndim&#39;]] = df[[f&#39;{label}_wf_raw_ndim&#39;]].applymap(np.asarray)
-            # Flatten each row in wf columns
-            df[[f&#39;{label}_wf_raw&#39;]] = df[[f&#39;{label}_wf_raw&#39;]].applymap(np.ravel)
+    for column in df.columns:
+        for row in df.index:  # check it is array by cheking all rows, look into dtypes
+            check = np.shape(df[column][row])
+            if len(check) &gt;= 2:
+                # Create new columns with shape tuple for future unflattening/reshaping
+                df[[f&#39;{column}_ndim&#39;]] = df[[f&#39;{column}&#39;]].applymap(np.shape)
+                # Change tuples to 1D np.array to save it to parquet
+                df[[f&#39;{column}_ndim&#39;]] = df[[f&#39;{column}_ndim&#39;]].applymap(np.asarray)
+                # Flatten each row in wf columns
+                df[[f&#39;{column}&#39;]] = df[[f&#39;{column}&#39;]].applymap(np.ravel)
 
-        if f&#39;{label}_wf_highpass&#39; in df.columns:
-            # Create new columns with shape tuple for future unflattening/reshaping
-            df[[f&#39;{label}_wf_highpass_ndim&#39;]] = df[[f&#39;{label}_wf_highpass&#39;]].applymap(np.shape)
-            # Change tuples to 1D np.array to save it to parquet
-            df[[f&#39;{label}_wf_highpass_ndim&#39;]] = df[[f&#39;{label}_wf_highpass_ndim&#39;]].applymap(np.asarray)
-            # Flatten each row in wf columns
-            df[[f&#39;{label}_wf_highpass&#39;]] = df[[f&#39;{label}_wf_highpass&#39;]].applymap(np.ravel)
-
-        if f&#39;{label}_nans&#39; in df.columns:
-            # Create new columns with shape tuple for future unflattening/reshaping
-            df[[f&#39;{label}_nans_ndim&#39;]] = df[[f&#39;{label}_nans&#39;]].applymap(np.shape)
-            # Change tuples to 1D np.array to save it to parquet
-            df[[f&#39;{label}_nans_ndim&#39;]] = df[[f&#39;{label}_nans_ndim&#39;]].applymap(np.asarray)
-            # Flatten each row in wf columns
-            df[[f&#39;{label}_nans&#39;]] = df[[f&#39;{label}_nans&#39;]].applymap(np.ravel)
+                break
 
     # Make filename if non given
     if output_filename_pqt is None:
@@ -277,7 +339,7 @@ def export_df_to_parquet(df: pd.DataFrame,
 </code></dt>
 <dd>
 <div class="desc">Construct pandas dataframe from RedVox DataWindow. Default sensor extracted is audio, for more options see sensor_labels parameter.<br><br>:param input_dw: REQUIRED. Redvox DataWindow<br>:param sensor_labels: optional list of strings, list of sensors available ['audio', 'barometer', 'accelerometer',<br>
-'gyroscope', 'magnetometer', 'health', 'location', 'synchronization', 'best_location']. For example: sensor_labels = ['audio', 'accelerometer'].<br>
+'gyroscope', 'magnetometer', 'health', 'location', 'synchronization', 'clock', 'best_location']. For example: sensor_labels = ['audio', 'accelerometer'].<br>
 Default is ["audio"]<br>:param highpass_type: optional string, type of highpass applied. One of: 'obspy', 'butter', or 'rc'. Default is 'obspy'<br>:param frequency_filter_low: optional float, lowest frequency for highpass filter. Default is 100 second periods<br>:param filter_order: optional integer, the order of the filter. Default is 4<br><br>:return: pd.DataFrame</div>
 <details class="source">
 <summary>
@@ -293,7 +355,7 @@ Default is ["audio"]<br>:param highpass_type: optional string, type of highpass 
 
     :param input_dw: REQUIRED. Redvox DataWindow
     :param sensor_labels: optional list of strings, list of sensors available [&#39;audio&#39;, &#39;barometer&#39;, &#39;accelerometer&#39;,
-        &#39;gyroscope&#39;, &#39;magnetometer&#39;, &#39;health&#39;, &#39;location&#39;, &#39;synchronization&#39;, &#39;best_location&#39;]. For example: sensor_labels = [&#39;audio&#39;, &#39;accelerometer&#39;].
+        &#39;gyroscope&#39;, &#39;magnetometer&#39;, &#39;health&#39;, &#39;location&#39;, &#39;synchronization&#39;, &#39;clock&#39;, &#39;best_location&#39;]. For example: sensor_labels = [&#39;audio&#39;, &#39;accelerometer&#39;].
         Default is [&#34;audio&#34;]
     :param highpass_type: optional string, type of highpass applied. One of: &#39;obspy&#39;, &#39;butter&#39;, or &#39;rc&#39;. Default is &#39;obspy&#39;
     :param frequency_filter_low: optional float, lowest frequency for highpass filter. Default is 100 second periods
@@ -310,12 +372,12 @@ Default is ["audio"]<br>:param highpass_type: optional string, type of highpass 
     # BEGIN RED PANDAS
     print(&#34;\nInitiating RedVox Redpandas:&#34;)
     df_all_sensors_all_stations = pd.DataFrame([rpd_build_sta.station_to_dict_from_dw(station=station,
-                                                                                      sdk_version=rdvx_data.sdk_version,
+                                                                                      sdk_version=rdvx_data.sdk_version(),
                                                                                       sensor_labels=sensor_labels,
                                                                                       highpass_type=highpass_type,
                                                                                       frequency_filter_low=frequency_filter_low,
                                                                                       filter_order=filter_order)
-                                                for station in rdvx_data.stations])
+                                                for station in rdvx_data.stations()])
     df_all_sensors_all_stations.sort_values(by=&#34;station_id&#34;, ignore_index=True, inplace=True)
 
     # Offer glimpse of what the DataFrame contains

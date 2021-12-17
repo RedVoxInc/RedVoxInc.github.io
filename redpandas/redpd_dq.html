@@ -36,10 +36,12 @@ from dataclasses_json import dataclass_json
 import numpy as np
 
 # RedVox modules
+# from redvox.common.data_window import DataWindow
 from redvox.common.data_window import DataWindow
 from redvox.common.date_time_utils import MICROSECONDS_IN_SECOND
 import redvox.common.date_time_utils as dt
-from redvox.common.station import Station
+# from redvox.common.station import Station
+from redvox.common.data_window import Station
 from redvox.api1000.wrapped_redvox_packet.station_information import OsType
 
 
@@ -69,21 +71,21 @@ def mic_sync(data_window: DataWindow) -&gt; None:
     :return: print statements with Mic and Clock specs
     &#34;&#34;&#34;
     station: Station
-    for station in data_window.stations:
+    for station in data_window.stations():
         if station.has_audio_data():
-            print(f&#34;{station.id} Audio Sensor (All timestamps are in microseconds since epoch UTC):\n&#34;
-                  f&#34;mic sample rate in hz: {station.audio_sensor().sample_rate_hz}\n&#34;
-                  f&#34;is mic sample rate constant: {station.audio_sensor().is_sample_rate_fixed}\n&#34;
-                  f&#34;mic sample interval in seconds: {station.audio_sensor().sample_interval_s}\n&#34;
-                  f&#34;mic sample interval std dev: {station.audio_sensor().sample_interval_std_s}\n&#34;
+            print(f&#34;{station.id()} Audio Sensor (All timestamps are in microseconds since epoch UTC):\n&#34;
+                  f&#34;mic sample rate in hz: {station.audio_sensor().sample_rate_hz()}\n&#34;
+                  f&#34;is mic sample rate constant: {station.audio_sensor().is_sample_rate_fixed()}\n&#34;
+                  f&#34;mic sample interval in seconds: {station.audio_sensor().sample_interval_s()}\n&#34;
+                  f&#34;mic sample interval std dev: {station.audio_sensor().sample_interval_std_s()}\n&#34;
                   f&#34;the first data timestamp: {station.audio_sensor().first_data_timestamp()}\n&#34;
                   f&#34;the last data timestamp:  {station.audio_sensor().last_data_timestamp()}\n&#34;
                   f&#34;the data as an ndarray: {station.audio_sensor().samples()}\n&#34;
                   f&#34;the number of data samples: {station.audio_sensor().num_samples()}\n&#34;
                   f&#34;the names of the dataframe columns: {station.audio_sensor().data_channels()}\n&#34;)
 
-            mic_sample_rate_nominal_hz = station.audio_sample_rate_nominal_hz
-            mic_sample_rate_hz = station.audio_sensor().sample_rate_hz
+            mic_sample_rate_nominal_hz = station.audio_sample_rate_nominal_hz()
+            mic_sample_rate_hz = station.audio_sensor().sample_rate_hz()
             # Unaltered time can have nans if packets missing or edges are truncated
             mic_unaltered_time_s = \
                 station.audio_sensor().unaltered_data_timestamps() / MICROSECONDS_IN_SECOND
@@ -91,7 +93,7 @@ def mic_sync(data_window: DataWindow) -&gt; None:
             mic_corrected_time_s = \
                 station.audio_sensor().data_timestamps() / MICROSECONDS_IN_SECOND
 
-            print(&#34;\nMIC AND CLOCK SPECS: Station ID&#34;, station.id)
+            print(&#34;\nMIC AND CLOCK SPECS: Station ID&#34;, station.id())
             if any(np.isnan(mic_corrected_time_s)) &gt; 0:
                 print(&#39;SYNCH WARNING: Have nans in data_timestamps&#39;)
                 print(&#39;Number Indices:&#39;, np.count_nonzero(np.isnan(mic_corrected_time_s)))
@@ -101,22 +103,22 @@ def mic_sync(data_window: DataWindow) -&gt; None:
                 print(&#39;Nans in unaltered_data_timestamps&#39;)
                 print(&#39;Number Indices:&#39;, np.count_nonzero(np.isnan(mic_unaltered_time_s)))
 
-            print(&#39;App start time:&#39;, station.start_timestamp)
-            print(&#39;Clock model start time:&#39;, station.timesync_analysis.offset_model.start_time)
-            if np.abs(station.timesync_analysis.offset_model.intercept) == 0:
+            print(&#39;App start time:&#39;, station.start_date())
+            print(&#39;Clock model start time:&#39;, station.timesync_data().offset_model().start_time)
+            if np.abs(station.timesync_data().offset_model().intercept) == 0:
                 print(&#39;ZERO OFFSET, NO CORRECTION&#39;)
             else:
-                print(&#39;Offset, microseconds:&#39;, station.timesync_analysis.offset_model.intercept)
-                print(&#39;Mean best latency:&#39;, station.timesync_analysis.offset_model.mean_latency)
-                print(&#39;Best latency std dev:&#39;, station.timesync_analysis.offset_model.std_dev_latency)
-                print(&#39;Number bins:&#39;, station.timesync_analysis.offset_model.k_bins)
-                print(&#39;Min number of samples:&#39;, station.timesync_analysis.offset_model.n_samples)
+                print(&#39;Offset, microseconds:&#39;, station.timesync_data().offset_model().intercept)
+                print(&#39;Mean best latency:&#39;, station.timesync_data().offset_model().mean_latency)
+                print(&#39;Best latency std dev:&#39;, station.timesync_data().offset_model().std_dev_latency)
+                print(&#39;Number bins:&#39;, station.timesync_data().offset_model().k_bins)
+                print(&#39;Min number of samples:&#39;, station.timesync_data().offset_model().n_samples)
 
-            if np.abs(station.timesync_analysis.offset_model.slope) == 0:
+            if np.abs(station.timesync_data().offset_model().slope) == 0:
                 print(&#39;NO SLOPE, CONSTANT OFFSET&#39;)
             else:
-                print(&#39;Slope:&#39;, station.timesync_analysis.offset_model.slope)
-                print(&#39;Regression score:&#39;, station.timesync_analysis.offset_model.score)
+                print(&#39;Slope:&#39;, station.timesync_data().offset_model().slope)
+                print(&#39;Regression score:&#39;, station.timesync_data().offset_model().score)
 
             print(&#39;Nominal sample rate, Hz:&#39;, mic_sample_rate_nominal_hz)
             print(&#39;Corrected sample rate, Hz:&#39;, mic_sample_rate_hz)
@@ -132,7 +134,7 @@ def mic_sync(data_window: DataWindow) -&gt; None:
             print(&#34;Percent sample rate computation error: {0:.2E} %&#34;.format(sample_rate_percent_error))
         else:
             # There should ALWAYS be mic data.
-            print(f&#39;NO MIC DATA IN STATION {station.id}, SOMETHING IS AMISS&#39;)
+            print(f&#39;NO MIC DATA IN STATION {station.id()}, SOMETHING IS AMISS&#39;)
             continue
 
 
@@ -144,17 +146,17 @@ def station_channel_timing(data_window: DataWindow) -&gt; None:
     :return: print statement with Station timing and sensors specs
     &#34;&#34;&#34;
     station: Station
-    for station in data_window.stations:
-        print(&#34;STATION CHANNEL TIMING FOR ID&#34;, station.id)
-        if station.start_timestamp &gt; 0:
+    for station in data_window.stations():
+        print(&#34;STATION CHANNEL TIMING FOR ID&#34;, station.id())
+        if station.first_data_timestamp() &gt; 0:
             print(&#39;App start time:&#39;,
-                  dt.datetime_from_epoch_microseconds_utc(station.start_timestamp))
+                  dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp()))
         else:
             print(&#39;App start time not available&#39;)
         print(&#39;Station first time stamp:&#39;,
-              dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp))
+              dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp()))
         print(&#39;Station last time stamp:&#39;,
-              dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp))
+              dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp()))
 
         if station.has_audio_data():
             print(f&#34;\naudio Sensor:\n&#34;
@@ -219,97 +221,97 @@ def station_metadata(data_window: DataWindow) -&gt; None:
     :return: print statements with Station specs
     &#34;&#34;&#34;
     station: Station
-    for station in data_window.stations:
-        if station.start_timestamp &gt; 0:
+    for station in data_window.stations():
+        if station.first_data_timestamp() &gt; 0:
             print(f&#34;STATION SPECS FOR ID: &#34; 
-                  f&#34;{station.id}\n&#34;
+                  f&#34;{station.id()}\n&#34;
                   f&#34;App start time: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.start_timestamp)}\n&#34;
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp())}\n&#34;
                   f&#34;Station first time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp)}\n&#34;
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp())}\n&#34;
                   f&#34;Station last time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp)}\n&#34;)
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp())}\n&#34;)
         else:
             print(f&#34;STATION SPECS FOR ID: &#34;
-                  f&#34;{station.id}\n&#34;
+                  f&#34;{station.id()}\n&#34;
                   f&#34;App start time not available\n&#34;
                   f&#34;Station first time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp)}\n&#34;
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp())}\n&#34;
                   f&#34;Station last time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp)}\n&#34;)
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp())}\n&#34;)
 
         print(f&#34;Station Metadata:\n&#34;
               f&#34;Make: &#34;
-              f&#34;{station.metadata.make}\n&#34;
+              f&#34;{station.metadata().make}\n&#34;
               f&#34;Model: &#34;
-              f&#34;{station.metadata.model}\n&#34;
+              f&#34;{station.metadata().model}\n&#34;
               f&#34;OS: &#34;
-              f&#34;{OsType(station.metadata.os).name}\n&#34;
+              f&#34;{OsType(station.metadata().os).name}\n&#34;
               f&#34;OS version: &#34;
-              f&#34;{station.metadata.os_version}\n&#34;
+              f&#34;{station.metadata().os_version}\n&#34;
               f&#34;App Version: &#34;
-              f&#34;{station.metadata.app_version}\n&#34;)
+              f&#34;{station.metadata().app_version}\n&#34;)
 
         if station.has_audio_data():
             print(f&#34;\nAudio Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.audio_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.audio_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.audio_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.audio_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.audio_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.audio_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.audio_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_barometer_data():
             print(f&#34;Barometer Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.barometer_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.barometer_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.barometer_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.barometer_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.barometer_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.barometer_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.barometer_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_accelerometer_data():
             print(f&#34;Accelerometer Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.accelerometer_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.accelerometer_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.accelerometer_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.accelerometer_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.accelerometer_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.accelerometer_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.accelerometer_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_magnetometer_data():
             print(f&#34;Magnetometer Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.magnetometer_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.magnetometer_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.magnetometer_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.magnetometer_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.magnetometer_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.magnetometer_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.magnetometer_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_gyroscope_data():
             print(f&#34;Gyroscope Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.gyroscope_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.gyroscope_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.gyroscope_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.gyroscope_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.gyroscope_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.gyroscope_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.gyroscope_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_location_sensor():
             print(f&#34;Location Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.location_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.location_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.location_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.location_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.location_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.location_sensor().sample_interval_std_s}\n&#34;
+                  f&#34;{station.location_sensor().sample_interval_std_s()}\n&#34;
                   f&#34;Number of GPS Points, Samples: &#34;
                   f&#34;{station.location_sensor().num_samples()}\n&#34;)</code></pre>
 </details>
@@ -337,21 +339,21 @@ def station_metadata(data_window: DataWindow) -&gt; None:
     :return: print statements with Mic and Clock specs
     &#34;&#34;&#34;
     station: Station
-    for station in data_window.stations:
+    for station in data_window.stations():
         if station.has_audio_data():
-            print(f&#34;{station.id} Audio Sensor (All timestamps are in microseconds since epoch UTC):\n&#34;
-                  f&#34;mic sample rate in hz: {station.audio_sensor().sample_rate_hz}\n&#34;
-                  f&#34;is mic sample rate constant: {station.audio_sensor().is_sample_rate_fixed}\n&#34;
-                  f&#34;mic sample interval in seconds: {station.audio_sensor().sample_interval_s}\n&#34;
-                  f&#34;mic sample interval std dev: {station.audio_sensor().sample_interval_std_s}\n&#34;
+            print(f&#34;{station.id()} Audio Sensor (All timestamps are in microseconds since epoch UTC):\n&#34;
+                  f&#34;mic sample rate in hz: {station.audio_sensor().sample_rate_hz()}\n&#34;
+                  f&#34;is mic sample rate constant: {station.audio_sensor().is_sample_rate_fixed()}\n&#34;
+                  f&#34;mic sample interval in seconds: {station.audio_sensor().sample_interval_s()}\n&#34;
+                  f&#34;mic sample interval std dev: {station.audio_sensor().sample_interval_std_s()}\n&#34;
                   f&#34;the first data timestamp: {station.audio_sensor().first_data_timestamp()}\n&#34;
                   f&#34;the last data timestamp:  {station.audio_sensor().last_data_timestamp()}\n&#34;
                   f&#34;the data as an ndarray: {station.audio_sensor().samples()}\n&#34;
                   f&#34;the number of data samples: {station.audio_sensor().num_samples()}\n&#34;
                   f&#34;the names of the dataframe columns: {station.audio_sensor().data_channels()}\n&#34;)
 
-            mic_sample_rate_nominal_hz = station.audio_sample_rate_nominal_hz
-            mic_sample_rate_hz = station.audio_sensor().sample_rate_hz
+            mic_sample_rate_nominal_hz = station.audio_sample_rate_nominal_hz()
+            mic_sample_rate_hz = station.audio_sensor().sample_rate_hz()
             # Unaltered time can have nans if packets missing or edges are truncated
             mic_unaltered_time_s = \
                 station.audio_sensor().unaltered_data_timestamps() / MICROSECONDS_IN_SECOND
@@ -359,7 +361,7 @@ def station_metadata(data_window: DataWindow) -&gt; None:
             mic_corrected_time_s = \
                 station.audio_sensor().data_timestamps() / MICROSECONDS_IN_SECOND
 
-            print(&#34;\nMIC AND CLOCK SPECS: Station ID&#34;, station.id)
+            print(&#34;\nMIC AND CLOCK SPECS: Station ID&#34;, station.id())
             if any(np.isnan(mic_corrected_time_s)) &gt; 0:
                 print(&#39;SYNCH WARNING: Have nans in data_timestamps&#39;)
                 print(&#39;Number Indices:&#39;, np.count_nonzero(np.isnan(mic_corrected_time_s)))
@@ -369,22 +371,22 @@ def station_metadata(data_window: DataWindow) -&gt; None:
                 print(&#39;Nans in unaltered_data_timestamps&#39;)
                 print(&#39;Number Indices:&#39;, np.count_nonzero(np.isnan(mic_unaltered_time_s)))
 
-            print(&#39;App start time:&#39;, station.start_timestamp)
-            print(&#39;Clock model start time:&#39;, station.timesync_analysis.offset_model.start_time)
-            if np.abs(station.timesync_analysis.offset_model.intercept) == 0:
+            print(&#39;App start time:&#39;, station.start_date())
+            print(&#39;Clock model start time:&#39;, station.timesync_data().offset_model().start_time)
+            if np.abs(station.timesync_data().offset_model().intercept) == 0:
                 print(&#39;ZERO OFFSET, NO CORRECTION&#39;)
             else:
-                print(&#39;Offset, microseconds:&#39;, station.timesync_analysis.offset_model.intercept)
-                print(&#39;Mean best latency:&#39;, station.timesync_analysis.offset_model.mean_latency)
-                print(&#39;Best latency std dev:&#39;, station.timesync_analysis.offset_model.std_dev_latency)
-                print(&#39;Number bins:&#39;, station.timesync_analysis.offset_model.k_bins)
-                print(&#39;Min number of samples:&#39;, station.timesync_analysis.offset_model.n_samples)
+                print(&#39;Offset, microseconds:&#39;, station.timesync_data().offset_model().intercept)
+                print(&#39;Mean best latency:&#39;, station.timesync_data().offset_model().mean_latency)
+                print(&#39;Best latency std dev:&#39;, station.timesync_data().offset_model().std_dev_latency)
+                print(&#39;Number bins:&#39;, station.timesync_data().offset_model().k_bins)
+                print(&#39;Min number of samples:&#39;, station.timesync_data().offset_model().n_samples)
 
-            if np.abs(station.timesync_analysis.offset_model.slope) == 0:
+            if np.abs(station.timesync_data().offset_model().slope) == 0:
                 print(&#39;NO SLOPE, CONSTANT OFFSET&#39;)
             else:
-                print(&#39;Slope:&#39;, station.timesync_analysis.offset_model.slope)
-                print(&#39;Regression score:&#39;, station.timesync_analysis.offset_model.score)
+                print(&#39;Slope:&#39;, station.timesync_data().offset_model().slope)
+                print(&#39;Regression score:&#39;, station.timesync_data().offset_model().score)
 
             print(&#39;Nominal sample rate, Hz:&#39;, mic_sample_rate_nominal_hz)
             print(&#39;Corrected sample rate, Hz:&#39;, mic_sample_rate_hz)
@@ -400,7 +402,7 @@ def station_metadata(data_window: DataWindow) -&gt; None:
             print(&#34;Percent sample rate computation error: {0:.2E} %&#34;.format(sample_rate_percent_error))
         else:
             # There should ALWAYS be mic data.
-            print(f&#39;NO MIC DATA IN STATION {station.id}, SOMETHING IS AMISS&#39;)
+            print(f&#39;NO MIC DATA IN STATION {station.id()}, SOMETHING IS AMISS&#39;)
             continue</code></pre>
 </details>
 </dd>
@@ -421,17 +423,17 @@ def station_metadata(data_window: DataWindow) -&gt; None:
     :return: print statement with Station timing and sensors specs
     &#34;&#34;&#34;
     station: Station
-    for station in data_window.stations:
-        print(&#34;STATION CHANNEL TIMING FOR ID&#34;, station.id)
-        if station.start_timestamp &gt; 0:
+    for station in data_window.stations():
+        print(&#34;STATION CHANNEL TIMING FOR ID&#34;, station.id())
+        if station.first_data_timestamp() &gt; 0:
             print(&#39;App start time:&#39;,
-                  dt.datetime_from_epoch_microseconds_utc(station.start_timestamp))
+                  dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp()))
         else:
             print(&#39;App start time not available&#39;)
         print(&#39;Station first time stamp:&#39;,
-              dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp))
+              dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp()))
         print(&#39;Station last time stamp:&#39;,
-              dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp))
+              dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp()))
 
         if station.has_audio_data():
             print(f&#34;\naudio Sensor:\n&#34;
@@ -505,97 +507,97 @@ def station_metadata(data_window: DataWindow) -&gt; None:
     :return: print statements with Station specs
     &#34;&#34;&#34;
     station: Station
-    for station in data_window.stations:
-        if station.start_timestamp &gt; 0:
+    for station in data_window.stations():
+        if station.first_data_timestamp() &gt; 0:
             print(f&#34;STATION SPECS FOR ID: &#34; 
-                  f&#34;{station.id}\n&#34;
+                  f&#34;{station.id()}\n&#34;
                   f&#34;App start time: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.start_timestamp)}\n&#34;
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp())}\n&#34;
                   f&#34;Station first time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp)}\n&#34;
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp())}\n&#34;
                   f&#34;Station last time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp)}\n&#34;)
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp())}\n&#34;)
         else:
             print(f&#34;STATION SPECS FOR ID: &#34;
-                  f&#34;{station.id}\n&#34;
+                  f&#34;{station.id()}\n&#34;
                   f&#34;App start time not available\n&#34;
                   f&#34;Station first time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp)}\n&#34;
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.first_data_timestamp())}\n&#34;
                   f&#34;Station last time stamp: &#34;
-                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp)}\n&#34;)
+                  f&#34;{dt.datetime_from_epoch_microseconds_utc(station.last_data_timestamp())}\n&#34;)
 
         print(f&#34;Station Metadata:\n&#34;
               f&#34;Make: &#34;
-              f&#34;{station.metadata.make}\n&#34;
+              f&#34;{station.metadata().make}\n&#34;
               f&#34;Model: &#34;
-              f&#34;{station.metadata.model}\n&#34;
+              f&#34;{station.metadata().model}\n&#34;
               f&#34;OS: &#34;
-              f&#34;{OsType(station.metadata.os).name}\n&#34;
+              f&#34;{OsType(station.metadata().os).name}\n&#34;
               f&#34;OS version: &#34;
-              f&#34;{station.metadata.os_version}\n&#34;
+              f&#34;{station.metadata().os_version}\n&#34;
               f&#34;App Version: &#34;
-              f&#34;{station.metadata.app_version}\n&#34;)
+              f&#34;{station.metadata().app_version}\n&#34;)
 
         if station.has_audio_data():
             print(f&#34;\nAudio Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.audio_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.audio_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.audio_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.audio_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.audio_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.audio_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.audio_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_barometer_data():
             print(f&#34;Barometer Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.barometer_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.barometer_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.barometer_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.barometer_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.barometer_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.barometer_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.barometer_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_accelerometer_data():
             print(f&#34;Accelerometer Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.accelerometer_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.accelerometer_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.accelerometer_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.accelerometer_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.accelerometer_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.accelerometer_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.accelerometer_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_magnetometer_data():
             print(f&#34;Magnetometer Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.magnetometer_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.magnetometer_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.magnetometer_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.magnetometer_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.magnetometer_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.magnetometer_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.magnetometer_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_gyroscope_data():
             print(f&#34;Gyroscope Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.gyroscope_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.gyroscope_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.gyroscope_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.gyroscope_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.gyroscope_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.gyroscope_sensor().sample_interval_std_s}\n&#34;)
+                  f&#34;{station.gyroscope_sensor().sample_interval_std_s()}\n&#34;)
         if station.has_location_sensor():
             print(f&#34;Location Sensor:\n&#34;
                   f&#34;Model: &#34;
                   f&#34;{station.location_sensor().name}\n&#34;
                   f&#34;Sample rate, Hz: &#34;
-                  f&#34;{station.location_sensor().sample_rate_hz}\n&#34;
+                  f&#34;{station.location_sensor().sample_rate_hz()}\n&#34;
                   f&#34;Sample interval, seconds: &#34;
-                  f&#34;{station.location_sensor().sample_interval_s}\n&#34;
+                  f&#34;{station.location_sensor().sample_interval_s()}\n&#34;
                   f&#34;Sample interval standard dev, seconds: &#34;
-                  f&#34;{station.location_sensor().sample_interval_std_s}\n&#34;
+                  f&#34;{station.location_sensor().sample_interval_std_s()}\n&#34;
                   f&#34;Number of GPS Points, Samples: &#34;
                   f&#34;{station.location_sensor().num_samples()}\n&#34;)</code></pre>
 </details>

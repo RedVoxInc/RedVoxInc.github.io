@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>redpandas.redpd_build_station API documentation</title>
-<meta name="description" content="This module contains utilities for extraction of RedVox DataWindow data into dictionary structures for later conversion to
+<meta name="description" content="Utilities to extract RedVox DataWindow data into dictionary structures for later conversion to
 RedPandas DataFrames." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -23,21 +23,23 @@ RedPandas DataFrames." />
 <h1 class="title">Module <code>redpandas.redpd_build_station</code></h1>
 </header>
 <section id="section-intro">
-This module contains utilities for extraction of RedVox DataWindow data into dictionary structures for later conversion to<br>RedPandas DataFrames.
+Utilities to extract RedVox DataWindow data into dictionary structures for later conversion to<br>RedPandas DataFrames.
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-This module contains utilities for extraction of RedVox DataWindow data into dictionary structures for later conversion to
+Utilities to extract RedVox DataWindow data into dictionary structures for later conversion to
 RedPandas DataFrames.
 &#34;&#34;&#34;
 from typing import List, Dict, Union, Tuple
 
 import numpy as np
+# from redvox.common.station import Station
 from redvox.common.station import Station
 
 # RedPandas library
+import redpandas
 import redpandas.redpd_preprocess as rpd_prep
 import redpandas.redpd_scales as rpd_scales
 # Note: Available sensors in build station: [&#39;audio&#39;, &#39;barometer&#39;, &#39;accelerometer&#39;, &#39;magnetometer&#39;, &#39;gyroscope&#39;,
@@ -65,14 +67,15 @@ def station_to_dict_from_dw(
     :param filter_order: the order of the filter integer. Default is 4
     :return: a dictionary ready for conversion into a dataframe
     &#34;&#34;&#34;
-    sensors = {&#34;station_id&#34;: station.id,
-               &#39;station_start_date_epoch_micros&#39;: station.start_timestamp,
-               &#39;station_make&#39;: station.metadata.make,
-               &#39;station_model&#39;: station.metadata.model,
-               &#39;station_app_version&#39;: station.metadata.app_version,
-               &#39;redvox_sdk_version&#39;: sdk_version}
+    sensors = {&#34;station_id&#34;: station.id(),
+               &#39;station_start_date_epoch_micros&#39;: station.first_data_timestamp(),
+               &#39;station_make&#39;: station.metadata().make,
+               &#39;station_model&#39;: station.metadata().model,
+               &#39;station_app_version&#39;: station.metadata().app_version,
+               &#39;redvox_sdk_version&#39;: sdk_version,
+               &#39;redpandas_version&#39;: redpandas.VERSION}
 
-    print(f&#34;Prep Station {station.id}...&#34;, end=&#34; &#34;)
+    print(f&#34;Prep Station {station.id()}...&#34;, end=&#34; &#34;)
     for label in sensor_labels:
         print(f&#34;{label} sensor...&#34;, end=&#34; &#34;)
         df_sensor = build_station(station=station,
@@ -104,12 +107,12 @@ def sensor_uneven(station: Station, sensor_label: str) -&gt; Tuple[Union[None, f
 
     if eval(&#39;station.has_&#39; + sensor_label + &#39;_data()&#39;):
         sensor_dw = eval(&#39;station.&#39; + sensor_label + &#39;_sensor()&#39;)
-        sensor_sample_rate_hz = sensor_dw.sample_rate_hz
+        sensor_sample_rate_hz = sensor_dw.sample_rate_hz()
         sensor_epoch_s = sensor_dw.data_timestamps() * rpd_scales.MICROS_TO_S
         sensor_raw = sensor_dw.samples()
         sensor_nans = np.argwhere(np.isnan(sensor_raw))
     else:
-        print(f&#39;Station {station.id} has no {sensor_label} data.&#39;)
+        print(f&#39;Station {station.id()} has no {sensor_label} data.&#39;)
 
     return sensor_sample_rate_hz, sensor_epoch_s, sensor_raw, sensor_nans
 
@@ -125,7 +128,7 @@ def build_station(station: Station,
 
     :param station: RDVX Station object
     :param sensor_label: one of: [&#39;audio&#39;, &#39;barometer&#39;, &#39;accelerometer&#39;, &#39;gyroscope&#39;, &#39;magnetometer&#39;,
-        &#39;health&#39;, &#39;location&#39;, &#39;best_location&#39;, &#39;image&#39;]
+        &#39;health&#39;, &#39;location&#39;, &#39;best_location&#39;, &#39;image&#39;, &#39;clock&#39;, &#39;synchronization&#39;]
     :param highpass_type: &#39;obspy&#39;, &#39;butter&#39;, or &#39;rc&#39;, default &#39;obspy&#39;. Used for sensors barometer, acceleration,
         gyroscope, magnetometer
     :param frequency_filter_low: apply highpass filter. Default is 100 second periods
@@ -159,7 +162,6 @@ def build_station(station: Station,
     else:  # barometer, acceleration, gyroscope, magnetometer, linear_accel, orientation, rotation_vector, gravity
         sensor_sample_rate_hz, sensor_epoch_s, sensor_raw, sensor_nans = sensor_uneven(station=station,
                                                                                        sensor_label=sensor_label)
-
         list_sensor_highpass = []
         if sensor_sample_rate_hz:
             for index_dimension, _ in enumerate(sensor_raw):
@@ -170,7 +172,6 @@ def build_station(station: Station,
                                                                           highpass_type=highpass_type,
                                                                           frequency_filter_low=frequency_filter_low,
                                                                           filter_order=filter_order)
-                # print(sensor_waveform_highpass)
                 list_sensor_highpass.append(sensor_waveform_highpass)
 
             return {f&#39;{sensor_label}_sensor_name&#39;: eval(&#39;station.&#39; + sensor_label + &#39;_sensor()&#39;).name,
@@ -180,7 +181,6 @@ def build_station(station: Station,
                     f&#39;{sensor_label}_wf_highpass&#39;: np.array(list_sensor_highpass),
                     f&#39;{sensor_label}_nans&#39;: sensor_nans}
         else:
-            print(f&#34;{sensor_label} doesn&#39;t exist in the station.&#34;)
             return {}
 
 
@@ -212,14 +212,14 @@ def audio_wf_time_build_station(station: Station,
                 mic_wf = rpd_prep.detrend_nan(mic_wf_raw)
 
         return {&#39;audio_sensor_name&#39;: station.audio_sensor().name,
-                &#39;audio_sample_rate_nominal_hz&#39;: station.audio_sample_rate_nominal_hz,
-                &#39;audio_sample_rate_corrected_hz&#39;: station.audio_sensor().sample_rate_hz,
+                &#39;audio_sample_rate_nominal_hz&#39;: station.audio_sample_rate_nominal_hz(),
+                &#39;audio_sample_rate_corrected_hz&#39;: station.audio_sensor().sample_rate_hz(),
                 &#39;audio_epoch_s&#39;: mic_epoch_s,
                 &#39;audio_wf_raw&#39;: mic_wf_raw,
                 &#39;audio_wf&#39;: mic_wf,
                 &#39;audio_nans&#39;: mic_nans.tolist()}
     else:
-        print(f&#39;Station {station.id} has no audio data.&#39;)
+        print(f&#39;Station {station.id()} has no audio data.&#39;)
         return {}
 
 
@@ -233,7 +233,7 @@ def location_build_station(station: Station) -&gt; dict:
     &#34;&#34;&#34;
     if station.has_location_data():
         return {&#39;location_sensor_name&#39;: station.location_sensor().name,
-                &#39;location_sample_rate_hz&#39;: station.location_sensor().sample_rate_hz,
+                &#39;location_sample_rate_hz&#39;: station.location_sensor().sample_rate_hz(),
                 &#39;location_epoch_s&#39;: station.location_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;location_gps_epoch_s&#39;: station.location_sensor().get_data_channel(&#39;gps_timestamps&#39;)
                                         * rpd_scales.MICROS_TO_S,
@@ -249,7 +249,7 @@ def location_build_station(station: Station) -&gt; dict:
                 &#39;location_speed_accuracy&#39;: station.location_sensor().get_data_channel(&#34;speed_accuracy&#34;),
                 &#39;location_provider&#39;: station.location_sensor().get_data_channel(&#34;location_provider&#34;)}
     else:
-        print(f&#39;Station {station.id} has no location data.&#39;)
+        print(f&#39;Station {station.id()} has no location data.&#39;)
         return {}
 
 
@@ -263,7 +263,7 @@ def best_location_build_station(station: Station) -&gt; dict:
     &#34;&#34;&#34;
     if station.has_best_location_data():
         return {&#39;best_location_sensor_name&#39;: station.best_location_sensor().name,
-                &#39;best_location_sample_rate_hz&#39;: station.best_location_sensor().sample_rate_hz,
+                &#39;best_location_sample_rate_hz&#39;: station.best_location_sensor().sample_rate_hz(),
                 &#39;best_location_epoch_s&#39;: station.best_location_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;best_location_gps_epoch_s&#39;: station.best_location_sensor().get_data_channel(&#39;gps_timestamps&#39;)
                                              * rpd_scales.MICROS_TO_S,
@@ -279,7 +279,7 @@ def best_location_build_station(station: Station) -&gt; dict:
                 &#39;best-location_speed_accuracy&#39;: station.best_location_sensor().get_data_channel(&#34;speed_accuracy&#34;),
                 &#39;best_location_provider&#39;: station.best_location_sensor().get_data_channel(&#34;location_provider&#34;)}
     else:
-        print(f&#39;Station {station.id} has no best location data.&#39;)
+        print(f&#39;Station {station.id()} has no best location data.&#39;)
         return {}
 
 
@@ -293,7 +293,7 @@ def state_of_health_build_station(station: Station) -&gt; dict:
     &#34;&#34;&#34;
     if station.has_health_data():
         return {&#39;health_sensor_name&#39;: station.health_sensor().name,
-                &#39;health_sample_rate_hz&#39;: station.health_sensor().sample_rate_hz,
+                &#39;health_sample_rate_hz&#39;: station.health_sensor().sample_rate_hz(),
                 &#39;health_epoch_s&#39;: station.health_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;battery_charge_remaining_per&#39;:
                     station.health_sensor().get_data_channel(&#39;battery_charge_remaining&#39;),
@@ -307,7 +307,7 @@ def state_of_health_build_station(station: Station) -&gt; dict:
                 &#39;available_disk_byte&#39;: station.health_sensor().get_data_channel(&#39;avail_disk&#39;),
                 &#39;cell_service_state&#39;: station.health_sensor().get_data_channel(&#39;cell_service&#39;)}
     else:
-        print(f&#39;Station {station.id} has no health data.&#39;)
+        print(f&#39;Station {station.id()} has no health data.&#39;)
         return {}
 
 
@@ -320,12 +320,12 @@ def image_build_station(station: Station) -&gt; dict:
     &#34;&#34;&#34;
     if station.has_image_data():
         return {&#39;image_sensor_name&#39;: station.image_sensor().name,
-                &#39;image_sample_rate_hz&#39;: station.image_sensor().sample_rate_hz,
+                &#39;image_sample_rate_hz&#39;: station.image_sensor().sample_rate_hz(),
                 &#39;image_epoch_s&#39;: station.image_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;image_bytes&#39;: station.image_sensor().get_data_channel(&#39;image&#39;),
                 &#39;image_codec&#39;: station.image_sensor().get_data_channel(&#39;image_codec&#39;)}
     else:
-        print(f&#39;Station {station.id} has no image data.&#39;)
+        print(f&#39;Station {station.id()} has no image data.&#39;)
         return {}
 
 
@@ -338,16 +338,17 @@ def synchronization_build_station(station: Station) -&gt; dict:
     synchronization best offset (ms), synchronization offset delta (ms), and synchronization number exchanges.
     &#34;&#34;&#34;
     if station.has_timesync_data():
-        synchronization = station.timesync_analysis
-        return {&#39;synchronization_epoch_s&#39;: synchronization.get_start_times() * rpd_scales.MICROS_TO_S,
-                &#39;synchronization_latency_ms&#39;: synchronization.get_latencies() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_offset_ms&#39;: synchronization.get_offsets() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_best_offset_ms&#39;: synchronization.get_best_offset() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_offset_delta_ms&#39;: synchronization.get_offsets() * rpd_scales.MICROS_TO_MILLIS -
-                                                   synchronization.get_best_offset() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_number_exchanges&#39;: synchronization.timesync_data[0].num_tri_messages()}
+        synchronization = station.timesync_data()
+
+        return {&#39;synchronization_epoch_s&#39;: synchronization.get_exchange_timestamps(3) * rpd_scales.MICROS_TO_S,
+                &#39;synchronization_latency_ms&#39;: synchronization.best_latency_per_exchange() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_offset_ms&#39;: synchronization.best_offset_per_exchange() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_best_offset_ms&#39;: synchronization.best_offset() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_offset_delta_ms&#39;: synchronization.best_offset_per_exchange() * rpd_scales.MICROS_TO_MILLIS -
+                                                   synchronization.best_offset() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_number_exchanges&#39;: synchronization.num_tri_messages()}
     else:
-        print(f&#39;Station {station.id} has no time sync data.&#39;)
+        print(f&#39;Station {station.id()} has no timesync data.&#39;)
         return {}
 
 
@@ -360,7 +361,7 @@ def clock_build_station(station: Station) -&gt; dict:
     clock number bins, clock number samples, clock offset slope, and clock offset model score.
     &#34;&#34;&#34;
     if station.has_timesync_data():
-        clock = station.timesync_analysis.offset_model
+        clock = station.timesync_data().offset_model()
         return {&#39;clock_start_time_epoch_s&#39;: clock.start_time * rpd_scales.MICROS_TO_S,
                 &#39;clock_best_latency_ms&#39;: clock.mean_latency * rpd_scales.MICROS_TO_MILLIS,
                 &#39;clock_best_latency_std_ms&#39;: clock.std_dev_latency * rpd_scales.MICROS_TO_MILLIS,
@@ -370,7 +371,7 @@ def clock_build_station(station: Station) -&gt; dict:
                 &#39;clock_offset_slope&#39;: clock.slope,
                 &#39;clock_offset_model_score&#39;: clock.score}
     else:
-        print(f&#39;Station {station.id} has no timesync analysis.&#39;)
+        print(f&#39;Station {station.id()} has no timesync analysis.&#39;)
         return {}
 
 
@@ -384,11 +385,11 @@ def light_build_station(station: Station) -&gt; dict:
     if station.has_light_data():
 
         return {&#39;light_sensor_name&#39;: station.light_sensor().name,
-                &#39;light_sample_rate_hz&#39;: station.light_sensor().sample_rate_hz,
+                &#39;light_sample_rate_hz&#39;: station.light_sensor().sample_rate_hz(),
                 &#39;light_epoch_s&#39;: station.light_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;light_lux&#39;: station.light_sensor().get_data_channel(&#39;light&#39;)}
     else:
-        print(f&#39;Station {station.id} has no luminosity data.&#39;)
+        print(f&#39;Station {station.id()} has no luminosity data.&#39;)
         return {}</code></pre>
 </details>
 </section>
@@ -435,14 +436,14 @@ def light_build_station(station: Station) -&gt; dict:
                 mic_wf = rpd_prep.detrend_nan(mic_wf_raw)
 
         return {&#39;audio_sensor_name&#39;: station.audio_sensor().name,
-                &#39;audio_sample_rate_nominal_hz&#39;: station.audio_sample_rate_nominal_hz,
-                &#39;audio_sample_rate_corrected_hz&#39;: station.audio_sensor().sample_rate_hz,
+                &#39;audio_sample_rate_nominal_hz&#39;: station.audio_sample_rate_nominal_hz(),
+                &#39;audio_sample_rate_corrected_hz&#39;: station.audio_sensor().sample_rate_hz(),
                 &#39;audio_epoch_s&#39;: mic_epoch_s,
                 &#39;audio_wf_raw&#39;: mic_wf_raw,
                 &#39;audio_wf&#39;: mic_wf,
                 &#39;audio_nans&#39;: mic_nans.tolist()}
     else:
-        print(f&#39;Station {station.id} has no audio data.&#39;)
+        print(f&#39;Station {station.id()} has no audio data.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -465,7 +466,7 @@ def light_build_station(station: Station) -&gt; dict:
     &#34;&#34;&#34;
     if station.has_best_location_data():
         return {&#39;best_location_sensor_name&#39;: station.best_location_sensor().name,
-                &#39;best_location_sample_rate_hz&#39;: station.best_location_sensor().sample_rate_hz,
+                &#39;best_location_sample_rate_hz&#39;: station.best_location_sensor().sample_rate_hz(),
                 &#39;best_location_epoch_s&#39;: station.best_location_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;best_location_gps_epoch_s&#39;: station.best_location_sensor().get_data_channel(&#39;gps_timestamps&#39;)
                                              * rpd_scales.MICROS_TO_S,
@@ -481,7 +482,7 @@ def light_build_station(station: Station) -&gt; dict:
                 &#39;best-location_speed_accuracy&#39;: station.best_location_sensor().get_data_channel(&#34;speed_accuracy&#34;),
                 &#39;best_location_provider&#39;: station.best_location_sensor().get_data_channel(&#34;location_provider&#34;)}
     else:
-        print(f&#39;Station {station.id} has no best location data.&#39;)
+        print(f&#39;Station {station.id()} has no best location data.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -490,7 +491,7 @@ def light_build_station(station: Station) -&gt; dict:
 </code></dt>
 <dd>
 <div class="desc">Obtain sensor data from RDVX station<br><br>:param station: RDVX Station object<br>:param sensor_label: one of: ['audio', 'barometer', 'accelerometer', 'gyroscope', 'magnetometer',<br>
-'health', 'location', 'best_location', 'image']<br>:param highpass_type: 'obspy', 'butter', or 'rc', default 'obspy'. Used for sensors barometer, acceleration,<br>
+'health', 'location', 'best_location', 'image', 'clock', 'synchronization']<br>:param highpass_type: 'obspy', 'butter', or 'rc', default 'obspy'. Used for sensors barometer, acceleration,<br>
 gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. Default is 100 second periods<br>:param filter_order: the order of the filter integer. Default is 4<br>:return: dictionary with sensor name, sample rate, timestamps, data (raw and highpassed)</div>
 <details class="source">
 <summary>
@@ -506,7 +507,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
 
     :param station: RDVX Station object
     :param sensor_label: one of: [&#39;audio&#39;, &#39;barometer&#39;, &#39;accelerometer&#39;, &#39;gyroscope&#39;, &#39;magnetometer&#39;,
-        &#39;health&#39;, &#39;location&#39;, &#39;best_location&#39;, &#39;image&#39;]
+        &#39;health&#39;, &#39;location&#39;, &#39;best_location&#39;, &#39;image&#39;, &#39;clock&#39;, &#39;synchronization&#39;]
     :param highpass_type: &#39;obspy&#39;, &#39;butter&#39;, or &#39;rc&#39;, default &#39;obspy&#39;. Used for sensors barometer, acceleration,
         gyroscope, magnetometer
     :param frequency_filter_low: apply highpass filter. Default is 100 second periods
@@ -540,7 +541,6 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     else:  # barometer, acceleration, gyroscope, magnetometer, linear_accel, orientation, rotation_vector, gravity
         sensor_sample_rate_hz, sensor_epoch_s, sensor_raw, sensor_nans = sensor_uneven(station=station,
                                                                                        sensor_label=sensor_label)
-
         list_sensor_highpass = []
         if sensor_sample_rate_hz:
             for index_dimension, _ in enumerate(sensor_raw):
@@ -551,7 +551,6 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
                                                                           highpass_type=highpass_type,
                                                                           frequency_filter_low=frequency_filter_low,
                                                                           filter_order=filter_order)
-                # print(sensor_waveform_highpass)
                 list_sensor_highpass.append(sensor_waveform_highpass)
 
             return {f&#39;{sensor_label}_sensor_name&#39;: eval(&#39;station.&#39; + sensor_label + &#39;_sensor()&#39;).name,
@@ -561,7 +560,6 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
                     f&#39;{sensor_label}_wf_highpass&#39;: np.array(list_sensor_highpass),
                     f&#39;{sensor_label}_nans&#39;: sensor_nans}
         else:
-            print(f&#34;{sensor_label} doesn&#39;t exist in the station.&#34;)
             return {}</code></pre>
 </details>
 </dd>
@@ -583,7 +581,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     clock number bins, clock number samples, clock offset slope, and clock offset model score.
     &#34;&#34;&#34;
     if station.has_timesync_data():
-        clock = station.timesync_analysis.offset_model
+        clock = station.timesync_data().offset_model()
         return {&#39;clock_start_time_epoch_s&#39;: clock.start_time * rpd_scales.MICROS_TO_S,
                 &#39;clock_best_latency_ms&#39;: clock.mean_latency * rpd_scales.MICROS_TO_MILLIS,
                 &#39;clock_best_latency_std_ms&#39;: clock.std_dev_latency * rpd_scales.MICROS_TO_MILLIS,
@@ -593,7 +591,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
                 &#39;clock_offset_slope&#39;: clock.slope,
                 &#39;clock_offset_model_score&#39;: clock.score}
     else:
-        print(f&#39;Station {station.id} has no timesync analysis.&#39;)
+        print(f&#39;Station {station.id()} has no timesync analysis.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -615,12 +613,12 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     &#34;&#34;&#34;
     if station.has_image_data():
         return {&#39;image_sensor_name&#39;: station.image_sensor().name,
-                &#39;image_sample_rate_hz&#39;: station.image_sensor().sample_rate_hz,
+                &#39;image_sample_rate_hz&#39;: station.image_sensor().sample_rate_hz(),
                 &#39;image_epoch_s&#39;: station.image_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;image_bytes&#39;: station.image_sensor().get_data_channel(&#39;image&#39;),
                 &#39;image_codec&#39;: station.image_sensor().get_data_channel(&#39;image_codec&#39;)}
     else:
-        print(f&#39;Station {station.id} has no image data.&#39;)
+        print(f&#39;Station {station.id()} has no image data.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -643,11 +641,11 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     if station.has_light_data():
 
         return {&#39;light_sensor_name&#39;: station.light_sensor().name,
-                &#39;light_sample_rate_hz&#39;: station.light_sensor().sample_rate_hz,
+                &#39;light_sample_rate_hz&#39;: station.light_sensor().sample_rate_hz(),
                 &#39;light_epoch_s&#39;: station.light_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;light_lux&#39;: station.light_sensor().get_data_channel(&#39;light&#39;)}
     else:
-        print(f&#39;Station {station.id} has no luminosity data.&#39;)
+        print(f&#39;Station {station.id()} has no luminosity data.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -670,7 +668,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     &#34;&#34;&#34;
     if station.has_location_data():
         return {&#39;location_sensor_name&#39;: station.location_sensor().name,
-                &#39;location_sample_rate_hz&#39;: station.location_sensor().sample_rate_hz,
+                &#39;location_sample_rate_hz&#39;: station.location_sensor().sample_rate_hz(),
                 &#39;location_epoch_s&#39;: station.location_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;location_gps_epoch_s&#39;: station.location_sensor().get_data_channel(&#39;gps_timestamps&#39;)
                                         * rpd_scales.MICROS_TO_S,
@@ -686,7 +684,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
                 &#39;location_speed_accuracy&#39;: station.location_sensor().get_data_channel(&#34;speed_accuracy&#34;),
                 &#39;location_provider&#39;: station.location_sensor().get_data_channel(&#34;location_provider&#34;)}
     else:
-        print(f&#39;Station {station.id} has no location data.&#39;)
+        print(f&#39;Station {station.id()} has no location data.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -717,12 +715,12 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
 
     if eval(&#39;station.has_&#39; + sensor_label + &#39;_data()&#39;):
         sensor_dw = eval(&#39;station.&#39; + sensor_label + &#39;_sensor()&#39;)
-        sensor_sample_rate_hz = sensor_dw.sample_rate_hz
+        sensor_sample_rate_hz = sensor_dw.sample_rate_hz()
         sensor_epoch_s = sensor_dw.data_timestamps() * rpd_scales.MICROS_TO_S
         sensor_raw = sensor_dw.samples()
         sensor_nans = np.argwhere(np.isnan(sensor_raw))
     else:
-        print(f&#39;Station {station.id} has no {sensor_label} data.&#39;)
+        print(f&#39;Station {station.id()} has no {sensor_label} data.&#39;)
 
     return sensor_sample_rate_hz, sensor_epoch_s, sensor_raw, sensor_nans</code></pre>
 </details>
@@ -746,7 +744,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     &#34;&#34;&#34;
     if station.has_health_data():
         return {&#39;health_sensor_name&#39;: station.health_sensor().name,
-                &#39;health_sample_rate_hz&#39;: station.health_sensor().sample_rate_hz,
+                &#39;health_sample_rate_hz&#39;: station.health_sensor().sample_rate_hz(),
                 &#39;health_epoch_s&#39;: station.health_sensor().data_timestamps() * rpd_scales.MICROS_TO_S,
                 &#39;battery_charge_remaining_per&#39;:
                     station.health_sensor().get_data_channel(&#39;battery_charge_remaining&#39;),
@@ -760,7 +758,7 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
                 &#39;available_disk_byte&#39;: station.health_sensor().get_data_channel(&#39;avail_disk&#39;),
                 &#39;cell_service_state&#39;: station.health_sensor().get_data_channel(&#39;cell_service&#39;)}
     else:
-        print(f&#39;Station {station.id} has no health data.&#39;)
+        print(f&#39;Station {station.id()} has no health data.&#39;)
         return {}</code></pre>
 </details>
 </dd>
@@ -793,14 +791,15 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     :param filter_order: the order of the filter integer. Default is 4
     :return: a dictionary ready for conversion into a dataframe
     &#34;&#34;&#34;
-    sensors = {&#34;station_id&#34;: station.id,
-               &#39;station_start_date_epoch_micros&#39;: station.start_timestamp,
-               &#39;station_make&#39;: station.metadata.make,
-               &#39;station_model&#39;: station.metadata.model,
-               &#39;station_app_version&#39;: station.metadata.app_version,
-               &#39;redvox_sdk_version&#39;: sdk_version}
+    sensors = {&#34;station_id&#34;: station.id(),
+               &#39;station_start_date_epoch_micros&#39;: station.first_data_timestamp(),
+               &#39;station_make&#39;: station.metadata().make,
+               &#39;station_model&#39;: station.metadata().model,
+               &#39;station_app_version&#39;: station.metadata().app_version,
+               &#39;redvox_sdk_version&#39;: sdk_version,
+               &#39;redpandas_version&#39;: redpandas.VERSION}
 
-    print(f&#34;Prep Station {station.id}...&#34;, end=&#34; &#34;)
+    print(f&#34;Prep Station {station.id()}...&#34;, end=&#34; &#34;)
     for label in sensor_labels:
         print(f&#34;{label} sensor...&#34;, end=&#34; &#34;)
         df_sensor = build_station(station=station,
@@ -832,16 +831,17 @@ gyroscope, magnetometer<br>:param frequency_filter_low: apply highpass filter. D
     synchronization best offset (ms), synchronization offset delta (ms), and synchronization number exchanges.
     &#34;&#34;&#34;
     if station.has_timesync_data():
-        synchronization = station.timesync_analysis
-        return {&#39;synchronization_epoch_s&#39;: synchronization.get_start_times() * rpd_scales.MICROS_TO_S,
-                &#39;synchronization_latency_ms&#39;: synchronization.get_latencies() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_offset_ms&#39;: synchronization.get_offsets() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_best_offset_ms&#39;: synchronization.get_best_offset() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_offset_delta_ms&#39;: synchronization.get_offsets() * rpd_scales.MICROS_TO_MILLIS -
-                                                   synchronization.get_best_offset() * rpd_scales.MICROS_TO_MILLIS,
-                &#39;synchronization_number_exchanges&#39;: synchronization.timesync_data[0].num_tri_messages()}
+        synchronization = station.timesync_data()
+
+        return {&#39;synchronization_epoch_s&#39;: synchronization.get_exchange_timestamps(3) * rpd_scales.MICROS_TO_S,
+                &#39;synchronization_latency_ms&#39;: synchronization.best_latency_per_exchange() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_offset_ms&#39;: synchronization.best_offset_per_exchange() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_best_offset_ms&#39;: synchronization.best_offset() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_offset_delta_ms&#39;: synchronization.best_offset_per_exchange() * rpd_scales.MICROS_TO_MILLIS -
+                                                   synchronization.best_offset() * rpd_scales.MICROS_TO_MILLIS,
+                &#39;synchronization_number_exchanges&#39;: synchronization.num_tri_messages()}
     else:
-        print(f&#39;Station {station.id} has no time sync data.&#39;)
+        print(f&#39;Station {station.id()} has no timesync data.&#39;)
         return {}</code></pre>
 </details>
 </dd>

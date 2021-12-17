@@ -306,9 +306,9 @@ def plot_wiggles_pandas(df: pd.DataFrame,
                          f&#34;({len(sig_timestamps_label)})&#34;)
 
     if station_id_str is not None:  # check station input exists
-        if station_id_str in df[sig_id_label].unique() is False:
+        if (station_id_str in df[sig_id_label].values) is False:
             raise ValueError(f&#34;station_id_str parameter provided (&#39;{station_id_str}&#39;) &#34;
-                             f&#34;was not found in dataframe&#34;)
+                             f&#34;was not found in sig_id_label column name provided (&#39;{sig_id_label}&#39;)&#34;)
 
     # Get wiggle number, yticks label
     wiggle_num = find_wiggle_num(df=df,
@@ -703,9 +703,9 @@ Another example, for multiple stations with 1 sensor<br>:param show_figure: opti
                          f&#34;({len(sig_timestamps_label)})&#34;)
 
     if station_id_str is not None:  # check station input exists
-        if station_id_str in df[sig_id_label].unique() is False:
+        if (station_id_str in df[sig_id_label].values) is False:
             raise ValueError(f&#34;station_id_str parameter provided (&#39;{station_id_str}&#39;) &#34;
-                             f&#34;was not found in dataframe&#34;)
+                             f&#34;was not found in sig_id_label column name provided (&#39;{sig_id_label}&#39;)&#34;)
 
     # Get wiggle number, yticks label
     wiggle_num = find_wiggle_num(df=df,

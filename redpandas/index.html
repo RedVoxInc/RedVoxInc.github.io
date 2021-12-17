@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>redpandas API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Provides library level metadata and constants." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,17 +22,39 @@
 <h1 class="title">Package <code>redpandas</code></h1>
 </header>
 <section id="section-intro">
+Provides library level metadata and constants.
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Provides library level metadata and constants.
+&#34;&#34;&#34;
+
+NAME: str = &#34;redpandas&#34;
+VERSION: str = &#34;1.3.2&#34;
+
+
+def version() -&gt; str:
+    &#34;&#34;&#34;Returns the version number of this library.&#34;&#34;&#34;
+    return VERSION
+
+
+def print_version() -&gt; None:
+    &#34;&#34;&#34;Prints the version number of this library&#34;&#34;&#34;
+    print(version())</code></pre>
+</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
 <dt><code class="name"><a title="redpandas.redpd_build_station" href="redpd_build_station.html">redpandas.redpd_build_station</a></code></dt>
 <dd>
-<div class="desc">This module contains utilities for extraction of RedVox DataWindow data into dictionary structures for later conversion to<br>RedPandas DataFrames.</div>
+<div class="desc">Utilities to extract RedVox DataWindow data into dictionary structures for later conversion to<br>RedPandas DataFrames.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_cohere" href="redpd_cohere.html">redpandas.redpd_cohere</a></code></dt>
 <dd>
-<div class="desc">This module contains functions to calculate coherence.</div>
+<div class="desc">Calculate coherence.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_config" href="redpd_config.html">redpandas.redpd_config</a></code></dt>
 <dd>
@@ -64,19 +86,19 @@
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_geospatial" href="redpd_geospatial.html">redpandas.redpd_geospatial</a></code></dt>
 <dd>
-<div class="desc">This module contains functions to extract and process geospatial data.</div>
+<div class="desc">Functions to extract and process geospatial data.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_gravity" href="redpd_gravity.html">redpandas.redpd_gravity</a></code></dt>
 <dd>
-<div class="desc">This module contains functions to apply exponential filter on accelerometer to separate gravity and linear acceleration.<br>Based on the "past-gen" …</div>
+<div class="desc">Functions to apply exponential filter on accelerometer to separate gravity and linear acceleration.<br>Based on the "past-gen" Android code without …</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_iterator" href="redpd_iterator.html">redpandas.redpd_iterator</a></code></dt>
 <dd>
-<div class="desc">This module contains iterators used in redpd_preprocess.</div>
+<div class="desc">Iiterators used in redpd_preprocess.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_orientation" href="redpd_orientation.html">redpandas.redpd_orientation</a></code></dt>
 <dd>
-<div class="desc">This module contains functions to integrate, and apply complimentary filters for phone orientation.</div>
+<div class="desc">Functions to integrate, and apply complimentary filters for phone orientation.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_plot" href="redpd_plot/index.html">redpandas.redpd_plot</a></code></dt>
 <dd>
@@ -84,11 +106,11 @@
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_preprocess" href="redpd_preprocess.html">redpandas.redpd_preprocess</a></code></dt>
 <dd>
-<div class="desc">This module contains general utilities that can work with values containing nans. Mainly used for data manipulation<br>before construction of RedPandas …</div>
+<div class="desc">Utilities that can work with values containing nans. Mainly used for data manipulation<br>before construction of RedPandas DataFrame.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_scales" href="redpd_scales.html">redpandas.redpd_scales</a></code></dt>
 <dd>
-<div class="desc">This module contains scale conversions.</div>
+<div class="desc">Scale conversions.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_state" href="redpd_state.html">redpandas.redpd_state</a></code></dt>
 <dd>
@@ -96,11 +118,11 @@
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_tfr" href="redpd_tfr.html">redpandas.redpd_tfr</a></code></dt>
 <dd>
-<div class="desc">This module contains functions to calculate Time Representation Frequency.</div>
+<div class="desc">Calculate Time Representation Frequency.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.redpd_xcorr" href="redpd_xcorr.html">redpandas.redpd_xcorr</a></code></dt>
 <dd>
-<div class="desc">This module contains functions for calculating correlation.</div>
+<div class="desc">Calculate correlation.</div>
 </dd>
 <dt><code class="name"><a title="redpandas.tests" href="tests/index.html">redpandas.tests</a></code></dt>
 <dd>
@@ -111,6 +133,37 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="redpandas.print_version"><code class="name flex">
+<span>def <span class="ident">print_version</span></span>(<span>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc">Prints the version number of this library</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def print_version() -&gt; None:
+    &#34;&#34;&#34;Prints the version number of this library&#34;&#34;&#34;
+    print(version())</code></pre>
+</details>
+</dd>
+<dt id="redpandas.version"><code class="name flex">
+<span>def <span class="ident">version</span></span>(<span>) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc">Returns the version number of this library.</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def version() -&gt; str:
+    &#34;&#34;&#34;Returns the version number of this library.&#34;&#34;&#34;
+    return VERSION</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 </section>
@@ -143,6 +196,12 @@
 <li><code><a title="redpandas.redpd_tfr" href="redpd_tfr.html">redpandas.redpd_tfr</a></code></li>
 <li><code><a title="redpandas.redpd_xcorr" href="redpd_xcorr.html">redpandas.redpd_xcorr</a></code></li>
 <li><code><a title="redpandas.tests" href="tests/index.html">redpandas.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="redpandas.print_version" href="#redpandas.print_version">print_version</a></code></li>
+<li><code><a title="redpandas.version" href="#redpandas.version">version</a></code></li>
 </ul>
 </li>
 </ul>

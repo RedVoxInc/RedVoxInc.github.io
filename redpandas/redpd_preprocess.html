@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>redpandas.redpd_preprocess API documentation</title>
-<meta name="description" content="This module contains general utilities that can work with values containing nans. Mainly used for data manipulation
-before construction of RedPandas …" />
+<meta name="description" content="Utilities that can work with values containing nans. Mainly used for data manipulation
+before construction of RedPandas DataFrame." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,16 +23,14 @@ before construction of RedPandas …" />
 <h1 class="title">Module <code>redpandas.redpd_preprocess</code></h1>
 </header>
 <section id="section-intro">
-This module contains general utilities that can work with values containing nans. Mainly used for data manipulation<br>before construction of RedPandas DataFrame.<br><br>Last updated: 6 July 2021
+Utilities that can work with values containing nans. Mainly used for data manipulation<br>before construction of RedPandas DataFrame.
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-This module contains general utilities that can work with values containing nans. Mainly used for data manipulation
+Utilities that can work with values containing nans. Mainly used for data manipulation
 before construction of RedPandas DataFrame.
-
-Last updated: 6 July 2021
 &#34;&#34;&#34;
 
 from enum import Enum
@@ -373,7 +371,34 @@ def highpass_from_diff(sig_wf: np.ndarray,
     return sensor_waveform_reconstruct, frequency_filter_low
 
 
-# Auxiliary function to open parquets
+# Auxiliary functions to open parquets
+def df_unflatten(df: pd.DataFrame) -&gt; None:
+    &#34;&#34;&#34;
+    Restores original shape of elements in column. Used for loading columns in dataframe from parquet.
+
+    :param df: pandas DataFrame
+
+    :return: original df, replaces column values with reshaped ones
+    &#34;&#34;&#34;
+
+    df_ndim = df.filter(like=&#39;_ndim&#39;, axis=1)
+    og_names = [col.replace(&#39;_ndim&#39;, &#39;&#39;) for col in df_ndim.columns]
+
+    for col_name in og_names:
+        col_ndim_label = col_name + &#34;_ndim&#34;
+        col_values = df[col_name].to_numpy()
+        for index_array in df.index:
+            if len(df[col_ndim_label][index_array]) &gt; 1:  # check that there is data
+                if len(df[col_ndim_label][index_array]) == 2:
+                    col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                     int(df[col_ndim_label][index_array][1]))
+
+                if len(df[col_ndim_label][index_array]) == 3:  # tfr
+                    col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                     int(df[col_ndim_label][index_array][1]),
+                                                     int(df[col_ndim_label][index_array][2]))
+
+
 def df_column_unflatten(df: pd.DataFrame,
                         col_wf_label: str,
                         col_ndim_label: str) -&gt; None:
@@ -388,9 +413,15 @@ def df_column_unflatten(df: pd.DataFrame,
 
     col_values = df[col_wf_label].to_numpy()
     for index_array in df.index:
-        if len(df[col_ndim_label][index_array]) &gt; 1:
-            col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
-                                             int(df[col_ndim_label][index_array][1]))</code></pre>
+        if len(df[col_ndim_label][index_array]) &gt; 1:  # check that there is data
+            if len(df[col_ndim_label][index_array]) == 2:
+                col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                 int(df[col_ndim_label][index_array][1]))
+
+            if len(df[col_ndim_label][index_array]) == 3:  # tfr
+                col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                 int(df[col_ndim_label][index_array][1]),
+                                                 int(df[col_ndim_label][index_array][2]))</code></pre>
 </details>
 </section>
 <section>
@@ -568,9 +599,51 @@ def df_column_unflatten(df: pd.DataFrame,
 
     col_values = df[col_wf_label].to_numpy()
     for index_array in df.index:
-        if len(df[col_ndim_label][index_array]) &gt; 1:
-            col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
-                                             int(df[col_ndim_label][index_array][1]))</code></pre>
+        if len(df[col_ndim_label][index_array]) &gt; 1:  # check that there is data
+            if len(df[col_ndim_label][index_array]) == 2:
+                col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                 int(df[col_ndim_label][index_array][1]))
+
+            if len(df[col_ndim_label][index_array]) == 3:  # tfr
+                col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                 int(df[col_ndim_label][index_array][1]),
+                                                 int(df[col_ndim_label][index_array][2]))</code></pre>
+</details>
+</dd>
+<dt id="redpandas.redpd_preprocess.df_unflatten"><code class="name flex">
+<span>def <span class="ident">df_unflatten</span></span>(<span>df: pandas.core.frame.DataFrame) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc">Restores original shape of elements in column. Used for loading columns in dataframe from parquet.<br><br>:param df: pandas DataFrame<br><br>:return: original df, replaces column values with reshaped ones</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def df_unflatten(df: pd.DataFrame) -&gt; None:
+    &#34;&#34;&#34;
+    Restores original shape of elements in column. Used for loading columns in dataframe from parquet.
+
+    :param df: pandas DataFrame
+
+    :return: original df, replaces column values with reshaped ones
+    &#34;&#34;&#34;
+
+    df_ndim = df.filter(like=&#39;_ndim&#39;, axis=1)
+    og_names = [col.replace(&#39;_ndim&#39;, &#39;&#39;) for col in df_ndim.columns]
+
+    for col_name in og_names:
+        col_ndim_label = col_name + &#34;_ndim&#34;
+        col_values = df[col_name].to_numpy()
+        for index_array in df.index:
+            if len(df[col_ndim_label][index_array]) &gt; 1:  # check that there is data
+                if len(df[col_ndim_label][index_array]) == 2:
+                    col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                     int(df[col_ndim_label][index_array][1]))
+
+                if len(df[col_ndim_label][index_array]) == 3:  # tfr
+                    col_values[index_array].shape = (int(df[col_ndim_label][index_array][0]),
+                                                     int(df[col_ndim_label][index_array][1]),
+                                                     int(df[col_ndim_label][index_array][2]))</code></pre>
 </details>
 </dd>
 <dt id="redpandas.redpd_preprocess.filter_reflection_highpass"><code class="name flex">
@@ -955,6 +1028,7 @@ def df_column_unflatten(df: pd.DataFrame,
 <li><code><a title="redpandas.redpd_preprocess.demean_nan_norm" href="#redpandas.redpd_preprocess.demean_nan_norm">demean_nan_norm</a></code></li>
 <li><code><a title="redpandas.redpd_preprocess.detrend_nan" href="#redpandas.redpd_preprocess.detrend_nan">detrend_nan</a></code></li>
 <li><code><a title="redpandas.redpd_preprocess.df_column_unflatten" href="#redpandas.redpd_preprocess.df_column_unflatten">df_column_unflatten</a></code></li>
+<li><code><a title="redpandas.redpd_preprocess.df_unflatten" href="#redpandas.redpd_preprocess.df_unflatten">df_unflatten</a></code></li>
 <li><code><a title="redpandas.redpd_preprocess.filter_reflection_highpass" href="#redpandas.redpd_preprocess.filter_reflection_highpass">filter_reflection_highpass</a></code></li>
 <li><code><a title="redpandas.redpd_preprocess.height_asl_from_pressure_below10km" href="#redpandas.redpd_preprocess.height_asl_from_pressure_below10km">height_asl_from_pressure_below10km</a></code></li>
 <li><code><a title="redpandas.redpd_preprocess.highpass_from_diff" href="#redpandas.redpd_preprocess.highpass_from_diff">highpass_from_diff</a></code></li>
