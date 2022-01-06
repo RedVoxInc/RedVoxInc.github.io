@@ -47,13 +47,13 @@ def demo():
     print(&#34;nosave&#34;, e-s)
 
     s = timeit.default_timer()
-    dwaz = dw.DataWindow(&#34;large_test_lz4&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;LZ4&#34;)
+    dwaz = dw.DataWindow(&#34;large_test_lz4&#34;, config=dw_config, output_dir=save_path10, out_type=&#34;LZ4&#34;)
     e = timeit.default_timer()
     print(&#34;lz4&#34;, e-s)
     dwaz.save()
 
     s = timeit.default_timer()
-    drws = dw.DataWindow(&#34;large_test&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;PARQUET&#34;)
+    drws = dw.DataWindow(&#34;large_test&#34;, config=dw_config, output_dir=save_path10, out_type=&#34;PARQUET&#34;)
     e = timeit.default_timer()
     print(&#34;parquet&#34;, e-s)
     drws.save()
@@ -112,13 +112,13 @@ if __name__ == &#34;__main__&#34;:
     print(&#34;nosave&#34;, e-s)
 
     s = timeit.default_timer()
-    dwaz = dw.DataWindow(&#34;large_test_lz4&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;LZ4&#34;)
+    dwaz = dw.DataWindow(&#34;large_test_lz4&#34;, config=dw_config, output_dir=save_path10, out_type=&#34;LZ4&#34;)
     e = timeit.default_timer()
     print(&#34;lz4&#34;, e-s)
     dwaz.save()
 
     s = timeit.default_timer()
-    drws = dw.DataWindow(&#34;large_test&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;PARQUET&#34;)
+    drws = dw.DataWindow(&#34;large_test&#34;, config=dw_config, output_dir=save_path10, out_type=&#34;PARQUET&#34;)
     e = timeit.default_timer()
     print(&#34;parquet&#34;, e-s)
     drws.save()
