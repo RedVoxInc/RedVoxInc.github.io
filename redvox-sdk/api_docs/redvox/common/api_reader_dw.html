@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>redvox.common.api_reader_dw API documentation</title>
-<meta name="description" content="Read Redvox data from a single directory
-Data files can be either API 900 or API 1000 data formats" />
+<meta name="description" content="For use with DataWindow specifically.
+Do NOT use with non-DataWindow objects
+Read Redvox data from a single directory
+Data files can be either API …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,18 +25,22 @@ Data files can be either API 900 or API 1000 data formats" />
 <h1 class="title">Module <code>redvox.common.api_reader_dw</code></h1>
 </header>
 <section id="section-intro">
-<p>Read Redvox data from a single directory
+<p>For use with DataWindow specifically.
+Do NOT use with non-DataWindow objects
+Read Redvox data from a single directory
 Data files can be either API 900 or API 1000 data formats</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
+For use with DataWindow specifically.  Do NOT use with non-DataWindow objects
 Read Redvox data from a single directory
 Data files can be either API 900 or API 1000 data formats
 &#34;&#34;&#34;
 from typing import List, Optional
 import multiprocessing.pool
+import numpy as np
 
 import redvox.settings as settings
 from redvox.common import io
@@ -44,6 +50,9 @@ from redvox.common.station import Station
 
 
 class ApiReaderDw(ApiReader):
+    &#34;&#34;&#34;
+    For use with DataWindow specifically.  Do NOT use with non-DataWindow objects
+    &#34;&#34;&#34;
     def __init__(self,
                  base_dir: str,
                  structured_dir: bool = False,
@@ -51,7 +60,7 @@ class ApiReaderDw(ApiReader):
                  correct_timestamps: bool = False,
                  use_model_correction: bool = True,
                  dw_base_dir: str = &#34;.&#34;,
-                 save_files: bool = False,
+                 dw_save_mode: io.FileSystemSaveMode = io.FileSystemSaveMode.TEMP,
                  debug: bool = False,
                  pool: Optional[multiprocessing.pool.Pool] = None):
         &#34;&#34;&#34;
@@ -64,28 +73,49 @@ class ApiReaderDw(ApiReader):
         :param correct_timestamps: if True, correct the timestamps of the data.  Default False
         :param use_model_correction: if True, use the offset model of the station to correct the timestamps.
                                         if correct_timestamps is False, this value doesn&#39;t matter.  Default True
-        :param dw_base_dir: the directory to save DataWindow files to.  if save_files is False, this value doesn&#39;t
-                            matter.  default &#34;.&#34; (current directory)
-        :param save_files: if True, save the data.  Default False
+        :param dw_base_dir: the directory to save DataWindow files to.  if save_mode is FileSystemSaveMode.MEM,
+                            this value doesn&#39;t matter.  default &#34;.&#34; (current directory)
+        :param dw_save_mode: save method for the data window.  Default FileSystemSaveMode.TEMP which saves to a temp_dir
         :param debug: if True, output program warnings/errors during function execution.  Default False.
         &#34;&#34;&#34;
         super().__init__(base_dir, structured_dir, read_filter, debug, pool)
         self.correct_timestamps = correct_timestamps
         self.use_model_correction = use_model_correction
         self.dw_base_dir = dw_base_dir
-        self.save_files = save_files
+        self.dw_save_mode = dw_save_mode
+        self.all_files_size = np.sum([idx.files_size() for idx in self.files_index])
         self._stations = self._read_stations()
 
-    def _stations_by_index(self, findex: io.Index) -&gt; Station:
+    def _station_by_index(self, findex: io.Index) -&gt; Station:
         &#34;&#34;&#34;
+        builds station using the index of files to read
+        splits the index into smaller chunks if entire record cannot be held in memory
+
         :param findex: index with files to build a station with
         :return: Station built from files in findex, without building the data from parquet
         &#34;&#34;&#34;
-        stpa = Station.create_from_packets(self.read_files_in_index(findex), self.correct_timestamps,
-                                           self.use_model_correction, self.dw_base_dir, self.save_files)
-        if self.debug:
-            print(f&#34;station {stpa.id()} files read: {len(findex.entries)}&#34;)
-        return stpa
+        split_list = self._split_workload(findex)
+        use_temp_dir = True if len(split_list) &gt; 1 else False
+
+        if len(split_list) &gt; 0:
+            if self.debug and use_temp_dir:
+                print(&#34;Writing data to disk; this may take a few minutes to complete.&#34;)
+            stpa = Station.create_from_indexes(split_list,
+                                               use_model_correction=self.use_model_correction,
+                                               base_out_dir=self.dw_base_dir,
+                                               use_temp_dir=use_temp_dir
+                                               )
+            if self.debug:
+                print(f&#34;station {stpa.id()} files read: {len(findex.entries)}&#34;)
+                if len(split_list) &gt; 1:
+                    print(f&#34;required making {len(split_list)} smaller segments due to memory restraints&#34;)
+            if self.dw_save_mode == io.FileSystemSaveMode.MEM and use_temp_dir:
+                self.dw_save_mode = io.FileSystemSaveMode.TEMP
+            if self.correct_timestamps:
+                stpa.set_correct_timestamps()
+            return stpa
+        self.errors.append(&#34;No files found to create station.&#34;)
+        return Station()
 
     def get_stations(self, pool: Optional[multiprocessing.pool.Pool] = None) -&gt; List[Station]:
         &#34;&#34;&#34;
@@ -98,12 +128,12 @@ class ApiReaderDw(ApiReader):
         :param pool: optional multiprocessing pool
         :return: List of all stations in the ApiReader, without building the data from parquet
         &#34;&#34;&#34;
-        if settings.is_parallelism_enabled():
-            return list(maybe_parallel_map(pool, self._stations_by_index,
+        if settings.is_parallelism_enabled() and len(self.files_index) &gt; 1:
+            return list(maybe_parallel_map(pool, self._station_by_index,
                                            self.files_index,
                                            chunk_size=1
                                            ))
-        return list(map(self._stations_by_index, self.files_index))
+        return list(map(self._station_by_index, self.files_index))
 
     def get_station_by_id(self, get_id: str) -&gt; Optional[List[Station]]:
         &#34;&#34;&#34;
@@ -127,23 +157,11 @@ class ApiReaderDw(ApiReader):
 <dl>
 <dt id="redvox.common.api_reader_dw.ApiReaderDw"><code class="flex name class">
 <span>class <span class="ident">ApiReaderDw</span></span>
-<span>(</span><span>base_dir: str, structured_dir: bool = False, read_filter: <a title="redvox.common.io.ReadFilter" href="io.html#redvox.common.io.ReadFilter">ReadFilter</a> = None, correct_timestamps: bool = False, use_model_correction: bool = True, dw_base_dir: str = '.', save_files: bool = False, debug: bool = False, pool: Optional[multiprocessing.pool.Pool] = None)</span>
+<span>(</span><span>base_dir: str, structured_dir: bool = False, read_filter: <a title="redvox.common.io.ReadFilter" href="io.html#redvox.common.io.ReadFilter">ReadFilter</a> = None, correct_timestamps: bool = False, use_model_correction: bool = True, dw_base_dir: str = '.', dw_save_mode: <a title="redvox.common.io.FileSystemSaveMode" href="io.html#redvox.common.io.FileSystemSaveMode">FileSystemSaveMode</a> = FileSystemSaveMode.TEMP, debug: bool = False, pool: Optional[multiprocessing.pool.Pool] = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reads data from api 900 or api 1000 format, converting all data read into RedvoxPacketM for
-ease of comparison and use.</p>
-<h2 id="properties">Properties</h2>
-<p>filter: io.ReadFilter with the station ids, start and end time, start and end time padding, and
-types of files to read
-base_dir: str of the directory containing all the files to read
-structured_dir: bool, if True, the base_dir contains a specific directory structure used by the
-respective api formats.
-If False, base_dir only has the data files.
-Default False.
-files_index: io.Index of the files that match the filter that are in base_dir
-index_summary: io.IndexSummary of the filtered data
-debug: bool, if True, output additional information during function execution.
-Default False.</p>
+<div class="desc"><p>For use with DataWindow specifically.
+Do NOT use with non-DataWindow objects</p>
 <p>initialize API reader for data window</p>
 <p>:param base_dir: directory containing the files to read
 :param structured_dir: if True, base_dir contains a specific directory structure used by the respective
@@ -158,11 +176,11 @@ Default False
 if correct_timestamps is False, this value doesn't matter.
 Default True
 :param dw_base_dir: the directory to save DataWindow files to.
-if save_files is False, this value doesn't
-matter.
+if save_mode is FileSystemSaveMode.MEM,
+this value doesn't matter.
 default "." (current directory)
-:param save_files: if True, save the data.
-Default False
+:param dw_save_mode: save method for the data window.
+Default FileSystemSaveMode.TEMP which saves to a temp_dir
 :param debug: if True, output program warnings/errors during function execution.
 Default False.</p></div>
 <details class="source">
@@ -170,6 +188,9 @@ Default False.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ApiReaderDw(ApiReader):
+    &#34;&#34;&#34;
+    For use with DataWindow specifically.  Do NOT use with non-DataWindow objects
+    &#34;&#34;&#34;
     def __init__(self,
                  base_dir: str,
                  structured_dir: bool = False,
@@ -177,7 +198,7 @@ Default False.</p></div>
                  correct_timestamps: bool = False,
                  use_model_correction: bool = True,
                  dw_base_dir: str = &#34;.&#34;,
-                 save_files: bool = False,
+                 dw_save_mode: io.FileSystemSaveMode = io.FileSystemSaveMode.TEMP,
                  debug: bool = False,
                  pool: Optional[multiprocessing.pool.Pool] = None):
         &#34;&#34;&#34;
@@ -190,28 +211,49 @@ Default False.</p></div>
         :param correct_timestamps: if True, correct the timestamps of the data.  Default False
         :param use_model_correction: if True, use the offset model of the station to correct the timestamps.
                                         if correct_timestamps is False, this value doesn&#39;t matter.  Default True
-        :param dw_base_dir: the directory to save DataWindow files to.  if save_files is False, this value doesn&#39;t
-                            matter.  default &#34;.&#34; (current directory)
-        :param save_files: if True, save the data.  Default False
+        :param dw_base_dir: the directory to save DataWindow files to.  if save_mode is FileSystemSaveMode.MEM,
+                            this value doesn&#39;t matter.  default &#34;.&#34; (current directory)
+        :param dw_save_mode: save method for the data window.  Default FileSystemSaveMode.TEMP which saves to a temp_dir
         :param debug: if True, output program warnings/errors during function execution.  Default False.
         &#34;&#34;&#34;
         super().__init__(base_dir, structured_dir, read_filter, debug, pool)
         self.correct_timestamps = correct_timestamps
         self.use_model_correction = use_model_correction
         self.dw_base_dir = dw_base_dir
-        self.save_files = save_files
+        self.dw_save_mode = dw_save_mode
+        self.all_files_size = np.sum([idx.files_size() for idx in self.files_index])
         self._stations = self._read_stations()
 
-    def _stations_by_index(self, findex: io.Index) -&gt; Station:
+    def _station_by_index(self, findex: io.Index) -&gt; Station:
         &#34;&#34;&#34;
+        builds station using the index of files to read
+        splits the index into smaller chunks if entire record cannot be held in memory
+
         :param findex: index with files to build a station with
         :return: Station built from files in findex, without building the data from parquet
         &#34;&#34;&#34;
-        stpa = Station.create_from_packets(self.read_files_in_index(findex), self.correct_timestamps,
-                                           self.use_model_correction, self.dw_base_dir, self.save_files)
-        if self.debug:
-            print(f&#34;station {stpa.id()} files read: {len(findex.entries)}&#34;)
-        return stpa
+        split_list = self._split_workload(findex)
+        use_temp_dir = True if len(split_list) &gt; 1 else False
+
+        if len(split_list) &gt; 0:
+            if self.debug and use_temp_dir:
+                print(&#34;Writing data to disk; this may take a few minutes to complete.&#34;)
+            stpa = Station.create_from_indexes(split_list,
+                                               use_model_correction=self.use_model_correction,
+                                               base_out_dir=self.dw_base_dir,
+                                               use_temp_dir=use_temp_dir
+                                               )
+            if self.debug:
+                print(f&#34;station {stpa.id()} files read: {len(findex.entries)}&#34;)
+                if len(split_list) &gt; 1:
+                    print(f&#34;required making {len(split_list)} smaller segments due to memory restraints&#34;)
+            if self.dw_save_mode == io.FileSystemSaveMode.MEM and use_temp_dir:
+                self.dw_save_mode = io.FileSystemSaveMode.TEMP
+            if self.correct_timestamps:
+                stpa.set_correct_timestamps()
+            return stpa
+        self.errors.append(&#34;No files found to create station.&#34;)
+        return Station()
 
     def get_stations(self, pool: Optional[multiprocessing.pool.Pool] = None) -&gt; List[Station]:
         &#34;&#34;&#34;
@@ -224,12 +266,12 @@ Default False.</p></div>
         :param pool: optional multiprocessing pool
         :return: List of all stations in the ApiReader, without building the data from parquet
         &#34;&#34;&#34;
-        if settings.is_parallelism_enabled():
-            return list(maybe_parallel_map(pool, self._stations_by_index,
+        if settings.is_parallelism_enabled() and len(self.files_index) &gt; 1:
+            return list(maybe_parallel_map(pool, self._station_by_index,
                                            self.files_index,
                                            chunk_size=1
                                            ))
-        return list(map(self._stations_by_index, self.files_index))
+        return list(map(self._station_by_index, self.files_index))
 
     def get_station_by_id(self, get_id: str) -&gt; Optional[List[Station]]:
         &#34;&#34;&#34;

@@ -73,6 +73,10 @@ class SensorDataTest(unittest.TestCase):
 
     def test_empty(self):
         self.empty_sensor = SensorData(&#34;empty&#34;)
+        self.assertEqual(self.empty_sensor.errors().get_num_errors(), 0)
+        self.assertEqual(self.empty_sensor.num_samples(), 0)
+        self.assertEqual(len(self.empty_sensor.data_channels()), 0)
+        self.assertEqual(len(self.empty_sensor.get_data_channel(&#34;failure&#34;)), 0)
         self.assertEqual(self.empty_sensor.errors().get_num_errors(), 1)
 
     def test_name(self):
@@ -327,6 +331,10 @@ not have a method with the specified name.</p></div>
 
     def test_empty(self):
         self.empty_sensor = SensorData(&#34;empty&#34;)
+        self.assertEqual(self.empty_sensor.errors().get_num_errors(), 0)
+        self.assertEqual(self.empty_sensor.num_samples(), 0)
+        self.assertEqual(len(self.empty_sensor.data_channels()), 0)
+        self.assertEqual(len(self.empty_sensor.get_data_channel(&#34;failure&#34;)), 0)
         self.assertEqual(self.empty_sensor.errors().get_num_errors(), 1)
 
     def test_name(self):
@@ -664,6 +672,10 @@ not have a method with the specified name.</p></div>
 </summary>
 <pre><code class="python">def test_empty(self):
     self.empty_sensor = SensorData(&#34;empty&#34;)
+    self.assertEqual(self.empty_sensor.errors().get_num_errors(), 0)
+    self.assertEqual(self.empty_sensor.num_samples(), 0)
+    self.assertEqual(len(self.empty_sensor.data_channels()), 0)
+    self.assertEqual(len(self.empty_sensor.get_data_channel(&#34;failure&#34;)), 0)
     self.assertEqual(self.empty_sensor.errors().get_num_errors(), 1)</code></pre>
 </details>
 </dd>

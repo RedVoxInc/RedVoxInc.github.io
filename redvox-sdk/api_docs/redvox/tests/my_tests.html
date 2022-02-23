@@ -1,0 +1,1649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>redvox.tests.my_tests API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>redvox.tests.my_tests</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import datetime
+import timeit
+import os.path
+from typing import Optional, List
+
+import numpy as np
+import pickle
+import pandas as pd
+import tempfile
+
+import redvox.common.io as io
+import redvox.common.file_statistics as fs
+import redvox.api1000.wrapped_redvox_packet.wrapped_packet
+from redvox.common.api_reader import ApiReader
+from redvox.common.io import ReadFilter, Index, index_structured, index_unstructured
+from redvox.common.data_window import DataWindow, DataWindowConfig
+from redvox.common.data_window_configuration import DataWindowConfigFile
+from redvox.common import sensor_reader_utils as sru
+from redvox.tests import TEST_DATA_DIR
+import redvox.common.date_time_utils as dt
+from redvox.api1000.wrapped_redvox_packet.station_information import (
+    NetworkType,
+    PowerState,
+    CellServiceState,
+    WifiWakeLock,
+    ScreenState,
+)
+
+import redvox.settings as settings
+
+
+def config_main():
+
+    config = DataWindowConfigFile.from_path(
+        &#34;/Users/tyler/IdeaProjects/redvox-python-sdk/redvox/tests/my_tests.config.toml&#34;)
+    s = timeit.default_timer()
+    dwf = DataWindow.from_config(config)
+    e = timeit.default_timer()
+    print(&#34;from config&#34;, e-s)
+
+
+def str_test():
+    config = DataWindowConfig(&#34;/Users/tyler/Documents/inlblast_2021_9_30&#34;,
+                              structured_layout=True,
+                              station_ids=[&#34;1637610036&#34;],
+                              start_datetime=datetime.datetime(2021, 9, 30, 17, 0, 0),
+                              end_datetime=datetime.datetime(2021, 9, 30, 17, 5, 0))
+    dw = DataWindow(&#34;test_str_repr&#34;, config=config)
+    print(&#34;string: &#34;, dw)
+    print(&#34;repr: &#34;, repr(dw))
+    print(&#34;dict: &#34;, dw.as_dict())
+
+
+def main():
+    event_name = &#34;First_set_840_HT&#34;
+    # try:
+    #     dw = DataWindow.deserialize(f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}/{event_name}.pkl.lz4&#34;)
+    # except FileNotFoundError:
+    s = timeit.default_timer()
+    dwg = DataWindow(input_dir=f&#34;/Users/tyler/Downloads/80Hz_GPS_20210421&#34;, structured_layout=True,
+                     # station_ids=[&#34;1637610011&#34;],
+                     start_datetime=datetime.datetime(2021, 4, 21, 23, 0, 0),
+                     end_datetime=datetime.datetime(2021, 4, 21, 23, 30, 0)
+                     )
+    e = timeit.default_timer()
+    print(e - s)
+
+    # dw = DataWindow(input_dir=f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}&#34;, structured_layout=True,
+    #                 station_ids=[&#34;1637620003&#34;],
+    #                 start_datetime=datetime.datetime(2021, 4, 14, 18, 40, 0),
+    #                 end_datetime=datetime.datetime(2021, 4, 14, 18, 40, 1),
+    #                 end_buffer_td=datetime.timedelta(seconds=0)
+    #                 )
+    #     dw.serialize(f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}&#34;, f&#34;{event_name}.pkl.lz4&#34;)
+    #     print(&#34;saved to disk&#34;)
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_data&#34;
+    # station_ids = [&#34;1637610015&#34;]
+    # start_padding_s = 120
+    # end_padding_s = 120
+    # gap_time_s = 0.25
+    # apply_correction = False
+    # structured_layout = False
+    # dwc = DataWindowConfig(input_dir, structured_layout, station_ids,
+    #                        start_year=2020, start_month=7, start_day=11,
+    #                        start_hour=19, start_minute=56, start_second=25,
+    #                        end_year=2020, end_month=7, end_day=11,
+    #                        end_hour=19, end_minute=57, end_second=25,
+    #                        start_padding_seconds=start_padding_s, end_padding_seconds=end_padding_s,
+    #                        gap_time_seconds=gap_time_s, apply_correction=apply_correction)
+    # dwc = DataWindowConfig(input_dir, structured_layout, station_ids,
+    #                        start_year=2020, start_month=7, start_day=11,
+    #                        start_hour=19, start_minute=55, start_second=30,
+    #                        end_year=2020, end_month=7, end_day=11,
+    #                        end_hour=19, end_minute=56, end_second=30,
+    #                        start_padding_seconds=start_padding_s, end_padding_seconds=end_padding_s,
+    #                        gap_time_seconds=gap_time_s, apply_correction=apply_correction)
+
+    # dw = DataWindowSimple.from_config(dwc)
+
+    for station in dwg.stations:
+        print(station.id)
+        # station.location_sensor().get_data_channel(&#34;a&#34;)
+        # if station.has_location_data():
+        #     diffs = np.abs(station.location_sensor().data_timestamps()
+        #                    - station.location_sensor().get_data_channel(&#34;gps_timestamps&#34;))
+        #     print(diffs)
+        #     print(&#34;mean of (mach - gps timestamps): &#34;, np.nanmean(diffs))
+        #     print(&#34;std of (mach - gps timestamps): &#34;, np.nanstd(diffs))
+    # print(&#34;hi&#34;)
+
+    # debug, gap in middle, switch statement
+    # created timestamps in: 0.0010081179999996692
+    # created timestamps in: 0.0010188819999994436
+
+    # created timestamps in: 0.0009492180000001404
+    # created timestamps in: 0.0006874209999998548
+
+
+def now() -&gt; datetime:
+    return dt.now()
+
+
+def diff(desc: str, prev: datetime) -&gt; None:
+    print(f&#34;{desc}: {(now() - prev).total_seconds() * 1_000.0} ms&#34;)
+
+
+def arrow_file_read():
+    # settings.set_parallelism_enabled(True)
+    # s_ids = [&#34;1637610018&#34;, &#34;1637610017&#34;, &#34;1637610016&#34;, &#34;1637610015&#34;, &#34;1637610014&#34;,
+    #          &#34;1637610013&#34;, &#34;1637610012&#34;, &#34;1637610011&#34;, &#34;1637610019&#34;, &#34;1637620005&#34;]
+    path: str = &#34;/Users/tyler/Downloads/api1000 2/2021/08/04/20&#34;
+    # path = &#34;/Users/tyler/Documents/pyarrowreadertest&#34;
+    path = &#34;/Users/tyler/Documents/pyarrowreadertest/&#34;
+    save_path1 = &#34;/Users/tyler/Documents/pyarrowreadertest/small_test&#34;
+    # ddict = dwthing.as_dict()
+    # ar = ApiReader(path, False)
+    # path: str = &#34;/Users/tyler/Downloads/api900&#34;
+    # ar = ApiReader(path, True, ReadFilter(station_ids={&#34;1637681015&#34;, &#34;1637110703&#34;}))
+
+    # pa_test_dir = os.path.join(&#34;/Users/tyler/IdeaProjects/redvox-python-sdk/redvox/tests/common/pa_test&#34;)
+
+    # path: str = &#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+    # path: str = &#34;/Users/Tyler/Downloads/health_check/&#34;
+    # ar = ApiReader(path, True, ReadFilter(station_ids=set(s_ids)))
+    # ar = ApiReader(path, True)
+
+    path = &#34;/Users/tyler/Documents/skyfall2full/&#34;
+    save_path10 = &#34;/Users/tyler/Documents/pyarrowreadertest/large_test2&#34;
+
+    dw_config = dwpa.DataWindowConfig(path,
+                                      structured_layout=True,
+                                      start_datetime=dt.datetime_from_epoch_seconds_utc(1628035207),
+                                      end_datetime=dt.datetime_from_epoch_seconds_utc(1628035507)
+                                      )
+                                         # start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+                                         # end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+
+    # s = timeit.default_timer()
+    # dwa = dwpa.DataWindowArrow(&#34;small_test_no_save&#34;, config=dw_config, out_type=&#34;NONE&#34;)
+    # e = timeit.default_timer()
+    # print(&#34;nosave&#34;, e-s)
+    #
+    # for s in dwa.stations():
+    #     print(s.id(), s.gaps())
+
+    # s = timeit.default_timer()
+    # dwaz = dwpa.DataWindowArrow(&#34;large_test_lz4&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;LZ4&#34;)
+    # e = timeit.default_timer()
+    # print(&#34;lz4&#34;, e-s)
+    # dwaz.save()
+
+    # s = timeit.default_timer()
+    # drws = dwpa.DataWindowArrow(&#34;large_test&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;PARQUET&#34;)
+    # e = timeit.default_timer()
+    # print(&#34;parquet&#34;, e-s)
+    # drws.save()
+
+    # s = timeit.default_timer()
+    # old_dwaz = DataWindow(path,
+    #                       structured_layout=True,
+    #                       start_datetime=dt.datetime_from_epoch_seconds_utc(16280352070),
+    #                       end_datetime=dt.datetime_from_epoch_seconds_utc(16280352370)
+    #                       )
+    #                       # start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                       # end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+    # e = timeit.default_timer()
+    # print(&#34;old dw&#34;, e-s)
+    # old_dwaz.serialize(save_path10, &#34;old_dwaz.pkl.lz4&#34;)
+    #
+    # s = timeit.default_timer()
+    # old_dwaz = DataWindow.deserialize(os.path.join(save_path10, &#34;old_dwaz.pkl.lz4&#34;))
+    # e = timeit.default_timer()
+    # print(&#34;load old dw&#34;, e-s)
+
+    s = timeit.default_timer()
+    drws = dwpa.DataWindow.load(os.path.join(save_path10, &#34;large_test.json&#34;))
+    e = timeit.default_timer()
+    print(&#34;load parquet&#34;, e-s)
+
+    # s = timeit.default_timer()
+    # dwaz = dwpa.DataWindowArrow.deserialize(os.path.join(save_path10, &#34;large_test_lz4.pkl.lz4&#34;))
+    # e = timeit.default_timer()
+    # print(&#34;load lz4&#34;, e-s)
+
+    # print(&#34;size of old lz4: &#34;, pickle.dumps(old_dwaz).__sizeof__())
+    # print(&#34;size of lz4:     &#34;, pickle.dumps(dwaz).__sizeof__())
+    # print(&#34;size of nosave:  &#34;, pickle.dumps(dwa).__sizeof__())
+    # print(&#34;size of parquet: &#34;, pickle.dumps(drws).__sizeof__())
+
+    print(&#34;data test&#34;)
+    # print(dwa.stations()[0].audio_sensor().num_samples())
+    print(drws.stations()[0].audio_sensor().num_samples())
+    # print(dwa.stations()[0].barometer_sensor().num_samples())
+    print(drws.stations()[0].barometer_sensor().num_samples())
+    # print(dwa.stations()[0].has_location_sensor())
+    # print(dwa.stations()[0].health_sensor().get_cell_service_data()[0])
+    # print(dwa.stations()[0].accelerometer_sensor().first_data_timestamp())
+    # print(old_dwaz.stations[0].accelerometer_sensor().first_data_timestamp())
+    # # print(dwaz.stations()[0].audio_sensor().first_data_timestamp())
+    print(drws.stations()[0].audio_sensor().first_data_timestamp())
+    print(drws.stations()[0].audio_sensor().get_microphone_data()[0])
+    # # # print(dwaz.stations()[0].location_sensor().first_data_timestamp())
+    # print(drws.stations()[0].best_location_sensor().first_data_timestamp())
+    # print(drws.stations()[0].best_location_sensor().get_latitude_data()[0])
+    # # print(dwaz.stations()[0].barometer_sensor().first_data_timestamp())
+    # print(drws.stations()[0].barometer_sensor().first_data_timestamp())
+    # print(drws.stations()[0].barometer_sensor().get_pressure_data()[0])
+    # # print(dwaz.stations()[0].health_sensor().first_data_timestamp())
+    # print(drws.stations()[0].health_sensor().first_data_timestamp())
+    # print(drws.stations()[0].health_sensor().get_cell_service_data()[0])
+    # print(drws.stations()[0].health_sensor().get_battery_charge_remaining_data()[0])
+    #
+    # assert(dwa.stations()[0].audio_sensor().num_samples() == old_dwaz.stations[0].audio_sensor().num_samples())
+    # assert(dwa.stations()[0].has_location_data() == old_dwaz.stations[0].has_location_data())
+    # assert(dwa.stations()[0].accelerometer_sensor().first_data_timestamp()
+    #        == old_dwaz.stations[0].accelerometer_sensor().first_data_timestamp())
+    # assert(dwa.stations()[0].health_sensor().first_data_timestamp()
+    #        == old_dwaz.stations[0].health_sensor().first_data_timestamp())
+
+    # dwa.save()
+
+    # drws = dwpa.DataWindowArrow.from_json_file(os.path.join(save_path, &#34;small_test_lz4.json&#34;))
+    # drws = dwpa.DataWindowArrow.from_json_file(os.path.join(save_path, &#34;small_test.json&#34;))
+
+    # sf_test = ApiReader(&#34;/Users/tyler/Documents/skyfall2full&#34;, structured_dir=True,
+    #                     read_filter=ReadFilter(start_dt=dt.datetime_from_epoch_seconds_utc(1628006500),
+    #                                            end_dt=dt.datetime_from_epoch_seconds_utc(16280006530)))
+    # st_test = sf_test.read_files_by_id(&#34;1637610021&#34;)[0].station_information.station_metrics
+    #
+    # bf_test = ApiReader(path, structured_dir=True,
+    #                     read_filter=ReadFilter(start_dt=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                                            end_dt=dt.datetime_from_epoch_seconds_utc(1629339790)))
+    # bt_test = bf_test.read_files_by_id(&#34;1637620001&#34;)[0].station_information.station_metrics
+    #
+    # print(&#34;pre-fix&#34;)
+    # print(st_test.cpu_utilization.values)
+    # print(st_test.wifi_wake_lock)
+    #
+    # print(&#34;&#34;)
+    #
+    # print(&#34;post-fix&#34;)
+    # print(bt_test.cpu_utilization.values)
+    # print(bt_test.wifi_wake_lock)
+
+    # dwc = DataWindow(path, True,
+    #                      start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                      end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+    # dwc.to_json_file(save_path, &#34;test_event_dw&#34;)
+    # dwj = DataWindow.from_json_file(save_path, &#34;skyfall2&#34;)
+    # dw_config = dwpa.DataWindowConfigWpa(structured_layout=True,
+    #                                      start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                                      end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+    # dwa = dwpa.DataWindowArrow(path, dw_config,
+    #                                save_station_files=True,
+    #                                station_out_dir=save_path
+    #                                )
+    # dwr = dwthing.create_window_results(&#34;test_event_dw&#34;, save_path, dwpa.DataWindowResultLocation(), 0.)
+    # dwr.write()
+    # dwaj = dwpa.DataWindowArrow.from_json_file(&#34;/Users/tyler/Documents/pyarrowreadertest/test_out_small/&#34;
+    #                                               &#34;test_event_dw.json&#34;)
+
+    path = &#34;/Users/tyler/Documents/skyfall2full&#34;
+    save_path = &#34;/Users/tyler/Documents/pyarrowreadertest/skyfall2&#34;
+
+    # s = timeit.default_timer()
+    # dwthing = DataWindow(path, True,
+    #                      start_datetime=dt.datetime_from_epoch_seconds_utc(1627998300),
+    #                      end_datetime=dt.datetime_from_epoch_seconds_utc(1628010000))
+    # dwthing.to_json_file(save_path, &#34;skyfall2&#34;)
+    # dwthing = DataWindow.from_json_file(save_path, &#34;skyfall2&#34;)
+    # dw_config = dwpa.DataWindowConfigWpa(structured_layout=True,
+    #                                      start_datetime=dt.datetime_from_epoch_seconds_utc(1627998300),
+    #                                      end_datetime=dt.datetime_from_epoch_seconds_utc(1628010000))
+    # dwthing = dwpa.DataWindowArrow(path, dw_config,
+    #                                save_station_files=True,
+    #                                station_out_dir=save_path
+    #                                )
+    # dwr = dwthing.create_window_results(&#34;skyfall2&#34;, save_path, dwpa.DataWindowResultLocation(), 0.)
+    # dwr.write()
+    # dwthing = dwpa.DataWindowArrow.from_json_file(&#34;/Users/tyler/Documents/pyarrowreadertest/skyfall2/&#34;
+    #                                               &#34;skyfall2_dw.json&#34;)
+    # sthing = ar.get_stations_wpa_fs()
+    # e = timeit.default_timer()
+    # print(e-s)
+    # dwthing = dwpa.DataWindowArrow.from_json_file(&#34;/Users/tyler/Documents/pyarrowreadertest/test_out_smol/&#34;
+    #                                          &#34;test_event_dw.json&#34;)
+    # for og in dwthing.stations:
+    #     print(og.first_data_timestamp)
+    #     print(og.last_data_timestamp)
+    #     print(og.audio_sensor().num_samples())
+    #     og.errors.print()
+    #     ppd = pickle.dumps(og).__sizeof__()
+    #     print(ppd)
+
+    # print()
+    #
+    # s = timeit.default_timer()
+    # # oneter = DataWindow(path, station_ids=[&#34;1637681015&#34;, &#34;1637110703&#34;])
+    # # oneter = DataWindow(path)
+    # oneter = ar.get_stations()
+    # e = timeit.default_timer()
+    # print(e-s)
+    # for on in oneter:
+    #     print(on.first_data_timestamp)
+    #     print(on.last_data_timestamp)
+    #     print(on.audio_sensor().num_samples())
+    #     on.errors.print()
+    #     pps = pickle.dumps(on).__sizeof__()
+    #     print(pps)
+
+    # s = timeit.default_timer()
+    # lolz = ar.get_stations()
+    # e = timeit.default_timer()
+    # print(e-s)
+    # for lz in lolz:
+    #     ppp = pickle.dumps(lz).__sizeof__()
+    #     print(ppp)
+
+    # path: str = &#34;/Users/tyler/Documents/pyarrowreadertest&#34;
+    # ar = ApiReader(path, False, ReadFilter())
+    #
+    # ar.get_stations_rfiiwpa()
+
+
+def with_arrow():
+    settings.set_parallelism_enabled(True)
+    for i in range(2):
+        total_old_size = 0
+        total_old_time = 0
+        total_new_size = 0
+        total_new_time = 0
+        # path: str = &#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+        path: str = &#34;/Users/tyler/Downloads/api900&#34;
+
+        # start_dt = dt.datetime_from_epoch_microseconds_utc(1574370831086103.0)
+        start_dt = dt.datetime_from_epoch_seconds_utc(1574371000.0)
+        end_dt = dt.datetime_from_epoch_seconds_utc(1574371001.0)
+        # end_dt = dt.datetime_from_epoch_microseconds_utc(1574371076847298.0)
+
+        station_ids = [&#34;1637681015&#34;, &#34;1637110703&#34;, &#34;1637110703&#34;, &#34;1637110703&#34;]
+                       # [&#34;1637610016&#34;, &#34;1637610011&#34;, &#34;1637610013&#34;, &#34;1637610025&#34;, &#34;1637610021&#34;, &#34;1637610022&#34;,
+                       # &#34;1637610024&#34;, &#34;1637681015&#34;, &#34;1637610001&#34;, &#34;1637610002&#34;, &#34;1637662002&#34;, &#34;1637199002&#34;,
+                       # &#34;1637110703&#34;, &#34;1637110001&#34;]
+
+        s = timeit.default_timer()
+        # dw_wpa = dwpa.DataWindow(path,
+        #                          station_ids=station_ids,
+        #                          start_datetime=start_dt, end_datetime=end_dt,
+        #                          debug=True)
+        e = timeit.default_timer()
+        total_new_time += e-s
+
+        s = timeit.default_timer()
+        dw = DataWindow(path,
+                        station_ids=station_ids,
+                        start_datetime=start_dt, end_datetime=end_dt,
+                        debug=True)
+        e = timeit.default_timer()
+        total_old_time += e-s
+
+        qtv = {}
+        qdtv = {}
+        ptv = {}
+        # for sta in dw_wpa.stations:
+        #     qtv[sta.id] = []
+        #     qdtv[sta.id] = []
+        #     for sen in sta.data():
+        #         q = sen.pyarrow_table().__sizeof__()
+        #         qd = sen.data_df()
+        #         qdt = qd.__sizeof__()
+        #         qdtv[sta.id].append([qdt, sen.type.name])
+        #         qtv[sta.id].append([q, sen.type.name])
+        #         total_new_size += q
+        for sta in dw.stations:
+            ptv[sta.id] = []
+            for sen in sta.data:
+                pt = sen.data_df.__sizeof__()
+                ptv[sta.id].append([pt, sen.type.name])
+                total_old_size += pt
+
+        # for sta in dw_wpa.stations:
+        #     audi = sta.audio_sensor().get_pyarrow_table().columns
+        #     art = pickle.dumps(audi).__sizeof__()
+
+            # br = dw.stations[0].audio_sensor().data_df.values
+            # brt = pickle.dumps(br).__sizeof__()
+
+        # for k in dw_wpa.station_ids:
+        #     if k not in dw.station_ids:
+        #         print(&#34;MISMATCH&#34;)
+        #     assert(dw_wpa.get_station(k)[0].audio_sensor().first_data_timestamp()
+        #            == dw.get_station(k)[0].audio_sensor().first_data_timestamp())
+
+        # t = ApiReader(path, True)
+        #
+        # s = timeit.default_timer()
+        # st_wpa = t.get_stations_wpa()
+        # e = timeit.default_timer()
+        # p = pickle.dumps(st_wpa)
+        # total_new_size += p.__sizeof__()
+        # total_new_time += e-s
+        #
+        # s = timeit.default_timer()
+        # st = t.get_stations()
+        # e = timeit.default_timer()
+        # p = pickle.dumps(st)
+        # total_old_size += p.__sizeof__()
+        # total_old_time += e-s
+
+        # for m in t.files_index:
+        #     for f in m.stream_raw():
+                # s = timeit.default_timer()
+                # h: SensorDataPa = srupa.load_apim_audio(f)
+                # e = timeit.default_timer()
+                # p = pickle.dumps(h)
+                # total_new_size += p.__sizeof__()
+                # total_new_time += e-s
+                # print(f&#34;make sensor default: {e - s}, size: {p.__sizeof__()}&#34;)
+                # s = timeit.default_timer()
+                # k: SensorData = sru.load_apim_audio(f)
+                # e = timeit.default_timer()
+                # p = pickle.dumps(k)
+                # total_old_size += p.__sizeof__()
+                # total_old_time += e-s
+                # print(f&#34;make sensor default: {e - s}, size: {p.__sizeof__()}&#34;)
+                # assert(h.first_data_timestamp() == k.first_data_timestamp())
+                # assert(h.last_data_timestamp() == k.last_data_timestamp())
+                # assert(h.num_samples() == k.num_samples())
+        print(f&#34;Run #{i}&#34;)
+        print(f&#34;old_size: {total_old_size}&#34;)
+        print(f&#34;old_time: {total_old_time}&#34;)
+        for a in ptv:
+            print(f&#34;{a}:&#34;, ptv[a])
+        print(f&#34;new_size: {total_new_size}&#34;)
+        print(f&#34;new_time: {total_new_time}&#34;)
+        for b in qtv:
+            print(f&#34;{b}:&#34;, qtv[b])
+        for c in qdtv:
+            print(f&#34;{c}:&#34;, qdtv[c])
+
+
+def pie():
+    settings.set_parallelism_enabled(False)
+
+    # config_main()
+
+    path: str = &#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+    path2: str = &#34;/Users/tyler/Documents/skyfall_pipeline&#34;
+    path3 = &#34;/Users/tyler/Downloads/api900&#34;
+    # start_dt = dt.datetime_from_epoch_seconds_utc(1603806014)
+    # end_dt = start_dt + dt.timedelta(seconds=10*60)
+    start_dt = dt.datetime(2019, 11, 21, 21, 13, 0)
+    end_dt = dt.datetime(2019, 11, 21, 21, 19, 0)
+
+    # v = ApiReader(path3, True, read_filter=ReadFilter(start_dt=start_dt, end_dt=end_dt))
+    # ApiReader(path, True)
+    # ApiReader(path2, True, read_filter=ReadFilter(start_dt=start_dt, end_dt=end_dt))
+
+    # s = now()
+    # idx_py: io.Index = io.index_structured_py(path)
+    # diff(&#34;index_structured: python&#34;, s)
+    # s = now()
+    # stats_py: List[fs.StationStat] = fs.extract_stats_parallel(idx_py)
+    # diff(&#34;extract_stats: python&#34;, s)
+    # s = now()
+    # idx: io.Index = io.index_structured(path)
+    # diff(&#34;index_structured: native&#34;, s)
+    # s = now()
+    # stats: List[fs.StationStat] = fs.extract_stats(idx)
+    # diff(&#34;extract_stats: native&#34;, s)
+
+    # b = ApiReader(path, True)
+
+    # f = b.read_files()
+
+    layout = True
+
+    # input_dir = &#34;/Users/tyler/Downloads/api900_Firevox_20200222_GoodComms&#34;
+    # s = timeit.default_timer()
+    # dws = DataWindowFast(input_dir=input_dir)
+    # e = timeit.default_timer()
+    # print(&#34;api m read &#34;, e - s)
+
+    print(&#34;diff starts&#34;)
+    input_dir = &#34;/Users/tyler/Documents/stress_test_files/api1000&#34;
+
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_apim&#34;
+    # station_ids = [&#34;1637610011&#34;]
+    station_ids = [&#34;1637110701&#34;]
+    # s = timeit.default_timer()
+    # dws = DataWindowFast(input_dir=input_dir,
+    #                      structured_layout=True,
+    #                      station_ids=station_ids
+    #                      )
+    # e = timeit.default_timer()
+    # print(&#34;fast&#34;, e - s)
+    # s = timeit.default_timer()
+    # dwd = DataWindow(input_dir=input_dir,
+    #                  structured_layout=True,
+    #                  station_ids=station_ids
+    #                  )
+    # e = timeit.default_timer()
+    # print(&#34;slow&#34;, e - s)
+
+    print(&#34;80hz&#34;)
+    input_dir = f&#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+    station_ids = [
+                   &#34;1637610011&#34;, &#34;1637610012&#34;, &#34;1637620001&#34;,
+                   &#34;1637610013&#34;, &#34;1637610014&#34;, &#34;1637620002&#34;,
+                   &#34;1637610015&#34;, &#34;1637610016&#34;, &#34;1637620003&#34;,
+                   &#34;1637610017&#34;, &#34;1637610018&#34;, &#34;1637620004&#34;,
+                   &#34;1637610019&#34;, &#34;1637610020&#34;, &#34;1637620005&#34;,
+                   ]
+    start_dt = datetime.datetime(2021, 4, 23, 0, 0, 0)
+    end_dt = datetime.datetime(2021, 4, 23, 0, 20, 0)
+
+    # input_dir = f&#34;/Users/tyler/Downloads/Sweep_20210414/First_set_840_HT&#34;
+    # start_dt = datetime.datetime(2021, 4, 14, 18, 35, 0)
+    # end_dt = datetime.datetime(2021, 4, 14, 18, 45, 0)
+    # station_ids = [&#34;1637620001&#34;, &#34;1637620002&#34;, &#34;1637620003&#34;, &#34;1637620004&#34;, &#34;1637110701&#34;]
+
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_apim&#34;
+    # station_ids = [&#34;1637610011&#34;, &#34;1637610012&#34;]
+    # start_dt = datetime.datetime(2021, 4, 23, 0, 0, 15)
+    # end_dt = datetime.datetime(2021, 4, 23, 0, 0, 40)
+    # layout = False
+
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_data&#34;
+    # station_ids = [&#34;1637610011&#34;, &#34;1637610015&#34;]
+    # start_dt = datetime.datetime(2020, 7, 11, 19, 56, 25)
+    # end_dt = datetime.datetime(2020, 7, 11, 19, 58, 25)
+    # layout = False
+
+    # input_dir = &#34;/Users/tyler/Downloads/gps_repeat&#34;
+    # station_ids = [&#34;1637610012&#34;]
+    # start_dt = dt.datetime_from_epoch_seconds_utc(1619046403)
+    # end_dt = dt.datetime_from_epoch_seconds_utc(1619046404)
+    # layout = False
+
+    # s = timeit.default_timer()
+    # dwd = DataWindow(input_dir=input_dir,
+    #                  structured_layout=layout,
+    #                  station_ids=station_ids,
+    #                  start_datetime=start_dt,
+    #                  end_datetime=end_dt
+    #                  )
+    # e = timeit.default_timer()
+    # print(&#34;fast&#34;, e - s)
+
+    # print(&#34;8k&#34;)
+    input_dir = &#34;/Users/tyler/Documents/skyfall_pipeline&#34;
+    station_ids = [&#34;1637610021&#34;]
+    start_dt = dt.datetime_from_epoch_seconds_utc(1603806314)
+    end_dt = start_dt + dt.timedelta(seconds=120*60)
+
+    # s = timeit.default_timer()
+    # dws = DataWindow(input_dir=input_dir,
+    #                  structured_layout=layout,
+    #                  station_ids=station_ids,
+    #                  start_datetime=start_dt,
+    #                  end_datetime=end_dt,
+    #                  )
+    # e = timeit.default_timer()
+    # print(&#34;fast&#34;, e - s)
+
+    # input_dir = f&#34;/Users/tyler/Downloads/80Hz_GPS_20210421/&#34;
+    # start_dt = datetime.datetime(2021, 4, 21, 23, 00, 0)
+    # end_dt = datetime.datetime(2021, 4, 21, 23, 30, 0)
+
+    # event_name = &#34;Second_set_856_HT&#34;
+    # start_dt = datetime.datetime(2021, 4, 14, 18, 50, 0)
+    # end_dt = datetime.datetime(2021, 4, 14, 19, 0, 0)
+
+    event_name = &#34;Third_set_1029_HT&#34;
+    # start_dt = datetime.datetime(2021, 4, 14, 20, 25, 0)
+    # end_dt = datetime.datetime(2021, 4, 14, 20, 35, 0)
+
+    input_dir = f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}&#34;
+
+    # input_dir = &#34;/Users/tyler/Downloads/nan_pad_test&#34;
+    # start_dt = dt.datetime_from_epoch_seconds_utc(1568140000)
+    # end_dt = dt.datetime_from_epoch_seconds_utc(1568141000)
+    #
+    # s = timeit.default_timer()
+    # dwd = DataWindow(input_dir=input_dir,
+    #                  structured_layout=True,
+    #                  start_datetime=start_dt,
+    #                  end_datetime=end_dt
+    #                  )
+    # e = timeit.default_timer()
+    # print(e - s)
+    #
+    # s = timeit.default_timer()
+    # dws = DataWindowFast(input_dir=input_dir,
+    #                      structured_layout=True,
+    #                      start_datetime=start_dt,
+    #                      end_datetime=end_dt
+    #                      )
+    # e = timeit.default_timer()
+    # print(e - s)
+
+    # dws.to_json_file()
+
+    # s = timeit.default_timer()
+    # dws = DataWindow.from_json_file(base_dir=&#34;.&#34;, file_name=&#34;1619082000_1619083800_10&#34;)
+    # e = timeit.default_timer()
+    # print(e - s)
+
+    # input_dir = &#34;/Users/tyler/Documents/stress_test_files/api1000&#34;
+    # station_ids = [&#34;1637110701&#34;]
+
+    input_dir = &#34;/Users/tyler/Downloads/brissaud/&#34;
+
+    s = timeit.default_timer()
+    dws = DataWindow(input_dir=input_dir,
+                     structured_layout=layout,
+                     # station_ids=station_ids + [&#34;1219553907&#34;],
+                     start_datetime=dt.datetime_from_epoch_seconds_utc(1623500000),
+                     # end_datetime=dt.datetime_from_epoch_seconds_utc(1624500000),
+                     # end_datetime=dt.datetime_from_epoch_seconds_utc(1623831100),
+                     start_buffer_td=datetime.timedelta(seconds=60),
+                     end_buffer_td=datetime.timedelta(seconds=-564361),
+                     debug=True
+                     )
+    e = timeit.default_timer()
+    print(&#34;normal&#34;, e - s)
+
+    print(dws.start_buffer_td)
+    print(dws.end_buffer_td)
+
+    for st in dws.stations:
+        print(st.id)
+        print(st.first_data_timestamp)
+        # print([g for g in st.audio_sensor().get_data_channel(&#34;microphone&#34;) if np.isnan(g)])
+        # print(st.timesync_analysis.get_offsets())
+        # mic_data = st.location_sensor()
+        # print(mic_data.get_data_channel(&#34;location_provider&#34;)[0])
+        # mic_data = st.health_sensor()
+        # print(mic_data.get_data_channel(&#34;network_type&#34;)[0])
+        # print(mic_data.get_data_channel(&#34;power_state&#34;)[0])
+        # print(mic_data.get_data_channel(&#34;cell_service&#34;)[0])
+        # print(mic_data.sample_rate_hz)
+        # print(mic_data.num_samples())
+        # loc_gps = loc_data.get_data_channel(&#34;gps_timestamps&#34;)
+        # loc_ts = loc_data.data_timestamps()
+        # for loc in range(loc_data.num_samples() - 1):
+        #     if loc_gps[loc] == loc_gps[loc+1]:
+        #         print(loc_ts[loc], &#34;: same gps as next point&#34;)
+        # print(np.argwhere(np.isnan(mic_data.get_data_channel(&#34;microphone&#34;))))
+
+
+if __name__ == &#34;__main__&#34;:
+    str_test()
+    # pie()
+    # with_arrow()
+    # arrow_file_read()
+
+
+# def check_recursive_stats(self,
+#                           request_filter: io.ReadFilter,
+#                           pool: Optional[multiprocessing.pool.Pool] = None,
+#                           ):
+#     _pool: multiprocessing.pool.Pool = multiprocessing.Pool() if pool is None else pool
+#     index = self._apply_filter(request_filter)
+#     # if there are no restrictions on time or we found nothing, return the index
+#     if (
+#             (not self.filter.start_dt and not self.filter.end_dt)
+#             or (not request_filter.start_dt and not request_filter.end_dt)
+#             or len(index.entries) &lt; 1
+#     ):
+#         return index
+#     ret = self._check_station_stats_recursive(request_filter=request_filter,
+#                                               pool=_pool,
+#                                               no_more_start=False,
+#                                               no_more_end=False)
+#
+#     if pool is None:
+#         _pool.close()
+#     return ret
+#
+#
+# def _check_station_stats_recursive(
+#         self,
+#         no_more_start: bool,
+#         no_more_end: bool,
+#         request_filter: Optional[io.ReadFilter] = None,
+#         pool: Optional[multiprocessing.pool.Pool] = None
+# ) -&gt; io.Index:
+#
+#     _no_more_start = no_more_start  # re-define as local variables
+#     _no_more_end = no_more_end
+#     index = self._apply_filter(request_filter)
+#     # check for termination condition
+#     if no_more_start and no_more_end:
+#         return index
+#
+#     stats = fs.extract_stats(index, pool=pool)
+#     timing_offsets: Optional[offset_model.TimingOffsets] = offset_model.compute_offsets(stats)
+#
+#     # punt if duration or other important values are invalid or if the latency array was empty
+#     if timing_offsets is None:
+#         return index
+#
+#     # if our filtered files encompass the request even when the packet times are updated, return the index
+#     if (not self.filter.start_dt or timing_offsets.adjusted_start &lt;= self.filter.start_dt) and (
+#             not self.filter.end_dt or timing_offsets.adjusted_end &gt;= self.filter.end_dt
+#     ):
+#         return index
+#
+#     # we have to update our filter to get more information
+#     new_filter = request_filter.clone()
+#     # check if there is a packet just beyond the request times
+#     # if _no_more_start is True, skip
+#     if not _no_more_start and (self.filter.start_dt and timing_offsets.adjusted_start &gt; self.filter.start_dt):
+#         beyond_start = (
+#                 self.filter.start_dt - np.abs(timing_offsets.start_offset) - stats[0].packet_duration
+#         )
+#         start_filter = (
+#             request_filter.clone()
+#                 .with_start_dt(beyond_start)
+#                 .with_end_dt(stats[0].packet_start_dt)
+#                 .with_end_dt_buf(timedelta(seconds=0))
+#         )
+#         start_index = self._apply_filter(start_filter)
+#         # if the beyond check produces an earlier start date time,
+#         #  then update filter, otherwise flag result as no more data to obtain
+#         if (
+#                 len(start_index.entries) &gt; 0
+#                 and start_index.entries[0].date_time &lt; index.entries[0].date_time
+#         ):
+#             new_filter.with_start_dt(beyond_start)
+#             # _no_more_start = False
+#         else:
+#             # This section is reachable only for certain condition.
+#             # =&gt; Potentially inf loop??
+#             # NEEDS REVISE
+#             _no_more_start = True
+#     elif not _no_more_start:
+#         # executes if _no_more_start is still False (e.g. first run)
+#         # but timing_offsets.adjusted_start &lt;= self.filter.start_dt
+#         _no_more_start = True
+#
+#     # check if there is a packet just after the request times
+#     # if _no_more_end is True, skip
+#     if not _no_more_end and (self.filter.end_dt and timing_offsets.adjusted_end &lt; self.filter.end_dt):
+#         beyond_end = self.filter.end_dt + np.abs(timing_offsets.end_offset)
+#         end_filter = (
+#             request_filter.clone()
+#                 .with_start_dt(stats[-1].packet_start_dt + stats[-1].packet_duration)
+#                 .with_end_dt(beyond_end)
+#                 .with_start_dt_buf(timedelta(seconds=0))
+#         )
+#         end_index = self._apply_filter(end_filter)
+#         # if the beyond check produces a later end date time,
+#         #  then update filter, otherwise flag result as no more data to obtain
+#         if (
+#                 len(end_index.entries) &gt; 0
+#                 and end_index.entries[-1].date_time &gt; index.entries[-1].date_time
+#         ):
+#             new_filter.with_end_dt(beyond_end)
+#             # _no_more_end = False
+#         else:
+#             _no_more_end = True
+#     elif not _no_more_end:
+#         _no_more_end = True
+#
+#     return self._check_station_stats_recursive(request_filter=new_filter,
+#                                                pool=pool,
+#                                                no_more_start=_no_more_start,
+#                                                no_more_end=_no_more_end)
+
+
+# def fill_gaps_old(
+#         data_df: pd.DataFrame,
+#         sample_interval_micros: float,
+#         gap_time_micros: float,
+#         num_points_to_brute_force: int = DEFAULT_MAX_BRUTE_FORCE_GAP_TIMESTAMPS,
+# ) -&gt; pd.DataFrame:
+#     &#34;&#34;&#34;
+#     fills gaps in the dataframe with np.nan by interpolating timestamps based on the mean expected sample interval
+#
+#     :param data_df: dataframe with timestamps as column &#34;timestamps&#34;
+#     :param sample_interval_micros: sample interval in microseconds
+#     :param gap_time_micros: minimum amount of microseconds between data points that would indicate a gap
+#     :param num_points_to_brute_force: maximum number of points to calculate when filling a gap
+#     :return: dataframe without gaps
+#     &#34;&#34;&#34;
+#     # extract the necessary information to compute gap size and gap timestamps
+#     data_time_stamps = data_df[&#34;timestamps&#34;].to_numpy()
+#     first_data_timestamp = data_time_stamps[0]
+#     last_data_timestamp = data_time_stamps[-1]
+#     data_duration_micros = last_data_timestamp - first_data_timestamp
+#     num_points = len(data_time_stamps)
+#     # add one to calculation to include the last timestamp
+#     expected_num_points = np.ceil(data_duration_micros / sample_interval_micros) + 1
+#     # gap duration cannot be less than sample interval + one standard deviation
+#     gap_time_micros = np.max([sample_interval_micros, gap_time_micros])
+#     result_df = data_df.copy()
+#     # if there are less points than our expected amount, we have gaps to fill
+#     if num_points &lt; expected_num_points:
+#         # if the data we&#39;re looking at is short enough, we can start comparing points
+#         if num_points &lt; num_points_to_brute_force:
+#             # look at every timestamp difference
+#             timestamp_diffs = np.diff(data_time_stamps)
+#             for index in np.where(timestamp_diffs &gt; gap_time_micros)[0]:
+#                 # calc samples to add, subtracting 1 to prevent copying last timestamp
+#                 num_new_samples = (
+#                         np.ceil(timestamp_diffs[index] / sample_interval_micros) - 1
+#                 )
+#                 if timestamp_diffs[index] &gt; gap_time_micros and num_new_samples &gt; 0:
+#                     # add the gap data to the result dataframe
+#                     result_df = add_dataless_timestamps_to_df(
+#                         result_df,
+#                         index,
+#                         sample_interval_micros,
+#                         num_new_samples,
+#                     )
+#                     if len(result_df) &gt;= expected_num_points:
+#                         break  # stop the for loop execution when enough points are added
+#         else:
+#             # too many points to check, divide and conquer using recursion!
+#             half_samples = int(num_points / 2)
+#             first_data_df = data_df.iloc[:half_samples].copy().reset_index(drop=True)
+#             second_data_df = data_df.iloc[half_samples:].copy().reset_index(drop=True)
+#             # give half the samples to each recursive call
+#             first_data_df = fill_gaps_old(
+#                 first_data_df,
+#                 sample_interval_micros,
+#                 gap_time_micros,
+#                 num_points_to_brute_force,
+#             )
+#             second_data_df = fill_gaps_old(
+#                 second_data_df,
+#                 sample_interval_micros,
+#                 gap_time_micros,
+#                 num_points_to_brute_force,
+#             )
+#             result_df = first_data_df.append(second_data_df, ignore_index=True)
+#             if result_df[&#34;timestamps&#34;].size &lt; expected_num_points:
+#                 mid_df = data_df.iloc[half_samples-1:half_samples+1].copy().reset_index(drop=True)
+#                 mid_df = fill_gaps_old(mid_df, sample_interval_micros, gap_time_micros, num_points_to_brute_force)
+#                 mid_df = mid_df.iloc[1:len(mid_df[&#34;timestamps&#34;])-1]
+#                 result_df = result_df.append(mid_df, ignore_index=True)
+#     return result_df.sort_values(&#34;timestamps&#34;, ignore_index=True)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="redvox.tests.my_tests.arrow_file_read"><code class="name flex">
+<span>def <span class="ident">arrow_file_read</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def arrow_file_read():
+    # settings.set_parallelism_enabled(True)
+    # s_ids = [&#34;1637610018&#34;, &#34;1637610017&#34;, &#34;1637610016&#34;, &#34;1637610015&#34;, &#34;1637610014&#34;,
+    #          &#34;1637610013&#34;, &#34;1637610012&#34;, &#34;1637610011&#34;, &#34;1637610019&#34;, &#34;1637620005&#34;]
+    path: str = &#34;/Users/tyler/Downloads/api1000 2/2021/08/04/20&#34;
+    # path = &#34;/Users/tyler/Documents/pyarrowreadertest&#34;
+    path = &#34;/Users/tyler/Documents/pyarrowreadertest/&#34;
+    save_path1 = &#34;/Users/tyler/Documents/pyarrowreadertest/small_test&#34;
+    # ddict = dwthing.as_dict()
+    # ar = ApiReader(path, False)
+    # path: str = &#34;/Users/tyler/Downloads/api900&#34;
+    # ar = ApiReader(path, True, ReadFilter(station_ids={&#34;1637681015&#34;, &#34;1637110703&#34;}))
+
+    # pa_test_dir = os.path.join(&#34;/Users/tyler/IdeaProjects/redvox-python-sdk/redvox/tests/common/pa_test&#34;)
+
+    # path: str = &#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+    # path: str = &#34;/Users/Tyler/Downloads/health_check/&#34;
+    # ar = ApiReader(path, True, ReadFilter(station_ids=set(s_ids)))
+    # ar = ApiReader(path, True)
+
+    path = &#34;/Users/tyler/Documents/skyfall2full/&#34;
+    save_path10 = &#34;/Users/tyler/Documents/pyarrowreadertest/large_test2&#34;
+
+    dw_config = dwpa.DataWindowConfig(path,
+                                      structured_layout=True,
+                                      start_datetime=dt.datetime_from_epoch_seconds_utc(1628035207),
+                                      end_datetime=dt.datetime_from_epoch_seconds_utc(1628035507)
+                                      )
+                                         # start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+                                         # end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+
+    # s = timeit.default_timer()
+    # dwa = dwpa.DataWindowArrow(&#34;small_test_no_save&#34;, config=dw_config, out_type=&#34;NONE&#34;)
+    # e = timeit.default_timer()
+    # print(&#34;nosave&#34;, e-s)
+    #
+    # for s in dwa.stations():
+    #     print(s.id(), s.gaps())
+
+    # s = timeit.default_timer()
+    # dwaz = dwpa.DataWindowArrow(&#34;large_test_lz4&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;LZ4&#34;)
+    # e = timeit.default_timer()
+    # print(&#34;lz4&#34;, e-s)
+    # dwaz.save()
+
+    # s = timeit.default_timer()
+    # drws = dwpa.DataWindowArrow(&#34;large_test&#34;, config=dw_config, out_dir=save_path10, out_type=&#34;PARQUET&#34;)
+    # e = timeit.default_timer()
+    # print(&#34;parquet&#34;, e-s)
+    # drws.save()
+
+    # s = timeit.default_timer()
+    # old_dwaz = DataWindow(path,
+    #                       structured_layout=True,
+    #                       start_datetime=dt.datetime_from_epoch_seconds_utc(16280352070),
+    #                       end_datetime=dt.datetime_from_epoch_seconds_utc(16280352370)
+    #                       )
+    #                       # start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                       # end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+    # e = timeit.default_timer()
+    # print(&#34;old dw&#34;, e-s)
+    # old_dwaz.serialize(save_path10, &#34;old_dwaz.pkl.lz4&#34;)
+    #
+    # s = timeit.default_timer()
+    # old_dwaz = DataWindow.deserialize(os.path.join(save_path10, &#34;old_dwaz.pkl.lz4&#34;))
+    # e = timeit.default_timer()
+    # print(&#34;load old dw&#34;, e-s)
+
+    s = timeit.default_timer()
+    drws = dwpa.DataWindow.load(os.path.join(save_path10, &#34;large_test.json&#34;))
+    e = timeit.default_timer()
+    print(&#34;load parquet&#34;, e-s)
+
+    # s = timeit.default_timer()
+    # dwaz = dwpa.DataWindowArrow.deserialize(os.path.join(save_path10, &#34;large_test_lz4.pkl.lz4&#34;))
+    # e = timeit.default_timer()
+    # print(&#34;load lz4&#34;, e-s)
+
+    # print(&#34;size of old lz4: &#34;, pickle.dumps(old_dwaz).__sizeof__())
+    # print(&#34;size of lz4:     &#34;, pickle.dumps(dwaz).__sizeof__())
+    # print(&#34;size of nosave:  &#34;, pickle.dumps(dwa).__sizeof__())
+    # print(&#34;size of parquet: &#34;, pickle.dumps(drws).__sizeof__())
+
+    print(&#34;data test&#34;)
+    # print(dwa.stations()[0].audio_sensor().num_samples())
+    print(drws.stations()[0].audio_sensor().num_samples())
+    # print(dwa.stations()[0].barometer_sensor().num_samples())
+    print(drws.stations()[0].barometer_sensor().num_samples())
+    # print(dwa.stations()[0].has_location_sensor())
+    # print(dwa.stations()[0].health_sensor().get_cell_service_data()[0])
+    # print(dwa.stations()[0].accelerometer_sensor().first_data_timestamp())
+    # print(old_dwaz.stations[0].accelerometer_sensor().first_data_timestamp())
+    # # print(dwaz.stations()[0].audio_sensor().first_data_timestamp())
+    print(drws.stations()[0].audio_sensor().first_data_timestamp())
+    print(drws.stations()[0].audio_sensor().get_microphone_data()[0])
+    # # # print(dwaz.stations()[0].location_sensor().first_data_timestamp())
+    # print(drws.stations()[0].best_location_sensor().first_data_timestamp())
+    # print(drws.stations()[0].best_location_sensor().get_latitude_data()[0])
+    # # print(dwaz.stations()[0].barometer_sensor().first_data_timestamp())
+    # print(drws.stations()[0].barometer_sensor().first_data_timestamp())
+    # print(drws.stations()[0].barometer_sensor().get_pressure_data()[0])
+    # # print(dwaz.stations()[0].health_sensor().first_data_timestamp())
+    # print(drws.stations()[0].health_sensor().first_data_timestamp())
+    # print(drws.stations()[0].health_sensor().get_cell_service_data()[0])
+    # print(drws.stations()[0].health_sensor().get_battery_charge_remaining_data()[0])
+    #
+    # assert(dwa.stations()[0].audio_sensor().num_samples() == old_dwaz.stations[0].audio_sensor().num_samples())
+    # assert(dwa.stations()[0].has_location_data() == old_dwaz.stations[0].has_location_data())
+    # assert(dwa.stations()[0].accelerometer_sensor().first_data_timestamp()
+    #        == old_dwaz.stations[0].accelerometer_sensor().first_data_timestamp())
+    # assert(dwa.stations()[0].health_sensor().first_data_timestamp()
+    #        == old_dwaz.stations[0].health_sensor().first_data_timestamp())
+
+    # dwa.save()
+
+    # drws = dwpa.DataWindowArrow.from_json_file(os.path.join(save_path, &#34;small_test_lz4.json&#34;))
+    # drws = dwpa.DataWindowArrow.from_json_file(os.path.join(save_path, &#34;small_test.json&#34;))
+
+    # sf_test = ApiReader(&#34;/Users/tyler/Documents/skyfall2full&#34;, structured_dir=True,
+    #                     read_filter=ReadFilter(start_dt=dt.datetime_from_epoch_seconds_utc(1628006500),
+    #                                            end_dt=dt.datetime_from_epoch_seconds_utc(16280006530)))
+    # st_test = sf_test.read_files_by_id(&#34;1637610021&#34;)[0].station_information.station_metrics
+    #
+    # bf_test = ApiReader(path, structured_dir=True,
+    #                     read_filter=ReadFilter(start_dt=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                                            end_dt=dt.datetime_from_epoch_seconds_utc(1629339790)))
+    # bt_test = bf_test.read_files_by_id(&#34;1637620001&#34;)[0].station_information.station_metrics
+    #
+    # print(&#34;pre-fix&#34;)
+    # print(st_test.cpu_utilization.values)
+    # print(st_test.wifi_wake_lock)
+    #
+    # print(&#34;&#34;)
+    #
+    # print(&#34;post-fix&#34;)
+    # print(bt_test.cpu_utilization.values)
+    # print(bt_test.wifi_wake_lock)
+
+    # dwc = DataWindow(path, True,
+    #                      start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                      end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+    # dwc.to_json_file(save_path, &#34;test_event_dw&#34;)
+    # dwj = DataWindow.from_json_file(save_path, &#34;skyfall2&#34;)
+    # dw_config = dwpa.DataWindowConfigWpa(structured_layout=True,
+    #                                      start_datetime=dt.datetime_from_epoch_seconds_utc(1629339760),
+    #                                      end_datetime=dt.datetime_from_epoch_seconds_utc(1629339790))
+    # dwa = dwpa.DataWindowArrow(path, dw_config,
+    #                                save_station_files=True,
+    #                                station_out_dir=save_path
+    #                                )
+    # dwr = dwthing.create_window_results(&#34;test_event_dw&#34;, save_path, dwpa.DataWindowResultLocation(), 0.)
+    # dwr.write()
+    # dwaj = dwpa.DataWindowArrow.from_json_file(&#34;/Users/tyler/Documents/pyarrowreadertest/test_out_small/&#34;
+    #                                               &#34;test_event_dw.json&#34;)
+
+    path = &#34;/Users/tyler/Documents/skyfall2full&#34;
+    save_path = &#34;/Users/tyler/Documents/pyarrowreadertest/skyfall2&#34;
+
+    # s = timeit.default_timer()
+    # dwthing = DataWindow(path, True,
+    #                      start_datetime=dt.datetime_from_epoch_seconds_utc(1627998300),
+    #                      end_datetime=dt.datetime_from_epoch_seconds_utc(1628010000))
+    # dwthing.to_json_file(save_path, &#34;skyfall2&#34;)
+    # dwthing = DataWindow.from_json_file(save_path, &#34;skyfall2&#34;)
+    # dw_config = dwpa.DataWindowConfigWpa(structured_layout=True,
+    #                                      start_datetime=dt.datetime_from_epoch_seconds_utc(1627998300),
+    #                                      end_datetime=dt.datetime_from_epoch_seconds_utc(1628010000))
+    # dwthing = dwpa.DataWindowArrow(path, dw_config,
+    #                                save_station_files=True,
+    #                                station_out_dir=save_path
+    #                                )
+    # dwr = dwthing.create_window_results(&#34;skyfall2&#34;, save_path, dwpa.DataWindowResultLocation(), 0.)
+    # dwr.write()
+    # dwthing = dwpa.DataWindowArrow.from_json_file(&#34;/Users/tyler/Documents/pyarrowreadertest/skyfall2/&#34;
+    #                                               &#34;skyfall2_dw.json&#34;)
+    # sthing = ar.get_stations_wpa_fs()
+    # e = timeit.default_timer()
+    # print(e-s)
+    # dwthing = dwpa.DataWindowArrow.from_json_file(&#34;/Users/tyler/Documents/pyarrowreadertest/test_out_smol/&#34;
+    #                                          &#34;test_event_dw.json&#34;)
+    # for og in dwthing.stations:
+    #     print(og.first_data_timestamp)
+    #     print(og.last_data_timestamp)
+    #     print(og.audio_sensor().num_samples())
+    #     og.errors.print()
+    #     ppd = pickle.dumps(og).__sizeof__()
+    #     print(ppd)
+
+    # print()
+    #
+    # s = timeit.default_timer()
+    # # oneter = DataWindow(path, station_ids=[&#34;1637681015&#34;, &#34;1637110703&#34;])
+    # # oneter = DataWindow(path)
+    # oneter = ar.get_stations()
+    # e = timeit.default_timer()
+    # print(e-s)
+    # for on in oneter:
+    #     print(on.first_data_timestamp)
+    #     print(on.last_data_timestamp)
+    #     print(on.audio_sensor().num_samples())
+    #     on.errors.print()
+    #     pps = pickle.dumps(on).__sizeof__()
+    #     print(pps)
+
+    # s = timeit.default_timer()
+    # lolz = ar.get_stations()
+    # e = timeit.default_timer()
+    # print(e-s)
+    # for lz in lolz:
+    #     ppp = pickle.dumps(lz).__sizeof__()
+    #     print(ppp)
+
+    # path: str = &#34;/Users/tyler/Documents/pyarrowreadertest&#34;
+    # ar = ApiReader(path, False, ReadFilter())
+    #
+    # ar.get_stations_rfiiwpa()</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.config_main"><code class="name flex">
+<span>def <span class="ident">config_main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def config_main():
+
+    config = DataWindowConfigFile.from_path(
+        &#34;/Users/tyler/IdeaProjects/redvox-python-sdk/redvox/tests/my_tests.config.toml&#34;)
+    s = timeit.default_timer()
+    dwf = DataWindow.from_config(config)
+    e = timeit.default_timer()
+    print(&#34;from config&#34;, e-s)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.diff"><code class="name flex">
+<span>def <span class="ident">diff</span></span>(<span>desc: str, prev: <module 'datetime' from '/usr/local/Cellar/python@3.9/3.9.6/Frameworks/Python.framework/Versions/3.9/lib/python3.9/datetime.py'>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def diff(desc: str, prev: datetime) -&gt; None:
+    print(f&#34;{desc}: {(now() - prev).total_seconds() * 1_000.0} ms&#34;)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    event_name = &#34;First_set_840_HT&#34;
+    # try:
+    #     dw = DataWindow.deserialize(f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}/{event_name}.pkl.lz4&#34;)
+    # except FileNotFoundError:
+    s = timeit.default_timer()
+    dwg = DataWindow(input_dir=f&#34;/Users/tyler/Downloads/80Hz_GPS_20210421&#34;, structured_layout=True,
+                     # station_ids=[&#34;1637610011&#34;],
+                     start_datetime=datetime.datetime(2021, 4, 21, 23, 0, 0),
+                     end_datetime=datetime.datetime(2021, 4, 21, 23, 30, 0)
+                     )
+    e = timeit.default_timer()
+    print(e - s)
+
+    # dw = DataWindow(input_dir=f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}&#34;, structured_layout=True,
+    #                 station_ids=[&#34;1637620003&#34;],
+    #                 start_datetime=datetime.datetime(2021, 4, 14, 18, 40, 0),
+    #                 end_datetime=datetime.datetime(2021, 4, 14, 18, 40, 1),
+    #                 end_buffer_td=datetime.timedelta(seconds=0)
+    #                 )
+    #     dw.serialize(f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}&#34;, f&#34;{event_name}.pkl.lz4&#34;)
+    #     print(&#34;saved to disk&#34;)
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_data&#34;
+    # station_ids = [&#34;1637610015&#34;]
+    # start_padding_s = 120
+    # end_padding_s = 120
+    # gap_time_s = 0.25
+    # apply_correction = False
+    # structured_layout = False
+    # dwc = DataWindowConfig(input_dir, structured_layout, station_ids,
+    #                        start_year=2020, start_month=7, start_day=11,
+    #                        start_hour=19, start_minute=56, start_second=25,
+    #                        end_year=2020, end_month=7, end_day=11,
+    #                        end_hour=19, end_minute=57, end_second=25,
+    #                        start_padding_seconds=start_padding_s, end_padding_seconds=end_padding_s,
+    #                        gap_time_seconds=gap_time_s, apply_correction=apply_correction)
+    # dwc = DataWindowConfig(input_dir, structured_layout, station_ids,
+    #                        start_year=2020, start_month=7, start_day=11,
+    #                        start_hour=19, start_minute=55, start_second=30,
+    #                        end_year=2020, end_month=7, end_day=11,
+    #                        end_hour=19, end_minute=56, end_second=30,
+    #                        start_padding_seconds=start_padding_s, end_padding_seconds=end_padding_s,
+    #                        gap_time_seconds=gap_time_s, apply_correction=apply_correction)
+
+    # dw = DataWindowSimple.from_config(dwc)
+
+    for station in dwg.stations:
+        print(station.id)
+        # station.location_sensor().get_data_channel(&#34;a&#34;)
+        # if station.has_location_data():
+        #     diffs = np.abs(station.location_sensor().data_timestamps()
+        #                    - station.location_sensor().get_data_channel(&#34;gps_timestamps&#34;))
+        #     print(diffs)
+        #     print(&#34;mean of (mach - gps timestamps): &#34;, np.nanmean(diffs))
+        #     print(&#34;std of (mach - gps timestamps): &#34;, np.nanstd(diffs))
+    # print(&#34;hi&#34;)
+
+    # debug, gap in middle, switch statement
+    # created timestamps in: 0.0010081179999996692
+    # created timestamps in: 0.0010188819999994436
+
+    # created timestamps in: 0.0009492180000001404
+    # created timestamps in: 0.0006874209999998548</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.now"><code class="name flex">
+<span>def <span class="ident">now</span></span>(<span>) ‑> <module 'datetime' from '/usr/local/Cellar/python@3.9/3.9.6/Frameworks/Python.framework/Versions/3.9/lib/python3.9/datetime.py'></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def now() -&gt; datetime:
+    return dt.now()</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.pie"><code class="name flex">
+<span>def <span class="ident">pie</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pie():
+    settings.set_parallelism_enabled(False)
+
+    # config_main()
+
+    path: str = &#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+    path2: str = &#34;/Users/tyler/Documents/skyfall_pipeline&#34;
+    path3 = &#34;/Users/tyler/Downloads/api900&#34;
+    # start_dt = dt.datetime_from_epoch_seconds_utc(1603806014)
+    # end_dt = start_dt + dt.timedelta(seconds=10*60)
+    start_dt = dt.datetime(2019, 11, 21, 21, 13, 0)
+    end_dt = dt.datetime(2019, 11, 21, 21, 19, 0)
+
+    # v = ApiReader(path3, True, read_filter=ReadFilter(start_dt=start_dt, end_dt=end_dt))
+    # ApiReader(path, True)
+    # ApiReader(path2, True, read_filter=ReadFilter(start_dt=start_dt, end_dt=end_dt))
+
+    # s = now()
+    # idx_py: io.Index = io.index_structured_py(path)
+    # diff(&#34;index_structured: python&#34;, s)
+    # s = now()
+    # stats_py: List[fs.StationStat] = fs.extract_stats_parallel(idx_py)
+    # diff(&#34;extract_stats: python&#34;, s)
+    # s = now()
+    # idx: io.Index = io.index_structured(path)
+    # diff(&#34;index_structured: native&#34;, s)
+    # s = now()
+    # stats: List[fs.StationStat] = fs.extract_stats(idx)
+    # diff(&#34;extract_stats: native&#34;, s)
+
+    # b = ApiReader(path, True)
+
+    # f = b.read_files()
+
+    layout = True
+
+    # input_dir = &#34;/Users/tyler/Downloads/api900_Firevox_20200222_GoodComms&#34;
+    # s = timeit.default_timer()
+    # dws = DataWindowFast(input_dir=input_dir)
+    # e = timeit.default_timer()
+    # print(&#34;api m read &#34;, e - s)
+
+    print(&#34;diff starts&#34;)
+    input_dir = &#34;/Users/tyler/Documents/stress_test_files/api1000&#34;
+
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_apim&#34;
+    # station_ids = [&#34;1637610011&#34;]
+    station_ids = [&#34;1637110701&#34;]
+    # s = timeit.default_timer()
+    # dws = DataWindowFast(input_dir=input_dir,
+    #                      structured_layout=True,
+    #                      station_ids=station_ids
+    #                      )
+    # e = timeit.default_timer()
+    # print(&#34;fast&#34;, e - s)
+    # s = timeit.default_timer()
+    # dwd = DataWindow(input_dir=input_dir,
+    #                  structured_layout=True,
+    #                  station_ids=station_ids
+    #                  )
+    # e = timeit.default_timer()
+    # print(&#34;slow&#34;, e - s)
+
+    print(&#34;80hz&#34;)
+    input_dir = f&#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+    station_ids = [
+                   &#34;1637610011&#34;, &#34;1637610012&#34;, &#34;1637620001&#34;,
+                   &#34;1637610013&#34;, &#34;1637610014&#34;, &#34;1637620002&#34;,
+                   &#34;1637610015&#34;, &#34;1637610016&#34;, &#34;1637620003&#34;,
+                   &#34;1637610017&#34;, &#34;1637610018&#34;, &#34;1637620004&#34;,
+                   &#34;1637610019&#34;, &#34;1637610020&#34;, &#34;1637620005&#34;,
+                   ]
+    start_dt = datetime.datetime(2021, 4, 23, 0, 0, 0)
+    end_dt = datetime.datetime(2021, 4, 23, 0, 20, 0)
+
+    # input_dir = f&#34;/Users/tyler/Downloads/Sweep_20210414/First_set_840_HT&#34;
+    # start_dt = datetime.datetime(2021, 4, 14, 18, 35, 0)
+    # end_dt = datetime.datetime(2021, 4, 14, 18, 45, 0)
+    # station_ids = [&#34;1637620001&#34;, &#34;1637620002&#34;, &#34;1637620003&#34;, &#34;1637620004&#34;, &#34;1637110701&#34;]
+
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_apim&#34;
+    # station_ids = [&#34;1637610011&#34;, &#34;1637610012&#34;]
+    # start_dt = datetime.datetime(2021, 4, 23, 0, 0, 15)
+    # end_dt = datetime.datetime(2021, 4, 23, 0, 0, 40)
+    # layout = False
+
+    # input_dir = &#34;/Users/tyler/IdeaProjects/redvox-projects/tyler/test_read_data&#34;
+    # station_ids = [&#34;1637610011&#34;, &#34;1637610015&#34;]
+    # start_dt = datetime.datetime(2020, 7, 11, 19, 56, 25)
+    # end_dt = datetime.datetime(2020, 7, 11, 19, 58, 25)
+    # layout = False
+
+    # input_dir = &#34;/Users/tyler/Downloads/gps_repeat&#34;
+    # station_ids = [&#34;1637610012&#34;]
+    # start_dt = dt.datetime_from_epoch_seconds_utc(1619046403)
+    # end_dt = dt.datetime_from_epoch_seconds_utc(1619046404)
+    # layout = False
+
+    # s = timeit.default_timer()
+    # dwd = DataWindow(input_dir=input_dir,
+    #                  structured_layout=layout,
+    #                  station_ids=station_ids,
+    #                  start_datetime=start_dt,
+    #                  end_datetime=end_dt
+    #                  )
+    # e = timeit.default_timer()
+    # print(&#34;fast&#34;, e - s)
+
+    # print(&#34;8k&#34;)
+    input_dir = &#34;/Users/tyler/Documents/skyfall_pipeline&#34;
+    station_ids = [&#34;1637610021&#34;]
+    start_dt = dt.datetime_from_epoch_seconds_utc(1603806314)
+    end_dt = start_dt + dt.timedelta(seconds=120*60)
+
+    # s = timeit.default_timer()
+    # dws = DataWindow(input_dir=input_dir,
+    #                  structured_layout=layout,
+    #                  station_ids=station_ids,
+    #                  start_datetime=start_dt,
+    #                  end_datetime=end_dt,
+    #                  )
+    # e = timeit.default_timer()
+    # print(&#34;fast&#34;, e - s)
+
+    # input_dir = f&#34;/Users/tyler/Downloads/80Hz_GPS_20210421/&#34;
+    # start_dt = datetime.datetime(2021, 4, 21, 23, 00, 0)
+    # end_dt = datetime.datetime(2021, 4, 21, 23, 30, 0)
+
+    # event_name = &#34;Second_set_856_HT&#34;
+    # start_dt = datetime.datetime(2021, 4, 14, 18, 50, 0)
+    # end_dt = datetime.datetime(2021, 4, 14, 19, 0, 0)
+
+    event_name = &#34;Third_set_1029_HT&#34;
+    # start_dt = datetime.datetime(2021, 4, 14, 20, 25, 0)
+    # end_dt = datetime.datetime(2021, 4, 14, 20, 35, 0)
+
+    input_dir = f&#34;/Users/tyler/Downloads/Sweep_20210414/{event_name}&#34;
+
+    # input_dir = &#34;/Users/tyler/Downloads/nan_pad_test&#34;
+    # start_dt = dt.datetime_from_epoch_seconds_utc(1568140000)
+    # end_dt = dt.datetime_from_epoch_seconds_utc(1568141000)
+    #
+    # s = timeit.default_timer()
+    # dwd = DataWindow(input_dir=input_dir,
+    #                  structured_layout=True,
+    #                  start_datetime=start_dt,
+    #                  end_datetime=end_dt
+    #                  )
+    # e = timeit.default_timer()
+    # print(e - s)
+    #
+    # s = timeit.default_timer()
+    # dws = DataWindowFast(input_dir=input_dir,
+    #                      structured_layout=True,
+    #                      start_datetime=start_dt,
+    #                      end_datetime=end_dt
+    #                      )
+    # e = timeit.default_timer()
+    # print(e - s)
+
+    # dws.to_json_file()
+
+    # s = timeit.default_timer()
+    # dws = DataWindow.from_json_file(base_dir=&#34;.&#34;, file_name=&#34;1619082000_1619083800_10&#34;)
+    # e = timeit.default_timer()
+    # print(e - s)
+
+    # input_dir = &#34;/Users/tyler/Documents/stress_test_files/api1000&#34;
+    # station_ids = [&#34;1637110701&#34;]
+
+    input_dir = &#34;/Users/tyler/Downloads/brissaud/&#34;
+
+    s = timeit.default_timer()
+    dws = DataWindow(input_dir=input_dir,
+                     structured_layout=layout,
+                     # station_ids=station_ids + [&#34;1219553907&#34;],
+                     start_datetime=dt.datetime_from_epoch_seconds_utc(1623500000),
+                     # end_datetime=dt.datetime_from_epoch_seconds_utc(1624500000),
+                     # end_datetime=dt.datetime_from_epoch_seconds_utc(1623831100),
+                     start_buffer_td=datetime.timedelta(seconds=60),
+                     end_buffer_td=datetime.timedelta(seconds=-564361),
+                     debug=True
+                     )
+    e = timeit.default_timer()
+    print(&#34;normal&#34;, e - s)
+
+    print(dws.start_buffer_td)
+    print(dws.end_buffer_td)
+
+    for st in dws.stations:
+        print(st.id)
+        print(st.first_data_timestamp)
+        # print([g for g in st.audio_sensor().get_data_channel(&#34;microphone&#34;) if np.isnan(g)])
+        # print(st.timesync_analysis.get_offsets())
+        # mic_data = st.location_sensor()
+        # print(mic_data.get_data_channel(&#34;location_provider&#34;)[0])
+        # mic_data = st.health_sensor()
+        # print(mic_data.get_data_channel(&#34;network_type&#34;)[0])
+        # print(mic_data.get_data_channel(&#34;power_state&#34;)[0])
+        # print(mic_data.get_data_channel(&#34;cell_service&#34;)[0])
+        # print(mic_data.sample_rate_hz)
+        # print(mic_data.num_samples())
+        # loc_gps = loc_data.get_data_channel(&#34;gps_timestamps&#34;)
+        # loc_ts = loc_data.data_timestamps()
+        # for loc in range(loc_data.num_samples() - 1):
+        #     if loc_gps[loc] == loc_gps[loc+1]:
+        #         print(loc_ts[loc], &#34;: same gps as next point&#34;)
+        # print(np.argwhere(np.isnan(mic_data.get_data_channel(&#34;microphone&#34;))))</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.str_test"><code class="name flex">
+<span>def <span class="ident">str_test</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def str_test():
+    config = DataWindowConfig(&#34;/Users/tyler/Documents/inlblast_2021_9_30&#34;,
+                              structured_layout=True,
+                              station_ids=[&#34;1637610036&#34;],
+                              start_datetime=datetime.datetime(2021, 9, 30, 17, 0, 0),
+                              end_datetime=datetime.datetime(2021, 9, 30, 17, 5, 0))
+    dw = DataWindow(&#34;test_str_repr&#34;, config=config)
+    print(&#34;string: &#34;, dw)
+    print(&#34;repr: &#34;, repr(dw))
+    print(&#34;dict: &#34;, dw.as_dict())</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.my_tests.with_arrow"><code class="name flex">
+<span>def <span class="ident">with_arrow</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def with_arrow():
+    settings.set_parallelism_enabled(True)
+    for i in range(2):
+        total_old_size = 0
+        total_old_time = 0
+        total_new_size = 0
+        total_new_time = 0
+        # path: str = &#34;/Users/tyler/Downloads/20210423_80Hz_baseline&#34;
+        path: str = &#34;/Users/tyler/Downloads/api900&#34;
+
+        # start_dt = dt.datetime_from_epoch_microseconds_utc(1574370831086103.0)
+        start_dt = dt.datetime_from_epoch_seconds_utc(1574371000.0)
+        end_dt = dt.datetime_from_epoch_seconds_utc(1574371001.0)
+        # end_dt = dt.datetime_from_epoch_microseconds_utc(1574371076847298.0)
+
+        station_ids = [&#34;1637681015&#34;, &#34;1637110703&#34;, &#34;1637110703&#34;, &#34;1637110703&#34;]
+                       # [&#34;1637610016&#34;, &#34;1637610011&#34;, &#34;1637610013&#34;, &#34;1637610025&#34;, &#34;1637610021&#34;, &#34;1637610022&#34;,
+                       # &#34;1637610024&#34;, &#34;1637681015&#34;, &#34;1637610001&#34;, &#34;1637610002&#34;, &#34;1637662002&#34;, &#34;1637199002&#34;,
+                       # &#34;1637110703&#34;, &#34;1637110001&#34;]
+
+        s = timeit.default_timer()
+        # dw_wpa = dwpa.DataWindow(path,
+        #                          station_ids=station_ids,
+        #                          start_datetime=start_dt, end_datetime=end_dt,
+        #                          debug=True)
+        e = timeit.default_timer()
+        total_new_time += e-s
+
+        s = timeit.default_timer()
+        dw = DataWindow(path,
+                        station_ids=station_ids,
+                        start_datetime=start_dt, end_datetime=end_dt,
+                        debug=True)
+        e = timeit.default_timer()
+        total_old_time += e-s
+
+        qtv = {}
+        qdtv = {}
+        ptv = {}
+        # for sta in dw_wpa.stations:
+        #     qtv[sta.id] = []
+        #     qdtv[sta.id] = []
+        #     for sen in sta.data():
+        #         q = sen.pyarrow_table().__sizeof__()
+        #         qd = sen.data_df()
+        #         qdt = qd.__sizeof__()
+        #         qdtv[sta.id].append([qdt, sen.type.name])
+        #         qtv[sta.id].append([q, sen.type.name])
+        #         total_new_size += q
+        for sta in dw.stations:
+            ptv[sta.id] = []
+            for sen in sta.data:
+                pt = sen.data_df.__sizeof__()
+                ptv[sta.id].append([pt, sen.type.name])
+                total_old_size += pt
+
+        # for sta in dw_wpa.stations:
+        #     audi = sta.audio_sensor().get_pyarrow_table().columns
+        #     art = pickle.dumps(audi).__sizeof__()
+
+            # br = dw.stations[0].audio_sensor().data_df.values
+            # brt = pickle.dumps(br).__sizeof__()
+
+        # for k in dw_wpa.station_ids:
+        #     if k not in dw.station_ids:
+        #         print(&#34;MISMATCH&#34;)
+        #     assert(dw_wpa.get_station(k)[0].audio_sensor().first_data_timestamp()
+        #            == dw.get_station(k)[0].audio_sensor().first_data_timestamp())
+
+        # t = ApiReader(path, True)
+        #
+        # s = timeit.default_timer()
+        # st_wpa = t.get_stations_wpa()
+        # e = timeit.default_timer()
+        # p = pickle.dumps(st_wpa)
+        # total_new_size += p.__sizeof__()
+        # total_new_time += e-s
+        #
+        # s = timeit.default_timer()
+        # st = t.get_stations()
+        # e = timeit.default_timer()
+        # p = pickle.dumps(st)
+        # total_old_size += p.__sizeof__()
+        # total_old_time += e-s
+
+        # for m in t.files_index:
+        #     for f in m.stream_raw():
+                # s = timeit.default_timer()
+                # h: SensorDataPa = srupa.load_apim_audio(f)
+                # e = timeit.default_timer()
+                # p = pickle.dumps(h)
+                # total_new_size += p.__sizeof__()
+                # total_new_time += e-s
+                # print(f&#34;make sensor default: {e - s}, size: {p.__sizeof__()}&#34;)
+                # s = timeit.default_timer()
+                # k: SensorData = sru.load_apim_audio(f)
+                # e = timeit.default_timer()
+                # p = pickle.dumps(k)
+                # total_old_size += p.__sizeof__()
+                # total_old_time += e-s
+                # print(f&#34;make sensor default: {e - s}, size: {p.__sizeof__()}&#34;)
+                # assert(h.first_data_timestamp() == k.first_data_timestamp())
+                # assert(h.last_data_timestamp() == k.last_data_timestamp())
+                # assert(h.num_samples() == k.num_samples())
+        print(f&#34;Run #{i}&#34;)
+        print(f&#34;old_size: {total_old_size}&#34;)
+        print(f&#34;old_time: {total_old_time}&#34;)
+        for a in ptv:
+            print(f&#34;{a}:&#34;, ptv[a])
+        print(f&#34;new_size: {total_new_size}&#34;)
+        print(f&#34;new_time: {total_new_time}&#34;)
+        for b in qtv:
+            print(f&#34;{b}:&#34;, qtv[b])
+        for c in qdtv:
+            print(f&#34;{c}:&#34;, qdtv[c])</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="redvox.tests" href="index.html">redvox.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="redvox.tests.my_tests.arrow_file_read" href="#redvox.tests.my_tests.arrow_file_read">arrow_file_read</a></code></li>
+<li><code><a title="redvox.tests.my_tests.config_main" href="#redvox.tests.my_tests.config_main">config_main</a></code></li>
+<li><code><a title="redvox.tests.my_tests.diff" href="#redvox.tests.my_tests.diff">diff</a></code></li>
+<li><code><a title="redvox.tests.my_tests.main" href="#redvox.tests.my_tests.main">main</a></code></li>
+<li><code><a title="redvox.tests.my_tests.now" href="#redvox.tests.my_tests.now">now</a></code></li>
+<li><code><a title="redvox.tests.my_tests.pie" href="#redvox.tests.my_tests.pie">pie</a></code></li>
+<li><code><a title="redvox.tests.my_tests.str_test" href="#redvox.tests.my_tests.str_test">str_test</a></code></li>
+<li><code><a title="redvox.tests.my_tests.with_arrow" href="#redvox.tests.my_tests.with_arrow">with_arrow</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

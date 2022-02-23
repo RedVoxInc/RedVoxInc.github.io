@@ -46,14 +46,14 @@ from typing import (
 
 import lz4.frame
 
-from redvox.common.io import FileSystemWriter, json_to_dict
+from redvox.common.io import FileSystemWriter, FileSystemSaveMode, json_to_dict, dict_to_json
 from redvox.common.date_time_utils import (
     datetime_to_epoch_microseconds_utc as us_dt,
 )
 
 
 if TYPE_CHECKING:
-    from redvox.common.data_window import DataWindow
+    from redvox.common.data_window import DataWindow, DataWindowConfig
     from redvox.common.data_window_old import DataWindow as DwOld
 
 
@@ -91,30 +91,57 @@ class DataWindowOutputType(enum.Enum):
         &#34;&#34;&#34;
         str_type = str_type.upper()
         if str_type == &#34;LZ4&#34; or str_type == &#34;PARQUET&#34;:
-            return DataWindowOutputType[str_type.upper()]
+            return DataWindowOutputType[str_type]
         return DataWindowOutputType[&#34;NONE&#34;]
 
 
 class DataWindowFileSystemWriter(FileSystemWriter):
     &#34;&#34;&#34;
-    This class holds the FileSystemWriter info for DataWindows
+    This class holds the FileSystemWriter info for DataWindows.  Extends the FileSystemWriter from io.py
+
+    Properties:
+        file_name: str, the name of the file (do not include extension)
+
+        file_ext: str, the extension used by the file (do not include the .)  Default &#34;NONE&#34;
+
+        base_dir: str, the directory to save the file to.  Default &#34;.&#34; (current dir)
+
+        make_run_me: bool, if True, makes a sample runme.py file when saving to disk.  default False
+
+        orig_path: str, the current working directory when the object is initialized
+
+    Protected:
+        _save_mode: FileSystemSaveMode, determines how files get saved
+
+        _temp_dir: TemporaryDirectory, temporary directory for large files when not saving to disk
     &#34;&#34;&#34;
 
     def __init__(self, file_name: str, file_ext: str = &#34;none&#34;, base_dir: str = &#34;.&#34;, make_run_me: bool = False):
         &#34;&#34;&#34;
-        initialize FileSystemWriter
+        initialize DataWindowFileSystemWriter
 
         :param file_name: name of file
         :param file_ext: extension of file, default &#34;none&#34;
         :param base_dir: directory to save file to, default &#34;.&#34; (current dir)
         :param make_run_me: if True, add a runme.py file to the saved files.  Default False
         &#34;&#34;&#34;
+        self.orig_path = os.getcwd()
         if not os.path.exists(base_dir):
             os.makedirs(base_dir, exist_ok=True)
         os.chdir(base_dir)
         super().__init__(file_name, file_ext, &#34;.&#34;,
-                         False if DataWindowOutputType.str_to_type(file_ext) == DataWindowOutputType.NONE else True)
+                         FileSystemSaveMode.DISK
+                         if DataWindowOutputType.str_to_type(file_ext) != DataWindowOutputType.NONE
+                         else FileSystemSaveMode.MEM)
         self.make_run_me = make_run_me
+
+    def set_extension(self, ext: str):
+        &#34;&#34;&#34;
+        change the file extension.  Valid values are &#34;PARQUET&#34;, &#34;LZ4&#34; and &#34;NONE&#34;.  Invalid values become &#34;NONE&#34;
+
+        :param ext: extension to change to
+        &#34;&#34;&#34;
+        self.file_extension = DataWindowOutputType.str_to_type(ext).name.lower()
 
 
 @dataclass
@@ -761,8 +788,21 @@ default lz4
 <span>(</span><span>file_name: str, file_ext: str = 'none', base_dir: str = '.', make_run_me: bool = False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This class holds the FileSystemWriter info for DataWindows</p>
-<p>initialize FileSystemWriter</p>
+<div class="desc"><p>This class holds the FileSystemWriter info for DataWindows.
+Extends the FileSystemWriter from io.py</p>
+<h2 id="properties">Properties</h2>
+<p>file_name: str, the name of the file (do not include extension)</p>
+<p>file_ext: str, the extension used by the file (do not include the .)
+Default "NONE"</p>
+<p>base_dir: str, the directory to save the file to.
+Default "." (current dir)</p>
+<p>make_run_me: bool, if True, makes a sample runme.py file when saving to disk.
+default False</p>
+<p>orig_path: str, the current working directory when the object is initialized</p>
+<h2 id="protected">Protected</h2>
+<p>_save_mode: FileSystemSaveMode, determines how files get saved</p>
+<p>_temp_dir: TemporaryDirectory, temporary directory for large files when not saving to disk</p>
+<p>initialize DataWindowFileSystemWriter</p>
 <p>:param file_name: name of file
 :param file_ext: extension of file, default "none"
 :param base_dir: directory to save file to, default "." (current dir)
@@ -774,41 +814,104 @@ Default False</p></div>
 </summary>
 <pre><code class="python">class DataWindowFileSystemWriter(FileSystemWriter):
     &#34;&#34;&#34;
-    This class holds the FileSystemWriter info for DataWindows
+    This class holds the FileSystemWriter info for DataWindows.  Extends the FileSystemWriter from io.py
+
+    Properties:
+        file_name: str, the name of the file (do not include extension)
+
+        file_ext: str, the extension used by the file (do not include the .)  Default &#34;NONE&#34;
+
+        base_dir: str, the directory to save the file to.  Default &#34;.&#34; (current dir)
+
+        make_run_me: bool, if True, makes a sample runme.py file when saving to disk.  default False
+
+        orig_path: str, the current working directory when the object is initialized
+
+    Protected:
+        _save_mode: FileSystemSaveMode, determines how files get saved
+
+        _temp_dir: TemporaryDirectory, temporary directory for large files when not saving to disk
     &#34;&#34;&#34;
 
     def __init__(self, file_name: str, file_ext: str = &#34;none&#34;, base_dir: str = &#34;.&#34;, make_run_me: bool = False):
         &#34;&#34;&#34;
-        initialize FileSystemWriter
+        initialize DataWindowFileSystemWriter
 
         :param file_name: name of file
         :param file_ext: extension of file, default &#34;none&#34;
         :param base_dir: directory to save file to, default &#34;.&#34; (current dir)
         :param make_run_me: if True, add a runme.py file to the saved files.  Default False
         &#34;&#34;&#34;
+        self.orig_path = os.getcwd()
         if not os.path.exists(base_dir):
             os.makedirs(base_dir, exist_ok=True)
         os.chdir(base_dir)
         super().__init__(file_name, file_ext, &#34;.&#34;,
-                         False if DataWindowOutputType.str_to_type(file_ext) == DataWindowOutputType.NONE else True)
-        self.make_run_me = make_run_me</code></pre>
+                         FileSystemSaveMode.DISK
+                         if DataWindowOutputType.str_to_type(file_ext) != DataWindowOutputType.NONE
+                         else FileSystemSaveMode.MEM)
+        self.make_run_me = make_run_me
+
+    def set_extension(self, ext: str):
+        &#34;&#34;&#34;
+        change the file extension.  Valid values are &#34;PARQUET&#34;, &#34;LZ4&#34; and &#34;NONE&#34;.  Invalid values become &#34;NONE&#34;
+
+        :param ext: extension to change to
+        &#34;&#34;&#34;
+        self.file_extension = DataWindowOutputType.str_to_type(ext).name.lower()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="redvox.common.io.FileSystemWriter" href="io.html#redvox.common.io.FileSystemWriter">FileSystemWriter</a></li>
 </ul>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.common.data_window_io.DataWindowFileSystemWriter.set_extension"><code class="name flex">
+<span>def <span class="ident">set_extension</span></span>(<span>self, ext: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>change the file extension.
+Valid values are "PARQUET", "LZ4" and "NONE".
+Invalid values become "NONE"</p>
+<p>:param ext: extension to change to</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_extension(self, ext: str):
+    &#34;&#34;&#34;
+    change the file extension.  Valid values are &#34;PARQUET&#34;, &#34;LZ4&#34; and &#34;NONE&#34;.  Invalid values become &#34;NONE&#34;
+
+    :param ext: extension to change to
+    &#34;&#34;&#34;
+    self.file_extension = DataWindowOutputType.str_to_type(ext).name.lower()</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
 <li><code><b><a title="redvox.common.io.FileSystemWriter" href="io.html#redvox.common.io.FileSystemWriter">FileSystemWriter</a></b></code>:
 <ul class="hlist">
 <li><code><a title="redvox.common.io.FileSystemWriter.as_dict" href="io.html#redvox.common.io.FileSystemWriter.as_dict">as_dict</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.create_dir" href="io.html#redvox.common.io.FileSystemWriter.create_dir">create_dir</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.from_dict" href="io.html#redvox.common.io.FileSystemWriter.from_dict">from_dict</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.full_name" href="io.html#redvox.common.io.FileSystemWriter.full_name">full_name</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.full_path" href="io.html#redvox.common.io.FileSystemWriter.full_path">full_path</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.get_temp" href="io.html#redvox.common.io.FileSystemWriter.get_temp">get_temp</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.is_save_disk" href="io.html#redvox.common.io.FileSystemWriter.is_save_disk">is_save_disk</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.is_use_disk" href="io.html#redvox.common.io.FileSystemWriter.is_use_disk">is_use_disk</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.is_use_mem" href="io.html#redvox.common.io.FileSystemWriter.is_use_mem">is_use_mem</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.is_use_temp" href="io.html#redvox.common.io.FileSystemWriter.is_use_temp">is_use_temp</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.json_file_name" href="io.html#redvox.common.io.FileSystemWriter.json_file_name">json_file_name</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.json_path" href="io.html#redvox.common.io.FileSystemWriter.json_path">json_path</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.save_dir" href="io.html#redvox.common.io.FileSystemWriter.save_dir">save_dir</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.save_mode" href="io.html#redvox.common.io.FileSystemWriter.save_mode">save_mode</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.set_name" href="io.html#redvox.common.io.FileSystemWriter.set_name">set_name</a></code></li>
 <li><code><a title="redvox.common.io.FileSystemWriter.set_name_and_extension" href="io.html#redvox.common.io.FileSystemWriter.set_name_and_extension">set_name_and_extension</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.set_save_mode" href="io.html#redvox.common.io.FileSystemWriter.set_save_mode">set_save_mode</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.set_use_disk" href="io.html#redvox.common.io.FileSystemWriter.set_use_disk">set_use_disk</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.set_use_mem" href="io.html#redvox.common.io.FileSystemWriter.set_use_mem">set_use_mem</a></code></li>
+<li><code><a title="redvox.common.io.FileSystemWriter.set_use_temp" href="io.html#redvox.common.io.FileSystemWriter.set_use_temp">set_use_temp</a></code></li>
 </ul>
 </li>
 </ul>
@@ -857,7 +960,7 @@ Default False</p></div>
         &#34;&#34;&#34;
         str_type = str_type.upper()
         if str_type == &#34;LZ4&#34; or str_type == &#34;PARQUET&#34;:
-            return DataWindowOutputType[str_type.upper()]
+            return DataWindowOutputType[str_type]
         return DataWindowOutputType[&#34;NONE&#34;]</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -938,7 +1041,7 @@ def str_to_type(str_type: str) -&gt; &#34;DataWindowOutputType&#34;:
     &#34;&#34;&#34;
     str_type = str_type.upper()
     if str_type == &#34;LZ4&#34; or str_type == &#34;PARQUET&#34;:
-        return DataWindowOutputType[str_type.upper()]
+        return DataWindowOutputType[str_type]
     return DataWindowOutputType[&#34;NONE&#34;]</code></pre>
 </details>
 </dd>
@@ -1008,6 +1111,9 @@ class DataWindowSerializationResult:
 <ul>
 <li>
 <h4><code><a title="redvox.common.data_window_io.DataWindowFileSystemWriter" href="#redvox.common.data_window_io.DataWindowFileSystemWriter">DataWindowFileSystemWriter</a></code></h4>
+<ul class="">
+<li><code><a title="redvox.common.data_window_io.DataWindowFileSystemWriter.set_extension" href="#redvox.common.data_window_io.DataWindowFileSystemWriter.set_extension">set_extension</a></code></li>
+</ul>
 </li>
 <li>
 <h4><code><a title="redvox.common.data_window_io.DataWindowOutputType" href="#redvox.common.data_window_io.DataWindowOutputType">DataWindowOutputType</a></code></h4>
