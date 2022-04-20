@@ -35,6 +35,7 @@ from glob import glob
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pyarrow.compute as pc
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 
@@ -121,7 +122,7 @@ class PyarrowSummary:
 
         sstd: float, std dev of sample rate in seconds
 
-        data: optional data as a Pyarrow Table
+        _data: optional data as a Pyarrow Table
     &#34;&#34;&#34;
     name: str
     stype: srupa.SensorType
@@ -289,33 +290,41 @@ class AggregateSummary:
                     smrs_dict[smry.stype] = [smry]
         self.summaries = self.get_audio()
         for styp, smrys in smrs_dict.items():
-            first_summary = smrys.pop(0)
-            tbl = first_summary.data()
-            combined_mint = np.mean([smrs.smint_s for smrs in smrys])
-            combined_std = np.mean([smrs.sstd_s for smrs in smrys])
-            if not first_summary.check_data():
-                os.makedirs(first_summary.fdir, exist_ok=True)
-            for smrs in smrys:
-                tbl = pa.concat_tables([tbl, smrs.data()])
+            if len(smrys) &gt; 0:
+                combined_mint = np.mean([smrs.smint_s for smrs in smrys])
+                combined_std = np.mean([smrs.sstd_s for smrs in smrys])
+                first_summary = smrys.pop(0)
+                tbl = first_summary.data()
                 if not first_summary.check_data():
-                    os.remove(smrs.file_name())
-            if first_summary.check_data():
-                first_summary._data = tbl
-            else:
-                pq.write_table(tbl, first_summary.file_name())
-            mnint = dtu.microseconds_to_seconds(float(np.mean(np.diff(tbl[&#34;timestamps&#34;].to_numpy()))))
-            stdint = dtu.microseconds_to_seconds(float(np.std(np.diff(tbl[&#34;timestamps&#34;].to_numpy()))))
-            if not combined_mint + combined_std &gt; mnint &gt; combined_mint - combined_std:
-                self.errors.append(f&#34;Mean interval s of combined {styp.name} sensor does not match the &#34;
-                                   f&#34;compilation of individual mean interval s per packet.  Will use compilation of &#34;
-                                   f&#34;individual values.&#34;)
-                mnint = combined_mint
-                stdint = combined_std
-            single_smry = PyarrowSummary(first_summary.name, styp, first_summary.start,
-                                         1 / mnint, first_summary.fdir, tbl.num_rows, mnint, stdint,
-                                         first_summary.data() if first_summary.check_data() else None
-                                         )
-            self.summaries.append(single_smry)
+                    os.makedirs(first_summary.fdir, exist_ok=True)
+                for smrs in smrys:
+                    tbl = pa.concat_tables([tbl, smrs.data()])
+                    if not first_summary.check_data():
+                        os.remove(smrs.file_name())
+                if first_summary.check_data():
+                    first_summary._data = tbl
+                else:
+                    pq.write_table(tbl, first_summary.file_name())
+                # sort data by timestamps
+                tbl = pc.take(tbl, pc.sort_indices(tbl, sort_keys=[(&#34;timestamps&#34;, &#34;ascending&#34;)]))
+                timestamps = tbl[&#34;timestamps&#34;].to_numpy()
+                if len(timestamps) &gt; 1:
+                    mnint = dtu.microseconds_to_seconds(float(np.mean(np.diff(timestamps))))
+                    stdint = dtu.microseconds_to_seconds(float(np.std(np.diff(timestamps))))
+                else:
+                    mnint = np.nan
+                    stdint = np.nan
+                if not combined_mint + combined_std &gt; mnint &gt; combined_mint - combined_std:
+                    self.errors.append(f&#34;Mean interval s of combined {styp.name} sensor does not match the &#34;
+                                       f&#34;compilation of individual mean interval s per packet.  Will use compilation &#34;
+                                       f&#34;of individual values.&#34;)
+                    mnint = combined_mint
+                    stdint = combined_std
+                single_smry = PyarrowSummary(first_summary.name, styp, first_summary.start,
+                                             1 / mnint, first_summary.fdir, tbl.num_rows, mnint, stdint,
+                                             first_summary.data() if first_summary.check_data() else None
+                                             )
+                self.summaries.append(single_smry)
 
     def merge_summaries_of_type(self, stype: SensorType):
         &#34;&#34;&#34;
@@ -502,10 +511,14 @@ def load_apim_image(packet: RedvoxPacketM) -&gt; Optional[PyarrowSummary]:
     if srupa.__has_sensor(packet, srupa.__IMAGE_FIELD_NAME):
         image_sensor: RedvoxPacketM.Sensors.Image = packet.sensors.image
         timestamps = image_sensor.timestamps.timestamps
-        if len(timestamps) &gt; 1:
+        additional_inputs = packet.station_information.app_settings.additional_input_sensors
+        if RedvoxPacketM.StationInformation.AppSettings.InputSensor.IMAGE_PER_SECOND in additional_inputs:
             sample_rate = 1.
+        # elif RedvoxPacketM.StationInformation.AppSettings.InputSensor.IMAGE_PER_PACKET in additional_inputs:
         else:
             sample_rate = 1 / srupa.__packet_duration_s(packet)
+        # else:
+        #   sample_rate = np.nan
         return PyarrowSummary(
             image_sensor.sensor_description, srupa.SensorType.IMAGE, np.nan, sample_rate, &#34;&#34;,
             len(timestamps), 1./sample_rate, 0., srupa.apim_image_to_pyarrow(image_sensor)
@@ -573,10 +586,13 @@ def load_apim_health(packet: RedvoxPacketM) -&gt; Optional[PyarrowSummary]:
         packet.station_information.station_metrics
     )
     timestamps = metrics.timestamps.timestamps
-    if len(timestamps) &gt; 1:
+    rate = packet.station_information.app_settings.metrics_rate
+    if rate == RedvoxPacketM.StationInformation.MetricsRate.ONCE_PER_SECOND:
         sample_rate = 1
-    else:
+    elif rate == RedvoxPacketM.StationInformation.MetricsRate.ONCE_PER_PACKET:
         sample_rate = 1 / srupa.__packet_duration_s(packet)
+    else:
+        sample_rate = np.nan
     if len(timestamps) &gt; 0:
         return PyarrowSummary(
             &#34;station health&#34;, srupa.SensorType.STATION_HEALTH, np.nan, sample_rate, &#34;&#34;,
@@ -678,6 +694,8 @@ def load_xyz(
             m_intv = srupa.__packet_duration_s(packet)
             intv_std = 0.
         if len(t) &gt; 0:
+            # read packet.station_information.app_settings.additional_input_sensors for fast sensors
+            # rename if needed
             return PyarrowSummary(
                 sensor.sensor_description, sensor_type, np.nan, np.nan, &#34;&#34;,
                 len(t), m_intv, intv_std, srupa.read_apim_xyz_sensor(sensor, field_name)
@@ -963,10 +981,13 @@ data and sample rate</p></div>
         packet.station_information.station_metrics
     )
     timestamps = metrics.timestamps.timestamps
-    if len(timestamps) &gt; 1:
+    rate = packet.station_information.app_settings.metrics_rate
+    if rate == RedvoxPacketM.StationInformation.MetricsRate.ONCE_PER_SECOND:
         sample_rate = 1
-    else:
+    elif rate == RedvoxPacketM.StationInformation.MetricsRate.ONCE_PER_PACKET:
         sample_rate = 1 / srupa.__packet_duration_s(packet)
+    else:
+        sample_rate = np.nan
     if len(timestamps) &gt; 0:
         return PyarrowSummary(
             &#34;station health&#34;, srupa.SensorType.STATION_HEALTH, np.nan, sample_rate, &#34;&#34;,
@@ -996,10 +1017,14 @@ data and sample rate</p></div>
     if srupa.__has_sensor(packet, srupa.__IMAGE_FIELD_NAME):
         image_sensor: RedvoxPacketM.Sensors.Image = packet.sensors.image
         timestamps = image_sensor.timestamps.timestamps
-        if len(timestamps) &gt; 1:
+        additional_inputs = packet.station_information.app_settings.additional_input_sensors
+        if RedvoxPacketM.StationInformation.AppSettings.InputSensor.IMAGE_PER_SECOND in additional_inputs:
             sample_rate = 1.
+        # elif RedvoxPacketM.StationInformation.AppSettings.InputSensor.IMAGE_PER_PACKET in additional_inputs:
         else:
             sample_rate = 1 / srupa.__packet_duration_s(packet)
+        # else:
+        #   sample_rate = np.nan
         return PyarrowSummary(
             image_sensor.sensor_description, srupa.SensorType.IMAGE, np.nan, sample_rate, &#34;&#34;,
             len(timestamps), 1./sample_rate, 0., srupa.apim_image_to_pyarrow(image_sensor)
@@ -1271,6 +1296,8 @@ data and sample rate</p></div>
             m_intv = srupa.__packet_duration_s(packet)
             intv_std = 0.
         if len(t) &gt; 0:
+            # read packet.station_information.app_settings.additional_input_sensors for fast sensors
+            # rename if needed
             return PyarrowSummary(
                 sensor.sensor_description, sensor_type, np.nan, np.nan, &#34;&#34;,
                 len(t), m_intv, intv_std, srupa.read_apim_xyz_sensor(sensor, field_name)
@@ -1368,7 +1395,7 @@ default None
 <dl>
 <dt id="redvox.common.packet_to_pyarrow.AggregateSummary"><code class="flex name class">
 <span>class <span class="ident">AggregateSummary</span></span>
-<span>(</span><span>summaries: List[<a title="redvox.common.packet_to_pyarrow.PyarrowSummary" href="#redvox.common.packet_to_pyarrow.PyarrowSummary">PyarrowSummary</a>] = &lt;factory&gt;, gaps: List[Tuple[float, float]] = &lt;factory&gt;, errors: <a title="redvox.common.errors.RedVoxExceptions" href="errors.html#redvox.common.errors.RedVoxExceptions">RedVoxExceptions</a> = &lt;redvox.common.errors.RedVoxExceptions object&gt;)</span>
+<span>(</span><span>summaries: List[<a title="redvox.common.packet_to_pyarrow.PyarrowSummary" href="#redvox.common.packet_to_pyarrow.PyarrowSummary">PyarrowSummary</a>] = &lt;factory&gt;, gaps: List[Tuple[float, float]] = &lt;factory&gt;, errors: <a title="redvox.common.errors.RedVoxExceptions" href="errors.html#redvox.common.errors.RedVoxExceptions">RedVoxExceptions</a> = {'obj_class': 'AggregateSummary'})</span>
 </code></dt>
 <dd>
 <div class="desc"><p>aggregate of summaries</p>
@@ -1468,33 +1495,41 @@ class AggregateSummary:
                     smrs_dict[smry.stype] = [smry]
         self.summaries = self.get_audio()
         for styp, smrys in smrs_dict.items():
-            first_summary = smrys.pop(0)
-            tbl = first_summary.data()
-            combined_mint = np.mean([smrs.smint_s for smrs in smrys])
-            combined_std = np.mean([smrs.sstd_s for smrs in smrys])
-            if not first_summary.check_data():
-                os.makedirs(first_summary.fdir, exist_ok=True)
-            for smrs in smrys:
-                tbl = pa.concat_tables([tbl, smrs.data()])
+            if len(smrys) &gt; 0:
+                combined_mint = np.mean([smrs.smint_s for smrs in smrys])
+                combined_std = np.mean([smrs.sstd_s for smrs in smrys])
+                first_summary = smrys.pop(0)
+                tbl = first_summary.data()
                 if not first_summary.check_data():
-                    os.remove(smrs.file_name())
-            if first_summary.check_data():
-                first_summary._data = tbl
-            else:
-                pq.write_table(tbl, first_summary.file_name())
-            mnint = dtu.microseconds_to_seconds(float(np.mean(np.diff(tbl[&#34;timestamps&#34;].to_numpy()))))
-            stdint = dtu.microseconds_to_seconds(float(np.std(np.diff(tbl[&#34;timestamps&#34;].to_numpy()))))
-            if not combined_mint + combined_std &gt; mnint &gt; combined_mint - combined_std:
-                self.errors.append(f&#34;Mean interval s of combined {styp.name} sensor does not match the &#34;
-                                   f&#34;compilation of individual mean interval s per packet.  Will use compilation of &#34;
-                                   f&#34;individual values.&#34;)
-                mnint = combined_mint
-                stdint = combined_std
-            single_smry = PyarrowSummary(first_summary.name, styp, first_summary.start,
-                                         1 / mnint, first_summary.fdir, tbl.num_rows, mnint, stdint,
-                                         first_summary.data() if first_summary.check_data() else None
-                                         )
-            self.summaries.append(single_smry)
+                    os.makedirs(first_summary.fdir, exist_ok=True)
+                for smrs in smrys:
+                    tbl = pa.concat_tables([tbl, smrs.data()])
+                    if not first_summary.check_data():
+                        os.remove(smrs.file_name())
+                if first_summary.check_data():
+                    first_summary._data = tbl
+                else:
+                    pq.write_table(tbl, first_summary.file_name())
+                # sort data by timestamps
+                tbl = pc.take(tbl, pc.sort_indices(tbl, sort_keys=[(&#34;timestamps&#34;, &#34;ascending&#34;)]))
+                timestamps = tbl[&#34;timestamps&#34;].to_numpy()
+                if len(timestamps) &gt; 1:
+                    mnint = dtu.microseconds_to_seconds(float(np.mean(np.diff(timestamps))))
+                    stdint = dtu.microseconds_to_seconds(float(np.std(np.diff(timestamps))))
+                else:
+                    mnint = np.nan
+                    stdint = np.nan
+                if not combined_mint + combined_std &gt; mnint &gt; combined_mint - combined_std:
+                    self.errors.append(f&#34;Mean interval s of combined {styp.name} sensor does not match the &#34;
+                                       f&#34;compilation of individual mean interval s per packet.  Will use compilation &#34;
+                                       f&#34;of individual values.&#34;)
+                    mnint = combined_mint
+                    stdint = combined_std
+                single_smry = PyarrowSummary(first_summary.name, styp, first_summary.start,
+                                             1 / mnint, first_summary.fdir, tbl.num_rows, mnint, stdint,
+                                             first_summary.data() if first_summary.check_data() else None
+                                             )
+                self.summaries.append(single_smry)
 
     def merge_summaries_of_type(self, stype: SensorType):
         &#34;&#34;&#34;
@@ -1861,33 +1896,41 @@ def schema(cls: Type[A],
                 smrs_dict[smry.stype] = [smry]
     self.summaries = self.get_audio()
     for styp, smrys in smrs_dict.items():
-        first_summary = smrys.pop(0)
-        tbl = first_summary.data()
-        combined_mint = np.mean([smrs.smint_s for smrs in smrys])
-        combined_std = np.mean([smrs.sstd_s for smrs in smrys])
-        if not first_summary.check_data():
-            os.makedirs(first_summary.fdir, exist_ok=True)
-        for smrs in smrys:
-            tbl = pa.concat_tables([tbl, smrs.data()])
+        if len(smrys) &gt; 0:
+            combined_mint = np.mean([smrs.smint_s for smrs in smrys])
+            combined_std = np.mean([smrs.sstd_s for smrs in smrys])
+            first_summary = smrys.pop(0)
+            tbl = first_summary.data()
             if not first_summary.check_data():
-                os.remove(smrs.file_name())
-        if first_summary.check_data():
-            first_summary._data = tbl
-        else:
-            pq.write_table(tbl, first_summary.file_name())
-        mnint = dtu.microseconds_to_seconds(float(np.mean(np.diff(tbl[&#34;timestamps&#34;].to_numpy()))))
-        stdint = dtu.microseconds_to_seconds(float(np.std(np.diff(tbl[&#34;timestamps&#34;].to_numpy()))))
-        if not combined_mint + combined_std &gt; mnint &gt; combined_mint - combined_std:
-            self.errors.append(f&#34;Mean interval s of combined {styp.name} sensor does not match the &#34;
-                               f&#34;compilation of individual mean interval s per packet.  Will use compilation of &#34;
-                               f&#34;individual values.&#34;)
-            mnint = combined_mint
-            stdint = combined_std
-        single_smry = PyarrowSummary(first_summary.name, styp, first_summary.start,
-                                     1 / mnint, first_summary.fdir, tbl.num_rows, mnint, stdint,
-                                     first_summary.data() if first_summary.check_data() else None
-                                     )
-        self.summaries.append(single_smry)</code></pre>
+                os.makedirs(first_summary.fdir, exist_ok=True)
+            for smrs in smrys:
+                tbl = pa.concat_tables([tbl, smrs.data()])
+                if not first_summary.check_data():
+                    os.remove(smrs.file_name())
+            if first_summary.check_data():
+                first_summary._data = tbl
+            else:
+                pq.write_table(tbl, first_summary.file_name())
+            # sort data by timestamps
+            tbl = pc.take(tbl, pc.sort_indices(tbl, sort_keys=[(&#34;timestamps&#34;, &#34;ascending&#34;)]))
+            timestamps = tbl[&#34;timestamps&#34;].to_numpy()
+            if len(timestamps) &gt; 1:
+                mnint = dtu.microseconds_to_seconds(float(np.mean(np.diff(timestamps))))
+                stdint = dtu.microseconds_to_seconds(float(np.std(np.diff(timestamps))))
+            else:
+                mnint = np.nan
+                stdint = np.nan
+            if not combined_mint + combined_std &gt; mnint &gt; combined_mint - combined_std:
+                self.errors.append(f&#34;Mean interval s of combined {styp.name} sensor does not match the &#34;
+                                   f&#34;compilation of individual mean interval s per packet.  Will use compilation &#34;
+                                   f&#34;of individual values.&#34;)
+                mnint = combined_mint
+                stdint = combined_std
+            single_smry = PyarrowSummary(first_summary.name, styp, first_summary.start,
+                                         1 / mnint, first_summary.fdir, tbl.num_rows, mnint, stdint,
+                                         first_summary.data() if first_summary.check_data() else None
+                                         )
+            self.summaries.append(single_smry)</code></pre>
 </details>
 </dd>
 <dt id="redvox.common.packet_to_pyarrow.AggregateSummary.merge_summaries_of_type"><code class="name flex">
@@ -2020,7 +2063,7 @@ def schema(cls: Type[A],
 <p>scount: int, number of samples to read</p>
 <p>smint: float, mean interval of sample rate in seconds</p>
 <p>sstd: float, std dev of sample rate in seconds</p>
-<p>data: optional data as a Pyarrow Table</p></div>
+<p>_data: optional data as a Pyarrow Table</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2048,7 +2091,7 @@ class PyarrowSummary:
 
         sstd: float, std dev of sample rate in seconds
 
-        data: optional data as a Pyarrow Table
+        _data: optional data as a Pyarrow Table
     &#34;&#34;&#34;
     name: str
     stype: srupa.SensorType

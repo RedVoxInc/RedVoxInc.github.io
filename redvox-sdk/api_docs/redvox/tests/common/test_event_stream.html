@@ -32,33 +32,52 @@ import redvox.tests as tests
 import redvox.common.event_stream as es
 
 
+class EventTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -&gt; None:
+        cls.input_dir = tests.TEST_DATA_DIR
+        cls.event = es.Event(0, &#34;testevent&#34;)
+        cls.real = es.Event(0, &#34;testreal&#34;)
+
+    def test_get_values(self):
+        self.assertEqual(self.event.get_string_values(), {})
+        self.assertEqual(self.event.get_numeric_values(), {})
+        self.assertEqual(self.event.get_boolean_values(), {})
+        self.assertEqual(self.event.get_byte_values(), {})
+
+    def test_get_columns(self):
+        self.assertEqual(len(self.event.get_string_column(&#34;fail&#34;)), 0)
+
+    def test_get_classification(self):
+        self.assertEqual(len(self.event.get_classification(0)), 0)
+
+    def test_get_string_item(self):
+        self.assertEqual(self.event.get_string_item(&#34;fail&#34;), None)
+
+    def test_get_numeric_item(self):
+        self.assertEqual(self.event.get_numeric_item(&#34;fail&#34;), None)
+
+    def test_get_boolean_item(self):
+        self.assertEqual(self.event.get_boolean_item(&#34;fail&#34;), None)
+
+    def test_get_byte_item(self):
+        self.assertEqual(self.event.get_byte_item(&#34;fail&#34;), None)
+
+    def test_get_timestamps(self):
+        self.assertEqual(self.event.get_timestamp(), 0)
+        self.assertEqual(self.event.get_uncorrected_timestamp(), 0)
+
+
 class EventStreamTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -&gt; None:
         cls.input_dir = tests.TEST_DATA_DIR
         cls.eventstream = es.EventStream(&#34;testevent&#34;)
-        cls.realstream = es.EventStream(&#34;testreal&#34;)
 
-    def test_schema(self):
-        self.assertEqual(self.eventstream.get_schema(), {&#34;string&#34;: [], &#34;numeric&#34;: [], &#34;boolean&#34;: [], &#34;byte&#34;: []})
-        self.assertEqual(self.eventstream.get_string_schema(), [])
-        self.assertEqual(self.eventstream.get_numeric_schema(), [])
-        self.assertEqual(self.eventstream.get_boolean_schema(), [])
-        self.assertEqual(self.eventstream.get_byte_schema(), [])
-
-    def test_get_values(self):
-        self.assertEqual(self.eventstream.get_string_values().to_pydict(), {})
-        self.assertEqual(self.eventstream.get_numeric_values().to_pydict(), {})
-        self.assertEqual(self.eventstream.get_boolean_values().to_pydict(), {})
-        self.assertEqual(self.eventstream.get_byte_values().to_pydict(), {})
-
-    def test_get_columns(self):
-        self.assertEqual(len(self.eventstream.get_string_column(&#34;fail&#34;)), 0)
-        self.assertTrue(self.eventstream.errors().get_num_errors() &gt; 0)
-
-    def test_get_timestamps(self):
-        self.assertEqual(len(self.eventstream.timestamps()), 0)
-        self.assertEqual(len(self.eventstream.unaltered_timestamps()), 0)</code></pre>
+    def test_get_event(self):
+        self.assertEqual(self.eventstream.get_event(), None)
+        self.assertEqual(self.eventstream.get_event(0), None)
+        self.assertEqual(self.eventstream.get_event(-1), None)</code></pre>
 </details>
 </section>
 <section>
@@ -112,28 +131,11 @@ not have a method with the specified name.</p></div>
     def setUpClass(cls) -&gt; None:
         cls.input_dir = tests.TEST_DATA_DIR
         cls.eventstream = es.EventStream(&#34;testevent&#34;)
-        cls.realstream = es.EventStream(&#34;testreal&#34;)
 
-    def test_schema(self):
-        self.assertEqual(self.eventstream.get_schema(), {&#34;string&#34;: [], &#34;numeric&#34;: [], &#34;boolean&#34;: [], &#34;byte&#34;: []})
-        self.assertEqual(self.eventstream.get_string_schema(), [])
-        self.assertEqual(self.eventstream.get_numeric_schema(), [])
-        self.assertEqual(self.eventstream.get_boolean_schema(), [])
-        self.assertEqual(self.eventstream.get_byte_schema(), [])
-
-    def test_get_values(self):
-        self.assertEqual(self.eventstream.get_string_values().to_pydict(), {})
-        self.assertEqual(self.eventstream.get_numeric_values().to_pydict(), {})
-        self.assertEqual(self.eventstream.get_boolean_values().to_pydict(), {})
-        self.assertEqual(self.eventstream.get_byte_values().to_pydict(), {})
-
-    def test_get_columns(self):
-        self.assertEqual(len(self.eventstream.get_string_column(&#34;fail&#34;)), 0)
-        self.assertTrue(self.eventstream.errors().get_num_errors() &gt; 0)
-
-    def test_get_timestamps(self):
-        self.assertEqual(len(self.eventstream.timestamps()), 0)
-        self.assertEqual(len(self.eventstream.unaltered_timestamps()), 0)</code></pre>
+    def test_get_event(self):
+        self.assertEqual(self.eventstream.get_event(), None)
+        self.assertEqual(self.eventstream.get_event(0), None)
+        self.assertEqual(self.eventstream.get_event(-1), None)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -153,14 +155,166 @@ not have a method with the specified name.</p></div>
 <pre><code class="python">@classmethod
 def setUpClass(cls) -&gt; None:
     cls.input_dir = tests.TEST_DATA_DIR
-    cls.eventstream = es.EventStream(&#34;testevent&#34;)
-    cls.realstream = es.EventStream(&#34;testreal&#34;)</code></pre>
+    cls.eventstream = es.EventStream(&#34;testevent&#34;)</code></pre>
 </details>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
-<dt id="redvox.tests.common.test_event_stream.EventStreamTest.test_get_columns"><code class="name flex">
+<dt id="redvox.tests.common.test_event_stream.EventStreamTest.test_get_event"><code class="name flex">
+<span>def <span class="ident">test_get_event</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_event(self):
+    self.assertEqual(self.eventstream.get_event(), None)
+    self.assertEqual(self.eventstream.get_event(0), None)
+    self.assertEqual(self.eventstream.get_event(-1), None)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.tests.common.test_event_stream.EventTest"><code class="flex name class">
+<span>class <span class="ident">EventTest</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class whose instances are single test cases.</p>
+<p>By default, the test code itself should be placed in a method named
+'runTest'.</p>
+<p>If the fixture may be used for many test cases, create as
+many test methods as are needed. When instantiating such a TestCase
+subclass, specify in the constructor arguments the name of the test method
+that the instance is to execute.</p>
+<p>Test authors should subclass TestCase for their own tests. Construction
+and deconstruction of the test's environment ('fixture') can be
+implemented by overriding the 'setUp' and 'tearDown' methods respectively.</p>
+<p>If it is necessary to override the <strong>init</strong> method, the base class
+<strong>init</strong> method must always be called. It is important that subclasses
+should not change the signature of their <strong>init</strong> method, since instances
+of the classes are instantiated automatically by parts of the framework
+in order to be run.</p>
+<p>When subclassing TestCase, you can set these attributes:
+* failureException: determines which exception will be raised when
+the instance's assertion methods fail; test methods raising this
+exception will be deemed to have 'failed' rather than 'errored'.
+* longMessage: determines whether long messages (including repr of
+objects used in assert methods) will be printed on failure in <em>addition</em>
+to any explicit message passed.
+* maxDiff: sets the maximum length of a diff in failure messages
+by assert methods using difflib. It is looked up as an instance
+attribute so can be configured by individual tests if required.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class EventTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -&gt; None:
+        cls.input_dir = tests.TEST_DATA_DIR
+        cls.event = es.Event(0, &#34;testevent&#34;)
+        cls.real = es.Event(0, &#34;testreal&#34;)
+
+    def test_get_values(self):
+        self.assertEqual(self.event.get_string_values(), {})
+        self.assertEqual(self.event.get_numeric_values(), {})
+        self.assertEqual(self.event.get_boolean_values(), {})
+        self.assertEqual(self.event.get_byte_values(), {})
+
+    def test_get_columns(self):
+        self.assertEqual(len(self.event.get_string_column(&#34;fail&#34;)), 0)
+
+    def test_get_classification(self):
+        self.assertEqual(len(self.event.get_classification(0)), 0)
+
+    def test_get_string_item(self):
+        self.assertEqual(self.event.get_string_item(&#34;fail&#34;), None)
+
+    def test_get_numeric_item(self):
+        self.assertEqual(self.event.get_numeric_item(&#34;fail&#34;), None)
+
+    def test_get_boolean_item(self):
+        self.assertEqual(self.event.get_boolean_item(&#34;fail&#34;), None)
+
+    def test_get_byte_item(self):
+        self.assertEqual(self.event.get_byte_item(&#34;fail&#34;), None)
+
+    def test_get_timestamps(self):
+        self.assertEqual(self.event.get_timestamp(), 0)
+        self.assertEqual(self.event.get_uncorrected_timestamp(), 0)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.tests.common.test_event_stream.EventTest.setUpClass"><code class="name flex">
+<span>def <span class="ident">setUpClass</span></span>(<span>) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Hook method for setting up class fixture before running tests in the class.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def setUpClass(cls) -&gt; None:
+    cls.input_dir = tests.TEST_DATA_DIR
+    cls.event = es.Event(0, &#34;testevent&#34;)
+    cls.real = es.Event(0, &#34;testreal&#34;)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_boolean_item"><code class="name flex">
+<span>def <span class="ident">test_get_boolean_item</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_boolean_item(self):
+    self.assertEqual(self.event.get_boolean_item(&#34;fail&#34;), None)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_byte_item"><code class="name flex">
+<span>def <span class="ident">test_get_byte_item</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_byte_item(self):
+    self.assertEqual(self.event.get_byte_item(&#34;fail&#34;), None)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_classification"><code class="name flex">
+<span>def <span class="ident">test_get_classification</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_classification(self):
+    self.assertEqual(len(self.event.get_classification(0)), 0)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_columns"><code class="name flex">
 <span>def <span class="ident">test_get_columns</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -170,11 +324,36 @@ def setUpClass(cls) -&gt; None:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_get_columns(self):
-    self.assertEqual(len(self.eventstream.get_string_column(&#34;fail&#34;)), 0)
-    self.assertTrue(self.eventstream.errors().get_num_errors() &gt; 0)</code></pre>
+    self.assertEqual(len(self.event.get_string_column(&#34;fail&#34;)), 0)</code></pre>
 </details>
 </dd>
-<dt id="redvox.tests.common.test_event_stream.EventStreamTest.test_get_timestamps"><code class="name flex">
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_numeric_item"><code class="name flex">
+<span>def <span class="ident">test_get_numeric_item</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_numeric_item(self):
+    self.assertEqual(self.event.get_numeric_item(&#34;fail&#34;), None)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_string_item"><code class="name flex">
+<span>def <span class="ident">test_get_string_item</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_get_string_item(self):
+    self.assertEqual(self.event.get_string_item(&#34;fail&#34;), None)</code></pre>
+</details>
+</dd>
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_timestamps"><code class="name flex">
 <span>def <span class="ident">test_get_timestamps</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -184,11 +363,11 @@ def setUpClass(cls) -&gt; None:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_get_timestamps(self):
-    self.assertEqual(len(self.eventstream.timestamps()), 0)
-    self.assertEqual(len(self.eventstream.unaltered_timestamps()), 0)</code></pre>
+    self.assertEqual(self.event.get_timestamp(), 0)
+    self.assertEqual(self.event.get_uncorrected_timestamp(), 0)</code></pre>
 </details>
 </dd>
-<dt id="redvox.tests.common.test_event_stream.EventStreamTest.test_get_values"><code class="name flex">
+<dt id="redvox.tests.common.test_event_stream.EventTest.test_get_values"><code class="name flex">
 <span>def <span class="ident">test_get_values</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -198,27 +377,10 @@ def setUpClass(cls) -&gt; None:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_get_values(self):
-    self.assertEqual(self.eventstream.get_string_values().to_pydict(), {})
-    self.assertEqual(self.eventstream.get_numeric_values().to_pydict(), {})
-    self.assertEqual(self.eventstream.get_boolean_values().to_pydict(), {})
-    self.assertEqual(self.eventstream.get_byte_values().to_pydict(), {})</code></pre>
-</details>
-</dd>
-<dt id="redvox.tests.common.test_event_stream.EventStreamTest.test_schema"><code class="name flex">
-<span>def <span class="ident">test_schema</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def test_schema(self):
-    self.assertEqual(self.eventstream.get_schema(), {&#34;string&#34;: [], &#34;numeric&#34;: [], &#34;boolean&#34;: [], &#34;byte&#34;: []})
-    self.assertEqual(self.eventstream.get_string_schema(), [])
-    self.assertEqual(self.eventstream.get_numeric_schema(), [])
-    self.assertEqual(self.eventstream.get_boolean_schema(), [])
-    self.assertEqual(self.eventstream.get_byte_schema(), [])</code></pre>
+    self.assertEqual(self.event.get_string_values(), {})
+    self.assertEqual(self.event.get_numeric_values(), {})
+    self.assertEqual(self.event.get_boolean_values(), {})
+    self.assertEqual(self.event.get_byte_values(), {})</code></pre>
 </details>
 </dd>
 </dl>
@@ -243,10 +405,21 @@ def setUpClass(cls) -&gt; None:
 <h4><code><a title="redvox.tests.common.test_event_stream.EventStreamTest" href="#redvox.tests.common.test_event_stream.EventStreamTest">EventStreamTest</a></code></h4>
 <ul class="">
 <li><code><a title="redvox.tests.common.test_event_stream.EventStreamTest.setUpClass" href="#redvox.tests.common.test_event_stream.EventStreamTest.setUpClass">setUpClass</a></code></li>
-<li><code><a title="redvox.tests.common.test_event_stream.EventStreamTest.test_get_columns" href="#redvox.tests.common.test_event_stream.EventStreamTest.test_get_columns">test_get_columns</a></code></li>
-<li><code><a title="redvox.tests.common.test_event_stream.EventStreamTest.test_get_timestamps" href="#redvox.tests.common.test_event_stream.EventStreamTest.test_get_timestamps">test_get_timestamps</a></code></li>
-<li><code><a title="redvox.tests.common.test_event_stream.EventStreamTest.test_get_values" href="#redvox.tests.common.test_event_stream.EventStreamTest.test_get_values">test_get_values</a></code></li>
-<li><code><a title="redvox.tests.common.test_event_stream.EventStreamTest.test_schema" href="#redvox.tests.common.test_event_stream.EventStreamTest.test_schema">test_schema</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventStreamTest.test_get_event" href="#redvox.tests.common.test_event_stream.EventStreamTest.test_get_event">test_get_event</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.tests.common.test_event_stream.EventTest" href="#redvox.tests.common.test_event_stream.EventTest">EventTest</a></code></h4>
+<ul class="">
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.setUpClass" href="#redvox.tests.common.test_event_stream.EventTest.setUpClass">setUpClass</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_boolean_item" href="#redvox.tests.common.test_event_stream.EventTest.test_get_boolean_item">test_get_boolean_item</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_byte_item" href="#redvox.tests.common.test_event_stream.EventTest.test_get_byte_item">test_get_byte_item</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_classification" href="#redvox.tests.common.test_event_stream.EventTest.test_get_classification">test_get_classification</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_columns" href="#redvox.tests.common.test_event_stream.EventTest.test_get_columns">test_get_columns</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_numeric_item" href="#redvox.tests.common.test_event_stream.EventTest.test_get_numeric_item">test_get_numeric_item</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_string_item" href="#redvox.tests.common.test_event_stream.EventTest.test_get_string_item">test_get_string_item</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_timestamps" href="#redvox.tests.common.test_event_stream.EventTest.test_get_timestamps">test_get_timestamps</a></code></li>
+<li><code><a title="redvox.tests.common.test_event_stream.EventTest.test_get_values" href="#redvox.tests.common.test_event_stream.EventTest.test_get_values">test_get_values</a></code></li>
 </ul>
 </li>
 </ul>

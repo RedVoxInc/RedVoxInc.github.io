@@ -42,22 +42,23 @@ from redvox.common.io import get_json_file, json_file_to_dict, json_to_dict
 
 
 if TYPE_CHECKING:
-    from redvox.common.event_stream import EventStream
+    from redvox.common.event_stream import Event, EventStream, EventStreams
 
 
-def to_json(event_stream: &#34;EventStream&#34;,) -&gt; str:
+def event_to_json(event: &#34;Event&#34;, ) -&gt; str:
     &#34;&#34;&#34;
-    :return: EventStream as json string
+    :param event: event to save
+    :return: Event as json string
     &#34;&#34;&#34;
-    return json.dumps(event_stream.as_dict())
+    return json.dumps(event.as_dict())
 
 
-def to_json_file(event_stream: &#34;EventStream&#34;,
-                 file_name: Optional[str] = None) -&gt; Path:
+def event_to_json_file(event: &#34;Event&#34;,
+                       file_name: Optional[str] = None) -&gt; Path:
     &#34;&#34;&#34;
-    saves the EventStream as json and data in the same directory.
+    saves the Event as json and data in the same directory.
 
-    :param event_stream: EventStream to save
+    :param event: Event to save
     :param file_name: the optional base file name.  Do not include a file extension.
                         If None, uses the default event_[id].json
     :return: path to json file
@@ -65,12 +66,74 @@ def to_json_file(event_stream: &#34;EventStream&#34;,
     _file_name: str = (
         file_name
         if file_name is not None
-        else event_stream.default_json_file_name()
+        else event.default_json_file_name()
     )
 
-    file_path: Path = event_stream.fs_writer().json_path()
+    file_path: Path = event.fs_writer().json_path()
     with open(file_path, &#34;w&#34;) as f_p:
-        f_p.write(to_json(event_stream))
+        f_p.write(event_to_json(event))
+        return file_path.resolve(False)
+
+
+def eventstream_to_json(event_stream: &#34;EventStream&#34;, ) -&gt; str:
+    &#34;&#34;&#34;
+    :return: EventStream as json string
+    &#34;&#34;&#34;
+    return json.dumps(event_stream.as_dict())
+
+
+def eventstream_to_json_file(event_stream: &#34;EventStream&#34;,
+                             file_dir: str = &#34;.&#34;,
+                             file_name: Optional[str] = None) -&gt; Path:
+    &#34;&#34;&#34;
+    saves the EventStream as json and data in the same directory.
+
+    :param event_stream: EventStream to save
+    :param file_dir: the directory to save the file into.  default current directory (&#34;.&#34;)
+    :param file_name: the optional base file name.  Do not include a file extension.
+                        If None, uses the default eventstream_[eventstream.name].json
+    :return: path to json file
+    &#34;&#34;&#34;
+    _file_name: str = (
+        file_name
+        if file_name is not None
+        else f&#34;eventstream_{event_stream.name}&#34;
+    )
+
+    file_path: Path = Path(os.path.join(file_dir, f&#34;{_file_name}.json&#34;))
+    with open(file_path, &#34;w&#34;) as f_p:
+        f_p.write(eventstream_to_json(event_stream))
+        return file_path.resolve(False)
+
+
+def eventstreams_to_json(event_streams: &#34;EventStreams&#34;, ) -&gt; str:
+    &#34;&#34;&#34;
+    :return: EventStreams as json string
+    &#34;&#34;&#34;
+    return json.dumps(event_streams.as_dict())
+
+
+def eventstreams_to_json_file(event_streams: &#34;EventStreams&#34;,
+                              file_dir: str = &#34;.&#34;,
+                              file_name: Optional[str] = None) -&gt; Path:
+    &#34;&#34;&#34;
+    saves the EventStreams as json and data in the same directory.
+
+    :param event_streams: EventStreams to save
+    :param file_dir: the directory to save the file into.  default current directory (&#34;.&#34;)
+    :param file_name: the optional base file name.  Do not include a file extension.
+                        If None, uses the default eventstreams.json
+    :return: path to json file
+    &#34;&#34;&#34;
+    _file_name: str = (
+        file_name
+        if file_name is not None
+        else &#34;eventstreams&#34;
+    )
+
+    file_path: Path = Path(os.path.join(file_dir, f&#34;{_file_name}.json&#34;))
+    with open(file_path, &#34;w&#34;) as f_p:
+        f_p.write(eventstreams_to_json(event_streams))
         return file_path.resolve(False)</code></pre>
 </details>
 </section>
@@ -81,28 +144,30 @@ def to_json_file(event_stream: &#34;EventStream&#34;,
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="redvox.common.event_stream_io.to_json"><code class="name flex">
-<span>def <span class="ident">to_json</span></span>(<span>event_stream: EventStream) ‑> str</span>
+<dt id="redvox.common.event_stream_io.event_to_json"><code class="name flex">
+<span>def <span class="ident">event_to_json</span></span>(<span>event: Event) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: EventStream as json string</p></div>
+<div class="desc"><p>:param event: event to save
+:return: Event as json string</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_json(event_stream: &#34;EventStream&#34;,) -&gt; str:
+<pre><code class="python">def event_to_json(event: &#34;Event&#34;, ) -&gt; str:
     &#34;&#34;&#34;
-    :return: EventStream as json string
+    :param event: event to save
+    :return: Event as json string
     &#34;&#34;&#34;
-    return json.dumps(event_stream.as_dict())</code></pre>
+    return json.dumps(event.as_dict())</code></pre>
 </details>
 </dd>
-<dt id="redvox.common.event_stream_io.to_json_file"><code class="name flex">
-<span>def <span class="ident">to_json_file</span></span>(<span>event_stream: EventStream, file_name: Optional[str] = None) ‑> pathlib.Path</span>
+<dt id="redvox.common.event_stream_io.event_to_json_file"><code class="name flex">
+<span>def <span class="ident">event_to_json_file</span></span>(<span>event: Event, file_name: Optional[str] = None) ‑> pathlib.Path</span>
 </code></dt>
 <dd>
-<div class="desc"><p>saves the EventStream as json and data in the same directory.</p>
-<p>:param event_stream: EventStream to save
+<div class="desc"><p>saves the Event as json and data in the same directory.</p>
+<p>:param event: Event to save
 :param file_name: the optional base file name.
 Do not include a file extension.
 If None, uses the default event_[id].json
@@ -111,12 +176,12 @@ If None, uses the default event_[id].json
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_json_file(event_stream: &#34;EventStream&#34;,
-                 file_name: Optional[str] = None) -&gt; Path:
+<pre><code class="python">def event_to_json_file(event: &#34;Event&#34;,
+                       file_name: Optional[str] = None) -&gt; Path:
     &#34;&#34;&#34;
-    saves the EventStream as json and data in the same directory.
+    saves the Event as json and data in the same directory.
 
-    :param event_stream: EventStream to save
+    :param event: Event to save
     :param file_name: the optional base file name.  Do not include a file extension.
                         If None, uses the default event_[id].json
     :return: path to json file
@@ -124,12 +189,124 @@ If None, uses the default event_[id].json
     _file_name: str = (
         file_name
         if file_name is not None
-        else event_stream.default_json_file_name()
+        else event.default_json_file_name()
     )
 
-    file_path: Path = event_stream.fs_writer().json_path()
+    file_path: Path = event.fs_writer().json_path()
     with open(file_path, &#34;w&#34;) as f_p:
-        f_p.write(to_json(event_stream))
+        f_p.write(event_to_json(event))
+        return file_path.resolve(False)</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.event_stream_io.eventstream_to_json"><code class="name flex">
+<span>def <span class="ident">eventstream_to_json</span></span>(<span>event_stream: EventStream) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: EventStream as json string</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def eventstream_to_json(event_stream: &#34;EventStream&#34;, ) -&gt; str:
+    &#34;&#34;&#34;
+    :return: EventStream as json string
+    &#34;&#34;&#34;
+    return json.dumps(event_stream.as_dict())</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.event_stream_io.eventstream_to_json_file"><code class="name flex">
+<span>def <span class="ident">eventstream_to_json_file</span></span>(<span>event_stream: EventStream, file_dir: str = '.', file_name: Optional[str] = None) ‑> pathlib.Path</span>
+</code></dt>
+<dd>
+<div class="desc"><p>saves the EventStream as json and data in the same directory.</p>
+<p>:param event_stream: EventStream to save
+:param file_dir: the directory to save the file into.
+default current directory (".")
+:param file_name: the optional base file name.
+Do not include a file extension.
+If None, uses the default eventstream_[eventstream.name].json
+:return: path to json file</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def eventstream_to_json_file(event_stream: &#34;EventStream&#34;,
+                             file_dir: str = &#34;.&#34;,
+                             file_name: Optional[str] = None) -&gt; Path:
+    &#34;&#34;&#34;
+    saves the EventStream as json and data in the same directory.
+
+    :param event_stream: EventStream to save
+    :param file_dir: the directory to save the file into.  default current directory (&#34;.&#34;)
+    :param file_name: the optional base file name.  Do not include a file extension.
+                        If None, uses the default eventstream_[eventstream.name].json
+    :return: path to json file
+    &#34;&#34;&#34;
+    _file_name: str = (
+        file_name
+        if file_name is not None
+        else f&#34;eventstream_{event_stream.name}&#34;
+    )
+
+    file_path: Path = Path(os.path.join(file_dir, f&#34;{_file_name}.json&#34;))
+    with open(file_path, &#34;w&#34;) as f_p:
+        f_p.write(eventstream_to_json(event_stream))
+        return file_path.resolve(False)</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.event_stream_io.eventstreams_to_json"><code class="name flex">
+<span>def <span class="ident">eventstreams_to_json</span></span>(<span>event_streams: EventStreams) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: EventStreams as json string</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def eventstreams_to_json(event_streams: &#34;EventStreams&#34;, ) -&gt; str:
+    &#34;&#34;&#34;
+    :return: EventStreams as json string
+    &#34;&#34;&#34;
+    return json.dumps(event_streams.as_dict())</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.event_stream_io.eventstreams_to_json_file"><code class="name flex">
+<span>def <span class="ident">eventstreams_to_json_file</span></span>(<span>event_streams: EventStreams, file_dir: str = '.', file_name: Optional[str] = None) ‑> pathlib.Path</span>
+</code></dt>
+<dd>
+<div class="desc"><p>saves the EventStreams as json and data in the same directory.</p>
+<p>:param event_streams: EventStreams to save
+:param file_dir: the directory to save the file into.
+default current directory (".")
+:param file_name: the optional base file name.
+Do not include a file extension.
+If None, uses the default eventstreams.json
+:return: path to json file</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def eventstreams_to_json_file(event_streams: &#34;EventStreams&#34;,
+                              file_dir: str = &#34;.&#34;,
+                              file_name: Optional[str] = None) -&gt; Path:
+    &#34;&#34;&#34;
+    saves the EventStreams as json and data in the same directory.
+
+    :param event_streams: EventStreams to save
+    :param file_dir: the directory to save the file into.  default current directory (&#34;.&#34;)
+    :param file_name: the optional base file name.  Do not include a file extension.
+                        If None, uses the default eventstreams.json
+    :return: path to json file
+    &#34;&#34;&#34;
+    _file_name: str = (
+        file_name
+        if file_name is not None
+        else &#34;eventstreams&#34;
+    )
+
+    file_path: Path = Path(os.path.join(file_dir, f&#34;{_file_name}.json&#34;))
+    with open(file_path, &#34;w&#34;) as f_p:
+        f_p.write(eventstreams_to_json(event_streams))
         return file_path.resolve(False)</code></pre>
 </details>
 </dd>
@@ -151,8 +328,12 @@ If None, uses the default event_[id].json
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="redvox.common.event_stream_io.to_json" href="#redvox.common.event_stream_io.to_json">to_json</a></code></li>
-<li><code><a title="redvox.common.event_stream_io.to_json_file" href="#redvox.common.event_stream_io.to_json_file">to_json_file</a></code></li>
+<li><code><a title="redvox.common.event_stream_io.event_to_json" href="#redvox.common.event_stream_io.event_to_json">event_to_json</a></code></li>
+<li><code><a title="redvox.common.event_stream_io.event_to_json_file" href="#redvox.common.event_stream_io.event_to_json_file">event_to_json_file</a></code></li>
+<li><code><a title="redvox.common.event_stream_io.eventstream_to_json" href="#redvox.common.event_stream_io.eventstream_to_json">eventstream_to_json</a></code></li>
+<li><code><a title="redvox.common.event_stream_io.eventstream_to_json_file" href="#redvox.common.event_stream_io.eventstream_to_json_file">eventstream_to_json_file</a></code></li>
+<li><code><a title="redvox.common.event_stream_io.eventstreams_to_json" href="#redvox.common.event_stream_io.eventstreams_to_json">eventstreams_to_json</a></code></li>
+<li><code><a title="redvox.common.event_stream_io.eventstreams_to_json_file" href="#redvox.common.event_stream_io.eventstreams_to_json_file">eventstreams_to_json_file</a></code></li>
 </ul>
 </li>
 </ul>

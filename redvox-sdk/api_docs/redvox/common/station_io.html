@@ -77,8 +77,8 @@ def to_json_file(station: &#34;Station&#34;,
     station.timesync_data().to_json_file()
 
     # ev_dir = os.path.join(station.save_dir(), &#34;events&#34;)
-    os.makedirs(station.event_data().base_dir, exist_ok=True)
-    station.event_data().save_streams()
+    os.makedirs(station.get_event_data_dir(), exist_ok=True)
+    station.event_data().to_json_file(station.get_event_data_dir())
 
     file_path: Path = Path(station.save_dir()).joinpath(station.fs_writer().json_file_name())
     with open(file_path, &#34;w&#34;) as f_p:
@@ -148,8 +148,8 @@ If None, uses the default [id]_[startdate].json
     station.timesync_data().to_json_file()
 
     # ev_dir = os.path.join(station.save_dir(), &#34;events&#34;)
-    os.makedirs(station.event_data().base_dir, exist_ok=True)
-    station.event_data().save_streams()
+    os.makedirs(station.get_event_data_dir(), exist_ok=True)
+    station.event_data().to_json_file(station.get_event_data_dir())
 
     file_path: Path = Path(station.save_dir()).joinpath(station.fs_writer().json_file_name())
     with open(file_path, &#34;w&#34;) as f_p:
