@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>redvox.common.api_reader API documentation</title>
 <meta name="description" content="Read Redvox data from a single directory
 Data files can be either API 900 or API 1000 data formats" />
@@ -34,32 +34,53 @@ Read Redvox data from a single directory
 Data files can be either API 900 or API 1000 data formats
 &#34;&#34;&#34;
 from typing import List, Optional
-from datetime import timedelta
+from datetime import timedelta, datetime
 import multiprocessing
 import multiprocessing.pool
 
+import pyarrow as pa
+import psutil
+
+import redvox.settings as settings
 import redvox.api1000.proto.redvox_api_m_pb2 as api_m
-from redvox.common import offset_model
-from redvox.common import api_conversions as ac
-from redvox.common import io
-from redvox.common import file_statistics as fs
+from redvox.common import offset_model, io,\
+    api_conversions as ac,\
+    file_statistics as fs
 from redvox.common.parallel_utils import maybe_parallel_map
 from redvox.common.station import Station
 from redvox.common.errors import RedVoxExceptions
 
 
+id_py_stct = pa.struct([(&#34;id&#34;, pa.string()), (&#34;uuid&#34;, pa.string()), (&#34;start_time&#34;, pa.float64()),
+                        ])
+meta_py_stct = pa.struct([(&#34;api&#34;, pa.float64()), (&#34;sub_api&#34;, pa.float64()), (&#34;make&#34;, pa.string()),
+                          (&#34;model&#34;, pa.string()), (&#34;os&#34;, pa.int64()), (&#34;os_version&#34;, pa.string()),
+                          (&#34;app&#34;, pa.string()), (&#34;app_version&#34;, pa.string()), (&#34;is_private&#34;, pa.bool_()),
+                          (&#34;packet_duration_s&#34;, pa.float64()), (&#34;station_description&#34;, pa.string()),
+                          ])
+
+
+PERCENT_FREE_MEM_USE = .8  # Percentage of total free memory to use when creating stations (1. is 100%)
+
+
 class ApiReader:
     &#34;&#34;&#34;
     Reads data from api 900 or api 1000 format, converting all data read into RedvoxPacketM for
-        ease of comparison and use.
+    ease of comparison and use.
+
     Properties:
         filter: io.ReadFilter with the station ids, start and end time, start and end time padding, and
-                types of files to read
+        types of files to read
+
         base_dir: str of the directory containing all the files to read
+
         structured_dir: bool, if True, the base_dir contains a specific directory structure used by the
-                        respective api formats.  If False, base_dir only has the data files.  Default False.
+        respective api formats.  If False, base_dir only has the data files.  Default False.
+
         files_index: io.Index of the files that match the filter that are in base_dir
+
         index_summary: io.IndexSummary of the filtered data
+
         debug: bool, if True, output additional information during function execution.  Default False.
     &#34;&#34;&#34;
 
@@ -78,7 +99,7 @@ class ApiReader:
         :param structured_dir: if True, base_dir contains a specific directory structure used by the respective
                                 api formats.  If False, base_dir only has the data files.  Default False.
         :param read_filter: ReadFilter for the data files, if None, get everything.  Default None
-        :param debug: if True, output additional statements during function execution.  Default False.
+        :param debug: if True, output program warnings/errors during function execution.  Default False.
         &#34;&#34;&#34;
         _pool: multiprocessing.pool.Pool = (
             multiprocessing.Pool() if pool is None else pool
@@ -96,6 +117,24 @@ class ApiReader:
         self.errors = RedVoxExceptions(&#34;APIReader&#34;)
         self.files_index = self._get_all_files(_pool)
         self.index_summary = io.IndexSummary.from_index(self._flatten_files_index())
+        if len(self.files_index) &gt; 0:
+            mem_split_factor = len(self.files_index) if settings.is_parallelism_enabled() else 1
+            self.chunk_limit = psutil.virtual_memory().available * PERCENT_FREE_MEM_USE / mem_split_factor
+            max_file_size = max([fe.decompressed_file_size_bytes for fi in self.files_index for fe in fi.entries])
+            if max_file_size &gt; self.chunk_limit:
+                raise MemoryError(f&#34;System requires {max_file_size} bytes of memory to process a file but only has &#34;
+                                  f&#34;{self.chunk_limit} available.  Please free or add more RAM.&#34;)
+            elif max_file_size * sum([len(fi.entries) for fi in self.files_index]) &gt; self.chunk_limit:
+                raise MemoryError(&#34;TOO MUCH DATA DAWG&#34;)
+            if debug:
+                if mem_split_factor == 1:
+                    print(f&#34;{len(self.files_index)} stations have {int(self.chunk_limit)} &#34;
+                          f&#34;bytes for loading files in memory.&#34;)
+                else:
+                    print(f&#34;{mem_split_factor} stations each have &#34;
+                          f&#34;{int(self.chunk_limit)} bytes for loading files in memory.&#34;)
+        else:
+            self.chunk_limit = 0
 
         if debug:
             self.errors.print()
@@ -160,6 +199,29 @@ class ApiReader:
             _pool.close()
         return index
 
+    def _redo_index(self, station_ids: set, new_start: datetime, new_end: datetime):
+        &#34;&#34;&#34;
+        Redo the index for files using new start and end dates.  removes any buffer time at the start and end of the
+        new query.  Returns the updated index or None
+
+        :param station_ids: set of ids to get
+        :param new_start: new start time to get data from
+        :param new_end: new end time to get data from
+        :return: Updated index or None
+        &#34;&#34;&#34;
+        diff_s = diff_e = timedelta(seconds=0)
+        new_index = self._apply_filter(io.ReadFilter()
+                                       .with_start_dt(new_start)
+                                       .with_end_dt(new_end)
+                                       .with_extensions(self.filter.extensions)
+                                       .with_api_versions(self.filter.api_versions)
+                                       .with_station_ids(station_ids)
+                                       .with_start_dt_buf(diff_s)
+                                       .with_end_dt_buf(diff_e))
+        if len(new_index.entries) &gt; 0:
+            return new_index
+        return None
+
     def _check_station_stats(
             self,
             station_index: io.Index,
@@ -190,43 +252,29 @@ class ApiReader:
         if timing_offsets is None:
             return [station_index]
 
-        diff_s = diff_e = timedelta(seconds=0)
-
         # if our filtered files do not encompass the request even when the packet times are updated
         # try getting 1.5 times the difference of the expected start/end and the start/end of the data
         insufficient_str = &#34;&#34;
-        if self.filter.start_dt and timing_offsets.adjusted_start &gt; self.filter.start_dt:
+        if (self.filter.start_dt and timing_offsets.adjusted_start &gt; self.filter.start_dt) or \
+                (self.filter.end_dt and timing_offsets.adjusted_start &gt;= self.filter.end_dt):
             insufficient_str += f&#34; {self.filter.start_dt} (start)&#34;
-            # diff_s = self.filter.start_dt_buf + 1.5 * (timing_offsets.adjusted_start - self.filter.start_dt)
             new_end = self.filter.start_dt - self.filter.start_dt_buf
             new_start = new_end - 1.5 * (timing_offsets.adjusted_start - self.filter.start_dt)
-            new_index = self._apply_filter(io.ReadFilter()
-                                           .with_start_dt(new_start)
-                                           .with_end_dt(new_end)
-                                           .with_extensions(self.filter.extensions)
-                                           .with_api_versions(self.filter.api_versions)
-                                           .with_station_ids(set(station_index.summarize().station_ids()))
-                                           .with_start_dt_buf(diff_s)
-                                           .with_end_dt_buf(diff_e))
-            if len(new_index.entries) &gt; 0:
+            new_index = self._redo_index(set(station_index.summarize().station_ids()), new_start, new_end)
+            if new_index:
                 station_index.append(new_index.entries)
                 stats.extend(fs.extract_stats(new_index))
-        if self.filter.end_dt and timing_offsets.adjusted_end &lt; self.filter.end_dt:
+
+        if (self.filter.end_dt and timing_offsets.adjusted_end &lt; self.filter.end_dt) or \
+                (self.filter.start_dt and timing_offsets.adjusted_end &lt;= self.filter.start_dt):
             insufficient_str += f&#34; {self.filter.end_dt} (end)&#34;
-            # diff_e = self.filter.end_dt_buf + 1.5 * (self.filter.end_dt - timing_offsets.adjusted_end)
             new_start = self.filter.end_dt + self.filter.end_dt_buf
             new_end = new_start + 1.5 * (self.filter.end_dt - timing_offsets.adjusted_end)
-            new_index = self._apply_filter(io.ReadFilter()
-                                           .with_start_dt(new_start)
-                                           .with_end_dt(new_end)
-                                           .with_extensions(self.filter.extensions)
-                                           .with_api_versions(self.filter.api_versions)
-                                           .with_station_ids(set(station_index.summarize().station_ids()))
-                                           .with_start_dt_buf(diff_s)
-                                           .with_end_dt_buf(diff_e))
-            if len(new_index.entries) &gt; 0:
+            new_index = self._redo_index(set(station_index.summarize().station_ids()), new_start, new_end)
+            if new_index:
                 station_index.append(new_index.entries)
                 stats.extend(fs.extract_stats(new_index))
+
         if len(insufficient_str) &gt; 0:
             self.errors.append(f&#34;Data for {station_index.summarize().station_ids()} exists, &#34;
                                f&#34;but not at:{insufficient_str}&#34;)
@@ -243,6 +291,28 @@ class ApiReader:
             results[key].append(entries=[station_index.entries[v]])
 
         return list(results.values())
+
+    def _split_workload(self, findex: io.Index) -&gt; List[io.Index]:
+        &#34;&#34;&#34;
+        takes an index and splits it into chunks based on a size limit
+        while running_total + next_file_size &lt; limit, adds files to a chunk (Index)
+        if limit is exceeded, adds the chunk and puts the next file into a new chunk
+
+        :param findex: index of files to split
+        :return: list of Index to process
+        &#34;&#34;&#34;
+        packet_list = []
+        chunk_queue = 0
+        chunk_list = []
+        for f in findex.entries:
+            chunk_queue += f.decompressed_file_size_bytes
+            if chunk_queue &gt; self.chunk_limit:
+                packet_list.append(io.Index(chunk_list))
+                chunk_queue = 0
+                chunk_list = []
+            chunk_list.append(f)
+        packet_list.append(io.Index(chunk_list))
+        return packet_list
 
     @staticmethod
     def read_files_in_index(indexf: io.Index) -&gt; List[api_m.RedvoxPacketM]:
@@ -307,12 +377,12 @@ class ApiReader:
 
         return result
 
-    def _stations_by_index(self, findex: io.Index) -&gt; Station:
+    def _station_by_index(self, findex: io.Index) -&gt; Station:
         &#34;&#34;&#34;
         :param findex: index with files to build a station with
         :return: Station built from files in findex
         &#34;&#34;&#34;
-        return Station(self.read_files_in_index(findex))
+        return Station.create_from_packets(self.read_files_in_index(findex))
 
     def get_stations(self, pool: Optional[multiprocessing.pool.Pool] = None) -&gt; List[Station]:
         &#34;&#34;&#34;
@@ -320,7 +390,7 @@ class ApiReader:
         :return: List of all stations in the ApiReader
         &#34;&#34;&#34;
         return list(maybe_parallel_map(pool,
-                                       self._stations_by_index,
+                                       self._station_by_index,
                                        self.files_index,
                                        chunk_size=1
                                        )
@@ -331,7 +401,7 @@ class ApiReader:
         :param get_id: the id to filter on
         :return: list of all stations with the requested id or None if id can&#39;t be found
         &#34;&#34;&#34;
-        result = [s for s in self.get_stations() if s.id == get_id]
+        result = [s for s in self.get_stations() if s.id() == get_id]
         if len(result) &lt; 1:
             return None
         return result</code></pre>
@@ -355,15 +425,15 @@ class ApiReader:
 ease of comparison and use.</p>
 <h2 id="properties">Properties</h2>
 <p>filter: io.ReadFilter with the station ids, start and end time, start and end time padding, and
-types of files to read
-base_dir: str of the directory containing all the files to read
-structured_dir: bool, if True, the base_dir contains a specific directory structure used by the
+types of files to read</p>
+<p>base_dir: str of the directory containing all the files to read</p>
+<p>structured_dir: bool, if True, the base_dir contains a specific directory structure used by the
 respective api formats.
 If False, base_dir only has the data files.
-Default False.
-files_index: io.Index of the files that match the filter that are in base_dir
-index_summary: io.IndexSummary of the filtered data
-debug: bool, if True, output additional information during function execution.
+Default False.</p>
+<p>files_index: io.Index of the files that match the filter that are in base_dir</p>
+<p>index_summary: io.IndexSummary of the filtered data</p>
+<p>debug: bool, if True, output additional information during function execution.
 Default False.</p>
 <p>Initialize the ApiReader object</p>
 <p>:param base_dir: directory containing the files to read
@@ -373,7 +443,7 @@ If False, base_dir only has the data files.
 Default False.
 :param read_filter: ReadFilter for the data files, if None, get everything.
 Default None
-:param debug: if True, output additional statements during function execution.
+:param debug: if True, output program warnings/errors during function execution.
 Default False.</p></div>
 <details class="source">
 <summary>
@@ -382,15 +452,21 @@ Default False.</p></div>
 <pre><code class="python">class ApiReader:
     &#34;&#34;&#34;
     Reads data from api 900 or api 1000 format, converting all data read into RedvoxPacketM for
-        ease of comparison and use.
+    ease of comparison and use.
+
     Properties:
         filter: io.ReadFilter with the station ids, start and end time, start and end time padding, and
-                types of files to read
+        types of files to read
+
         base_dir: str of the directory containing all the files to read
+
         structured_dir: bool, if True, the base_dir contains a specific directory structure used by the
-                        respective api formats.  If False, base_dir only has the data files.  Default False.
+        respective api formats.  If False, base_dir only has the data files.  Default False.
+
         files_index: io.Index of the files that match the filter that are in base_dir
+
         index_summary: io.IndexSummary of the filtered data
+
         debug: bool, if True, output additional information during function execution.  Default False.
     &#34;&#34;&#34;
 
@@ -409,7 +485,7 @@ Default False.</p></div>
         :param structured_dir: if True, base_dir contains a specific directory structure used by the respective
                                 api formats.  If False, base_dir only has the data files.  Default False.
         :param read_filter: ReadFilter for the data files, if None, get everything.  Default None
-        :param debug: if True, output additional statements during function execution.  Default False.
+        :param debug: if True, output program warnings/errors during function execution.  Default False.
         &#34;&#34;&#34;
         _pool: multiprocessing.pool.Pool = (
             multiprocessing.Pool() if pool is None else pool
@@ -427,6 +503,24 @@ Default False.</p></div>
         self.errors = RedVoxExceptions(&#34;APIReader&#34;)
         self.files_index = self._get_all_files(_pool)
         self.index_summary = io.IndexSummary.from_index(self._flatten_files_index())
+        if len(self.files_index) &gt; 0:
+            mem_split_factor = len(self.files_index) if settings.is_parallelism_enabled() else 1
+            self.chunk_limit = psutil.virtual_memory().available * PERCENT_FREE_MEM_USE / mem_split_factor
+            max_file_size = max([fe.decompressed_file_size_bytes for fi in self.files_index for fe in fi.entries])
+            if max_file_size &gt; self.chunk_limit:
+                raise MemoryError(f&#34;System requires {max_file_size} bytes of memory to process a file but only has &#34;
+                                  f&#34;{self.chunk_limit} available.  Please free or add more RAM.&#34;)
+            elif max_file_size * sum([len(fi.entries) for fi in self.files_index]) &gt; self.chunk_limit:
+                raise MemoryError(&#34;TOO MUCH DATA DAWG&#34;)
+            if debug:
+                if mem_split_factor == 1:
+                    print(f&#34;{len(self.files_index)} stations have {int(self.chunk_limit)} &#34;
+                          f&#34;bytes for loading files in memory.&#34;)
+                else:
+                    print(f&#34;{mem_split_factor} stations each have &#34;
+                          f&#34;{int(self.chunk_limit)} bytes for loading files in memory.&#34;)
+        else:
+            self.chunk_limit = 0
 
         if debug:
             self.errors.print()
@@ -491,6 +585,29 @@ Default False.</p></div>
             _pool.close()
         return index
 
+    def _redo_index(self, station_ids: set, new_start: datetime, new_end: datetime):
+        &#34;&#34;&#34;
+        Redo the index for files using new start and end dates.  removes any buffer time at the start and end of the
+        new query.  Returns the updated index or None
+
+        :param station_ids: set of ids to get
+        :param new_start: new start time to get data from
+        :param new_end: new end time to get data from
+        :return: Updated index or None
+        &#34;&#34;&#34;
+        diff_s = diff_e = timedelta(seconds=0)
+        new_index = self._apply_filter(io.ReadFilter()
+                                       .with_start_dt(new_start)
+                                       .with_end_dt(new_end)
+                                       .with_extensions(self.filter.extensions)
+                                       .with_api_versions(self.filter.api_versions)
+                                       .with_station_ids(station_ids)
+                                       .with_start_dt_buf(diff_s)
+                                       .with_end_dt_buf(diff_e))
+        if len(new_index.entries) &gt; 0:
+            return new_index
+        return None
+
     def _check_station_stats(
             self,
             station_index: io.Index,
@@ -521,43 +638,29 @@ Default False.</p></div>
         if timing_offsets is None:
             return [station_index]
 
-        diff_s = diff_e = timedelta(seconds=0)
-
         # if our filtered files do not encompass the request even when the packet times are updated
         # try getting 1.5 times the difference of the expected start/end and the start/end of the data
         insufficient_str = &#34;&#34;
-        if self.filter.start_dt and timing_offsets.adjusted_start &gt; self.filter.start_dt:
+        if (self.filter.start_dt and timing_offsets.adjusted_start &gt; self.filter.start_dt) or \
+                (self.filter.end_dt and timing_offsets.adjusted_start &gt;= self.filter.end_dt):
             insufficient_str += f&#34; {self.filter.start_dt} (start)&#34;
-            # diff_s = self.filter.start_dt_buf + 1.5 * (timing_offsets.adjusted_start - self.filter.start_dt)
             new_end = self.filter.start_dt - self.filter.start_dt_buf
             new_start = new_end - 1.5 * (timing_offsets.adjusted_start - self.filter.start_dt)
-            new_index = self._apply_filter(io.ReadFilter()
-                                           .with_start_dt(new_start)
-                                           .with_end_dt(new_end)
-                                           .with_extensions(self.filter.extensions)
-                                           .with_api_versions(self.filter.api_versions)
-                                           .with_station_ids(set(station_index.summarize().station_ids()))
-                                           .with_start_dt_buf(diff_s)
-                                           .with_end_dt_buf(diff_e))
-            if len(new_index.entries) &gt; 0:
+            new_index = self._redo_index(set(station_index.summarize().station_ids()), new_start, new_end)
+            if new_index:
                 station_index.append(new_index.entries)
                 stats.extend(fs.extract_stats(new_index))
-        if self.filter.end_dt and timing_offsets.adjusted_end &lt; self.filter.end_dt:
+
+        if (self.filter.end_dt and timing_offsets.adjusted_end &lt; self.filter.end_dt) or \
+                (self.filter.start_dt and timing_offsets.adjusted_end &lt;= self.filter.start_dt):
             insufficient_str += f&#34; {self.filter.end_dt} (end)&#34;
-            # diff_e = self.filter.end_dt_buf + 1.5 * (self.filter.end_dt - timing_offsets.adjusted_end)
             new_start = self.filter.end_dt + self.filter.end_dt_buf
             new_end = new_start + 1.5 * (self.filter.end_dt - timing_offsets.adjusted_end)
-            new_index = self._apply_filter(io.ReadFilter()
-                                           .with_start_dt(new_start)
-                                           .with_end_dt(new_end)
-                                           .with_extensions(self.filter.extensions)
-                                           .with_api_versions(self.filter.api_versions)
-                                           .with_station_ids(set(station_index.summarize().station_ids()))
-                                           .with_start_dt_buf(diff_s)
-                                           .with_end_dt_buf(diff_e))
-            if len(new_index.entries) &gt; 0:
+            new_index = self._redo_index(set(station_index.summarize().station_ids()), new_start, new_end)
+            if new_index:
                 station_index.append(new_index.entries)
                 stats.extend(fs.extract_stats(new_index))
+
         if len(insufficient_str) &gt; 0:
             self.errors.append(f&#34;Data for {station_index.summarize().station_ids()} exists, &#34;
                                f&#34;but not at:{insufficient_str}&#34;)
@@ -574,6 +677,28 @@ Default False.</p></div>
             results[key].append(entries=[station_index.entries[v]])
 
         return list(results.values())
+
+    def _split_workload(self, findex: io.Index) -&gt; List[io.Index]:
+        &#34;&#34;&#34;
+        takes an index and splits it into chunks based on a size limit
+        while running_total + next_file_size &lt; limit, adds files to a chunk (Index)
+        if limit is exceeded, adds the chunk and puts the next file into a new chunk
+
+        :param findex: index of files to split
+        :return: list of Index to process
+        &#34;&#34;&#34;
+        packet_list = []
+        chunk_queue = 0
+        chunk_list = []
+        for f in findex.entries:
+            chunk_queue += f.decompressed_file_size_bytes
+            if chunk_queue &gt; self.chunk_limit:
+                packet_list.append(io.Index(chunk_list))
+                chunk_queue = 0
+                chunk_list = []
+            chunk_list.append(f)
+        packet_list.append(io.Index(chunk_list))
+        return packet_list
 
     @staticmethod
     def read_files_in_index(indexf: io.Index) -&gt; List[api_m.RedvoxPacketM]:
@@ -638,12 +763,12 @@ Default False.</p></div>
 
         return result
 
-    def _stations_by_index(self, findex: io.Index) -&gt; Station:
+    def _station_by_index(self, findex: io.Index) -&gt; Station:
         &#34;&#34;&#34;
         :param findex: index with files to build a station with
         :return: Station built from files in findex
         &#34;&#34;&#34;
-        return Station(self.read_files_in_index(findex))
+        return Station.create_from_packets(self.read_files_in_index(findex))
 
     def get_stations(self, pool: Optional[multiprocessing.pool.Pool] = None) -&gt; List[Station]:
         &#34;&#34;&#34;
@@ -651,7 +776,7 @@ Default False.</p></div>
         :return: List of all stations in the ApiReader
         &#34;&#34;&#34;
         return list(maybe_parallel_map(pool,
-                                       self._stations_by_index,
+                                       self._station_by_index,
                                        self.files_index,
                                        chunk_size=1
                                        )
@@ -662,11 +787,15 @@ Default False.</p></div>
         :param get_id: the id to filter on
         :return: list of all stations with the requested id or None if id can&#39;t be found
         &#34;&#34;&#34;
-        result = [s for s in self.get_stations() if s.id == get_id]
+        result = [s for s in self.get_stations() if s.id() == get_id]
         if len(result) &lt; 1:
             return None
         return result</code></pre>
 </details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="redvox.common.api_reader_dw.ApiReaderDw" href="api_reader_dw.html#redvox.common.api_reader_dw.ApiReaderDw">ApiReaderDw</a></li>
+</ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="redvox.common.api_reader.ApiReader.read_files_in_index"><code class="name flex">
@@ -728,7 +857,7 @@ def read_files_in_index(indexf: io.Index) -&gt; List[api_m.RedvoxPacketM]:
     :param get_id: the id to filter on
     :return: list of all stations with the requested id or None if id can&#39;t be found
     &#34;&#34;&#34;
-    result = [s for s in self.get_stations() if s.id == get_id]
+    result = [s for s in self.get_stations() if s.id() == get_id]
     if len(result) &lt; 1:
         return None
     return result</code></pre>
@@ -750,7 +879,7 @@ def read_files_in_index(indexf: io.Index) -&gt; List[api_m.RedvoxPacketM]:
     :return: List of all stations in the ApiReader
     &#34;&#34;&#34;
     return list(maybe_parallel_map(pool,
-                                   self._stations_by_index,
+                                   self._station_by_index,
                                    self.files_index,
                                    chunk_size=1
                                    )
@@ -833,7 +962,7 @@ def read_files_in_index(indexf: io.Index) -&gt; List[api_m.RedvoxPacketM]:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
