@@ -4,8 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>redvox.tests.cloud API documentation</title>
-<meta name="description" content="" />
+<title>redvox.common.station_model API documentation</title>
+<meta name="description" content="Prototype class
+In Development …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,26 +20,148 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>redvox.tests.cloud</code></h1>
+<h1 class="title">Module <code>redvox.common.station_model</code></h1>
 </header>
 <section id="section-intro">
+<p>Prototype class
+In Development</p>
+<p>Class representing the Station information that can be used to convert Station into another format.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Prototype class
+In Development
+
+Class representing the Station information that can be used to convert Station into another format.
+&#34;&#34;&#34;
+
+# from typing import List
+#
+# import numpy as np
+#
+# import redvox
+# from redvox.common.session_model import SessionModel
+# from redvox.common.date_time_utils import datetime_from_epoch_microseconds_utc
+#
+#
+# class StationModel:
+#     &#34;&#34;&#34;
+#     Model for a station.  Does not include data.
+#
+#     Properties:
+#         id: string, the id of the station.  Users can change this
+#
+#         uuid: string, the uuid of the station.  This is set by the app when it is installed on a device
+#
+#         audio_sample_rate_hz: int, the audio sample rate in hz of the station
+#
+#         sessions: List of SessionModel: the sessions used to create the StationModel
+#
+#         app: string, name of the app
+#
+#         app_version: string, version of the app
+#
+#         api: float, the api version of the data
+#
+#         sub_api: float, the sub api of the data
+#
+#         make: string, make of the station
+#
+#         model: string, model of the station
+#
+#         num_sessions: int, number of sessions in the model
+#
+#         sdk_version: string, version of SDK used to create the model
+#
+#         start_date: float, timestamp of first station data point in microseconds since epoch UTC
+#
+#         end_date: float, timestamp of last station data point in microseconds since epoch UTC
+#
+#         changelog: List of str, list of all changes to station during lifetime
+#     &#34;&#34;&#34;
+#     def __init__(self,
+#                  station_id: str = &#34;&#34;,
+#                  uuid: str = &#34;&#34;,
+#                  app_name: str = &#34;Redvox&#34;,
+#                  api: float = np.nan,
+#                  sub_api: float = np.nan,
+#                  make: str = &#34;&#34;,
+#                  model: str = &#34;&#34;,
+#                  app_version: str = &#34;&#34;,
+#                  start_date: float = np.nan,
+#                  end_date: float = np.nan
+#                  ):
+#         self.id: str = station_id
+#         self.uuid: str = uuid
+#         self.app_name: str = app_name
+#         self.api: float = api
+#         self.sub_api: float = sub_api
+#         self.make: str = make
+#         self.model: str = model
+#         self.app_version: str = app_version
+#         self.num_sessions: int = 0
+#         self.sdk_version: str = redvox.version()
+#         self.start_date: float = start_date
+#         self.end_date: float = end_date
+#         self.changelog: List[str] = []
+#
+#     def add_session(self, session: SessionModel):
+#         &#34;&#34;&#34;
+#         Add a new session to the StationModel.  id and uuid must match; no change if no match
+#
+#         :param session: Session to add
+#         &#34;&#34;&#34;
+#         if self.id == session.id and self.uuid == session.uuid:
+#             self.num_sessions += 1
+#             if self.start_date &gt; session.start_date:
+#                 self.start_date = session.start_date
+#             if self.end_date &lt; session.last_data_timestamp:
+#                 self.end_date = session.last_data_timestamp
+#             first_timestamp = np.nan if np.isnan(session.first_data_timestamp) \
+#                 else datetime_from_epoch_microseconds_utc(
+#                 session.first_data_timestamp).strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
+#             last_timestamp = np.nan if np.isnan(session.last_data_timestamp) \
+#                 else datetime_from_epoch_microseconds_utc(
+#                 session.last_data_timestamp).strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
+#             self.changelog.append(f&#34;session from {first_timestamp}: {last_timestamp}&#34;)
+#
+#     @staticmethod
+#     def create_from_session(session: SessionModel) -&gt; &#34;StationModel&#34;:
+#         &#34;&#34;&#34;
+#         Create StationModel from a single session
+#
+#         :param session: SessionModel to create StationModel from
+#         :return: StationModel
+#         &#34;&#34;&#34;
+#         try:
+#             result = StationModel(session.id, session.uuid, session.app_name, session.api, session.sub_api,
+#                                   session.make, session.model, session.app_version, session.start_date,
+#                                   session.last_data_timestamp
+#                                   )
+#         except Exception as e:
+#             raise e
+#         return result
+#
+#     @staticmethod
+#     def create_from_sessions(sessions: List[SessionModel]) -&gt; &#34;StationModel&#34;:
+#         &#34;&#34;&#34;
+#         create StationModel from a list of sessions.  Uses the first SessionModel as the base for the StationModel,
+#         and will ignore any SessionModel that does not align with the first SessionModel
+#
+#         :param sessions: sessions to create StationModel from
+#         :return: StationModel
+#         &#34;&#34;&#34;
+#         p1 = sessions.pop(0)
+#         model = StationModel.create_from_session(p1)
+#         for p in sessions:
+#             model.add_session(p)
+#         sessions.insert(0, p1)
+#         return model</code></pre>
+</details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
-<dl>
-<dt><code class="name"><a title="redvox.tests.cloud.cloud_test_utils" href="cloud_test_utils.html">redvox.tests.cloud.cloud_test_utils</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="redvox.tests.cloud.session_model_api" href="session_model_api.html">redvox.tests.cloud.session_model_api</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="redvox.tests.cloud.test_client" href="test_client.html">redvox.tests.cloud.test_client</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -55,14 +178,7 @@
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="redvox.tests" href="../index.html">redvox.tests</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="redvox.tests.cloud.cloud_test_utils" href="cloud_test_utils.html">redvox.tests.cloud.cloud_test_utils</a></code></li>
-<li><code><a title="redvox.tests.cloud.session_model_api" href="session_model_api.html">redvox.tests.cloud.session_model_api</a></code></li>
-<li><code><a title="redvox.tests.cloud.test_client" href="test_client.html">redvox.tests.cloud.test_client</a></code></li>
+<li><code><a title="redvox.common" href="index.html">redvox.common</a></code></li>
 </ul>
 </li>
 </ul>

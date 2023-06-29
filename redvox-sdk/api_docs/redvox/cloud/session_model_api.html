@@ -1,0 +1,4205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>redvox.cloud.session_model_api API documentation</title>
+<meta name="description" content="Session Models and API calls …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>redvox.cloud.session_model_api</code></h1>
+</header>
+<section id="section-intro">
+<p>Session Models and API calls.</p>
+<p>Sessions represent a summary of a single station from when it starts recording to when it stops recording.</p>
+<p>Sessions are further subdivided into dynamic sessions. A single session contains keys to daily dynamic sessions.
+Daily dynamic sessions contain keys to hourly dynamic sessions.
+Hourly dynamic sessions contain keys to individual packets.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Session Models and API calls.
+
+Sessions represent a summary of a single station from when it starts recording to when it stops recording.
+
+Sessions are further subdivided into dynamic sessions. A single session contains keys to daily dynamic sessions.
+Daily dynamic sessions contain keys to hourly dynamic sessions.
+Hourly dynamic sessions contain keys to individual packets.
+&#34;&#34;&#34;
+
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional, List, Dict, Callable, Tuple, TYPE_CHECKING
+
+import requests
+from dataclasses_json import dataclass_json
+
+from redvox.api1000.wrapped_redvox_packet.station_information import StationInformation
+from redvox.api1000.wrapped_redvox_packet.timing_information import TimingInformation
+from redvox.api1000.wrapped_redvox_packet.wrapped_packet import WrappedRedvoxPacketM
+from redvox.cloud.api import post_req
+from redvox.cloud.config import RedVoxConfig
+from redvox.cloud.routes import RoutesV3
+from redvox.common.date_time_utils import datetime_from_epoch_microseconds_utc as us2dt
+from redvox.common.errors import RedVoxError
+
+if TYPE_CHECKING:
+    from redvox.cloud.client import CloudClient
+
+
+@dataclass_json
+@dataclass
+class TimeSyncData:
+    &#34;&#34;&#34;
+    Summarized time synchronization data.
+    &#34;&#34;&#34;
+
+    ts: float
+    lat: float
+    off: float
+
+
+@dataclass_json
+@dataclass
+class FirstLastBufTimeSync:
+    &#34;&#34;&#34;
+    A bounded buffer that stores the first and last N samples of time synchronization data.
+    &#34;&#34;&#34;
+
+    fst: List[Tuple[int, TimeSyncData]]
+    fst_max_size: int
+    lst: List[Tuple[int, TimeSyncData]]
+    lst_max_size: int
+
+
+@dataclass_json
+@dataclass
+class Timing:
+    &#34;&#34;&#34;
+    High-level timing information.
+    &#34;&#34;&#34;
+
+    first_data_ts: float
+    last_data_ts: float
+    n_ex: int
+    mean_lat: float
+    mean_off: float
+    fst_lst: FirstLastBufTimeSync
+
+    def first_data_dt(self) -&gt; datetime:
+        &#34;&#34;&#34;
+        :return: The datatime that represents the first datum.
+        &#34;&#34;&#34;
+        return us2dt(self.first_data_ts)
+
+    def last_data_dt(self) -&gt; datetime:
+        &#34;&#34;&#34;
+        :return: The datatime that represents the last datum.
+        &#34;&#34;&#34;
+        return us2dt(self.last_data_ts)
+
+
+@dataclass_json
+@dataclass
+class WelfordAggregator:
+    &#34;&#34;&#34;
+    Fields required for computing the online Welford algorithm.
+    See: https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford&#39;s_online_algorithm
+    &#34;&#34;&#34;
+
+    m2: float
+    mean: float
+    cnt: int
+
+    def finalize(self) -&gt; Tuple[float, float, float]:
+        &#34;&#34;&#34;
+        Computes the running variance.
+        :return: A tuple containing the mean, variance, and sample variance.
+        &#34;&#34;&#34;
+        if self.cnt &lt; 2:
+            raise RedVoxError(&#34;Not enough values to compute statistics from&#34;)
+        variance: float = self.m2 / float(self.cnt)
+        sample_variance: float = self.m2 / float(self.cnt - 1)
+        return self.mean, variance, sample_variance
+
+
+@dataclass_json
+@dataclass
+class Stats:
+    &#34;&#34;&#34;
+    Contains the minimum and maximum values of a collection as well as the statistics provided by Welford&#39;s online
+    algorithm.
+    &#34;&#34;&#34;
+
+    min: float
+    max: float
+    welford: WelfordAggregator
+
+
+@dataclass_json
+@dataclass
+class Sensor:
+    &#34;&#34;&#34;
+    Describes a station&#39;s sensor.
+    &#34;&#34;&#34;
+
+    name: str
+    description: str
+    sample_rate_stats: Stats
+
+
+@dataclass_json
+@dataclass
+class Session:
+    &#34;&#34;&#34;
+    Describes a single station&#39;s recording session.
+    &#34;&#34;&#34;
+
+    id: str
+    uuid: str
+    desc: str
+    start_ts: int
+    client: str
+    client_ver: str
+    session_ver: str
+    app: str
+    api: int
+    sub_api: int
+    make: str
+    model: str
+    app_ver: str
+    owner: str
+    private: bool
+    packet_dur: float
+    sensors: List[Sensor]
+    n_pkts: int
+    timing: Timing
+    sub: List[str]
+
+    def session_key(self) -&gt; str:
+        &#34;&#34;&#34;
+        :return: The key associated with this session.
+        &#34;&#34;&#34;
+        return f&#34;{self.id}:{self.uuid}:{self.start_ts}&#34;
+
+    def query_dynamic_session(
+        self, client: &#34;CloudClient&#34;, sub: str
+    ) -&gt; &#34;DynamicSessionModelResp&#34;:
+        &#34;&#34;&#34;
+        Queries a dynamic session that is associated with this session.
+        :param client: An instance of the cloud client.
+        :param sub: The dynamic session key/
+        :return: A DynamicSessionModelResp.
+        &#34;&#34;&#34;
+        ts_parts: List[int] = list(map(int, sub.split(&#34;:&#34;)))
+        return client.request_dynamic_session_model(
+            self.session_key(), ts_parts[0], ts_parts[1]
+        )
+
+
+@dataclass_json
+@dataclass
+class Location:
+    &#34;&#34;&#34;
+    Described a single location.
+    &#34;&#34;&#34;
+
+    lat: float
+    lng: float
+    alt: float
+
+
+@dataclass_json
+@dataclass
+class FirstLastBufLocation:
+    &#34;&#34;&#34;
+    A bounded buffer that stores the first and last location points.
+    &#34;&#34;&#34;
+
+    fst: List[Tuple[int, Location]]
+    fst_max_size: int
+    lst: List[Tuple[int, Location]]
+    lst_max_size: int
+
+
+@dataclass_json
+@dataclass
+class LocationStat:
+    &#34;&#34;&#34;
+    Location statistics.
+    &#34;&#34;&#34;
+
+    fst_lst: FirstLastBufLocation
+    lat: Stats
+    lng: Stats
+    alt: Stats
+
+
+@dataclass_json
+@dataclass
+class DynamicSession:
+    &#34;&#34;&#34;
+    A dynamic session belongs to a parent session, but instead of representing an entire recording, dynamic sessions
+    represent a chunk of time. Either daily or hourly dynamic sessions are supported.
+    &#34;&#34;&#34;
+
+    n_pkts: int
+    location: Dict[str, LocationStat]
+    battery: Stats
+    temperature: Stats
+
+    session_key: str
+    start_ts: int
+    end_ts: int
+    dur: str
+    sub: List[str]
+
+    def query_dynamic_session(
+        self, client: &#34;CloudClient&#34;, sub: str
+    ) -&gt; &#34;DynamicSessionModelResp&#34;:
+        &#34;&#34;&#34;
+        Queries a dynamic session that is associated with this session.
+        :param client: An instance of the cloud client.
+        :param sub: The dynamic session key.
+        :return: A DynamicSessionModelResp.
+        &#34;&#34;&#34;
+        ts_parts: List[int] = list(map(int, sub.split(&#34;:&#34;)))
+        return client.request_dynamic_session_model(
+            self.session_key, ts_parts[0], ts_parts[1]
+        )
+
+    # TODO
+    def query_packet(self, client: &#34;CloudClient&#34;, sub: str):
+        &#34;&#34;&#34;
+        Queries individual packets assuming this is an hourly dynamic session.
+        :param client: An instance of the cloud client.
+        :param sub: The packet key.
+        :return: TODO
+        &#34;&#34;&#34;
+        raise RedVoxError(&#34;Method not yet implemented&#34;)
+
+
+@dataclass_json
+@dataclass
+class SessionModelReq:
+    &#34;&#34;&#34;
+    Request object for directly querying sessions.
+    &#34;&#34;&#34;
+
+    auth_token: str
+    session_key: str
+
+
+@dataclass_json
+@dataclass
+class SessionModelResp:
+    &#34;&#34;&#34;
+    Response of directly queried session.
+    &#34;&#34;&#34;
+
+    err: Optional[str]
+    session: Optional[Session]
+
+
+@dataclass_json
+@dataclass
+class SessionModelsReq:
+    &#34;&#34;&#34;
+    Request object for querying a range of sessions.
+    &#34;&#34;&#34;
+
+    auth_token: str
+    id_uuids: Optional[List[str]] = None
+    owner: Optional[str] = None
+    start_ts: Optional[int] = None
+    end_ts: Optional[int] = None
+    include_public: bool = False
+
+
+@dataclass_json
+@dataclass
+class SessionModelsResp:
+    &#34;&#34;&#34;
+    Response object from querying a range of sessions.
+    &#34;&#34;&#34;
+
+    err: Optional[str]
+    sessions: List[Session]
+
+
+@dataclass_json
+@dataclass
+class DynamicSessionModelReq:
+    &#34;&#34;&#34;
+    Request object for querying a dynamic session.
+    &#34;&#34;&#34;
+
+    auth_token: str
+    session_key: str
+    start_ts: int
+    end_ts: int
+
+
+@dataclass_json
+@dataclass
+class DynamicSessionModelResp:
+    &#34;&#34;&#34;
+    Response object of querying a dynamic session.
+    &#34;&#34;&#34;
+
+    err: Optional[str]
+    dynamic_session: Optional[DynamicSession]
+
+
+def request_session(
+    redvox_config: RedVoxConfig,
+    req: SessionModelReq,
+    session: Optional[requests.Session] = None,
+    timeout: Optional[float] = None,
+) -&gt; SessionModelResp:
+    &#34;&#34;&#34;
+    Requests a single session given the session key.
+    :param redvox_config: An instance of the cloud configuration.
+    :param req: The session model request.
+    :param session: An optional HTTP client session.
+    :param timeout: An optional timeout.
+    :return: An instance of the SessionModelResp.
+    &#34;&#34;&#34;
+    # noinspection Mypy
+    handle_resp: Callable[
+        [requests.Response], SessionModelResp
+    ] = lambda resp: SessionModelResp.from_dict(resp.json())
+    return post_req(
+        redvox_config,
+        RoutesV3.SESSION_MODEL,
+        req,
+        handle_resp,
+        session,
+        timeout,
+    )
+
+
+def request_sessions(
+    redvox_config: RedVoxConfig,
+    req: SessionModelsReq,
+    session: Optional[requests.Session] = None,
+    timeout: Optional[float] = None,
+) -&gt; SessionModelsResp:
+    &#34;&#34;&#34;
+    Requests a range of sessions.
+    :param redvox_config: An instance of the cloud configuration.
+    :param req: The sessions model request.
+    :param session: An optional HTTP client session.
+    :param timeout: An optional timeout.
+    :return: An instance of the SessionModelsResp.
+    &#34;&#34;&#34;
+    # noinspection Mypy
+    handle_resp: Callable[
+        [requests.Response], SessionModelsResp
+    ] = lambda resp: SessionModelsResp.from_dict(resp.json())
+    return post_req(
+        redvox_config,
+        RoutesV3.SESSION_MODELS,
+        req,
+        handle_resp,
+        session,
+        timeout,
+    )
+
+
+def request_dynamic_session(
+    redvox_config: RedVoxConfig,
+    req: DynamicSessionModelReq,
+    session: Optional[requests.Session] = None,
+    timeout: Optional[float] = None,
+) -&gt; DynamicSessionModelResp:
+    &#34;&#34;&#34;
+    Requests a single dynamic session given the dynamic session key.
+    :param redvox_config: An instance of the cloud configuration.
+    :param req: The dynamic session model request.
+    :param session: An optional HTTP client session.
+    :param timeout: An optional timeout.
+    :return: An instance of the DynamicSessionModelResp.
+    &#34;&#34;&#34;
+    # noinspection Mypy
+    handle_resp: Callable[
+        [requests.Response], DynamicSessionModelResp
+    ] = lambda resp: DynamicSessionModelResp.from_dict(resp.json())
+    return post_req(
+        redvox_config,
+        RoutesV3.DYNAMIC_SESSION_MODEL,
+        req,
+        handle_resp,
+        session,
+        timeout,
+    )
+
+
+def session_key_from_packet(packet: WrappedRedvoxPacketM) -&gt; str:
+    &#34;&#34;&#34;
+    Constructs a session key given a RedVox packet.
+    :param packet: The packet to construct a session key from.
+    :return: A session key.
+    &#34;&#34;&#34;
+    station_info: StationInformation = packet.get_station_information()
+    if (
+        station_info is None
+        or station_info.get_id() == &#34;&#34;
+        or station_info.get_uuid() == &#34;&#34;
+    ):
+        raise RedVoxError(&#34;Missing required station information&#34;)
+    timing_info: TimingInformation = packet.get_timing_information()
+    if timing_info is None or timing_info.get_app_start_mach_timestamp() == 0:
+        raise RedVoxError(&#34;Missing required timing information&#34;)
+
+    start_ts: int = round(timing_info.get_app_start_mach_timestamp())
+    return f&#34;{station_info.get_id()}:{station_info.get_uuid()}:{start_ts}&#34;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="redvox.cloud.session_model_api.request_dynamic_session"><code class="name flex">
+<span>def <span class="ident">request_dynamic_session</span></span>(<span>redvox_config: <a title="redvox.cloud.config.RedVoxConfig" href="config.html#redvox.cloud.config.RedVoxConfig">RedVoxConfig</a>, req: <a title="redvox.cloud.session_model_api.DynamicSessionModelReq" href="#redvox.cloud.session_model_api.DynamicSessionModelReq">DynamicSessionModelReq</a>, session: Optional[requests.sessions.Session] = None, timeout: Optional[float] = None) ‑> <a title="redvox.cloud.session_model_api.DynamicSessionModelResp" href="#redvox.cloud.session_model_api.DynamicSessionModelResp">DynamicSessionModelResp</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Requests a single dynamic session given the dynamic session key.
+:param redvox_config: An instance of the cloud configuration.
+:param req: The dynamic session model request.
+:param session: An optional HTTP client session.
+:param timeout: An optional timeout.
+:return: An instance of the DynamicSessionModelResp.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def request_dynamic_session(
+    redvox_config: RedVoxConfig,
+    req: DynamicSessionModelReq,
+    session: Optional[requests.Session] = None,
+    timeout: Optional[float] = None,
+) -&gt; DynamicSessionModelResp:
+    &#34;&#34;&#34;
+    Requests a single dynamic session given the dynamic session key.
+    :param redvox_config: An instance of the cloud configuration.
+    :param req: The dynamic session model request.
+    :param session: An optional HTTP client session.
+    :param timeout: An optional timeout.
+    :return: An instance of the DynamicSessionModelResp.
+    &#34;&#34;&#34;
+    # noinspection Mypy
+    handle_resp: Callable[
+        [requests.Response], DynamicSessionModelResp
+    ] = lambda resp: DynamicSessionModelResp.from_dict(resp.json())
+    return post_req(
+        redvox_config,
+        RoutesV3.DYNAMIC_SESSION_MODEL,
+        req,
+        handle_resp,
+        session,
+        timeout,
+    )</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.request_session"><code class="name flex">
+<span>def <span class="ident">request_session</span></span>(<span>redvox_config: <a title="redvox.cloud.config.RedVoxConfig" href="config.html#redvox.cloud.config.RedVoxConfig">RedVoxConfig</a>, req: <a title="redvox.cloud.session_model_api.SessionModelReq" href="#redvox.cloud.session_model_api.SessionModelReq">SessionModelReq</a>, session: Optional[requests.sessions.Session] = None, timeout: Optional[float] = None) ‑> <a title="redvox.cloud.session_model_api.SessionModelResp" href="#redvox.cloud.session_model_api.SessionModelResp">SessionModelResp</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Requests a single session given the session key.
+:param redvox_config: An instance of the cloud configuration.
+:param req: The session model request.
+:param session: An optional HTTP client session.
+:param timeout: An optional timeout.
+:return: An instance of the SessionModelResp.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def request_session(
+    redvox_config: RedVoxConfig,
+    req: SessionModelReq,
+    session: Optional[requests.Session] = None,
+    timeout: Optional[float] = None,
+) -&gt; SessionModelResp:
+    &#34;&#34;&#34;
+    Requests a single session given the session key.
+    :param redvox_config: An instance of the cloud configuration.
+    :param req: The session model request.
+    :param session: An optional HTTP client session.
+    :param timeout: An optional timeout.
+    :return: An instance of the SessionModelResp.
+    &#34;&#34;&#34;
+    # noinspection Mypy
+    handle_resp: Callable[
+        [requests.Response], SessionModelResp
+    ] = lambda resp: SessionModelResp.from_dict(resp.json())
+    return post_req(
+        redvox_config,
+        RoutesV3.SESSION_MODEL,
+        req,
+        handle_resp,
+        session,
+        timeout,
+    )</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.request_sessions"><code class="name flex">
+<span>def <span class="ident">request_sessions</span></span>(<span>redvox_config: <a title="redvox.cloud.config.RedVoxConfig" href="config.html#redvox.cloud.config.RedVoxConfig">RedVoxConfig</a>, req: <a title="redvox.cloud.session_model_api.SessionModelsReq" href="#redvox.cloud.session_model_api.SessionModelsReq">SessionModelsReq</a>, session: Optional[requests.sessions.Session] = None, timeout: Optional[float] = None) ‑> <a title="redvox.cloud.session_model_api.SessionModelsResp" href="#redvox.cloud.session_model_api.SessionModelsResp">SessionModelsResp</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Requests a range of sessions.
+:param redvox_config: An instance of the cloud configuration.
+:param req: The sessions model request.
+:param session: An optional HTTP client session.
+:param timeout: An optional timeout.
+:return: An instance of the SessionModelsResp.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def request_sessions(
+    redvox_config: RedVoxConfig,
+    req: SessionModelsReq,
+    session: Optional[requests.Session] = None,
+    timeout: Optional[float] = None,
+) -&gt; SessionModelsResp:
+    &#34;&#34;&#34;
+    Requests a range of sessions.
+    :param redvox_config: An instance of the cloud configuration.
+    :param req: The sessions model request.
+    :param session: An optional HTTP client session.
+    :param timeout: An optional timeout.
+    :return: An instance of the SessionModelsResp.
+    &#34;&#34;&#34;
+    # noinspection Mypy
+    handle_resp: Callable[
+        [requests.Response], SessionModelsResp
+    ] = lambda resp: SessionModelsResp.from_dict(resp.json())
+    return post_req(
+        redvox_config,
+        RoutesV3.SESSION_MODELS,
+        req,
+        handle_resp,
+        session,
+        timeout,
+    )</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.session_key_from_packet"><code class="name flex">
+<span>def <span class="ident">session_key_from_packet</span></span>(<span>packet: <a title="redvox.api1000.wrapped_redvox_packet.wrapped_packet.WrappedRedvoxPacketM" href="../api1000/wrapped_redvox_packet/wrapped_packet.html#redvox.api1000.wrapped_redvox_packet.wrapped_packet.WrappedRedvoxPacketM">WrappedRedvoxPacketM</a>) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Constructs a session key given a RedVox packet.
+:param packet: The packet to construct a session key from.
+:return: A session key.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def session_key_from_packet(packet: WrappedRedvoxPacketM) -&gt; str:
+    &#34;&#34;&#34;
+    Constructs a session key given a RedVox packet.
+    :param packet: The packet to construct a session key from.
+    :return: A session key.
+    &#34;&#34;&#34;
+    station_info: StationInformation = packet.get_station_information()
+    if (
+        station_info is None
+        or station_info.get_id() == &#34;&#34;
+        or station_info.get_uuid() == &#34;&#34;
+    ):
+        raise RedVoxError(&#34;Missing required station information&#34;)
+    timing_info: TimingInformation = packet.get_timing_information()
+    if timing_info is None or timing_info.get_app_start_mach_timestamp() == 0:
+        raise RedVoxError(&#34;Missing required timing information&#34;)
+
+    start_ts: int = round(timing_info.get_app_start_mach_timestamp())
+    return f&#34;{station_info.get_id()}:{station_info.get_uuid()}:{start_ts}&#34;</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSession"><code class="flex name class">
+<span>class <span class="ident">DynamicSession</span></span>
+<span>(</span><span>n_pkts: int, location: Dict[str, <a title="redvox.cloud.session_model_api.LocationStat" href="#redvox.cloud.session_model_api.LocationStat">LocationStat</a>], battery: <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a>, temperature: <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a>, session_key: str, start_ts: int, end_ts: int, dur: str, sub: List[str])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A dynamic session belongs to a parent session, but instead of representing an entire recording, dynamic sessions
+represent a chunk of time. Either daily or hourly dynamic sessions are supported.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class DynamicSession:
+    &#34;&#34;&#34;
+    A dynamic session belongs to a parent session, but instead of representing an entire recording, dynamic sessions
+    represent a chunk of time. Either daily or hourly dynamic sessions are supported.
+    &#34;&#34;&#34;
+
+    n_pkts: int
+    location: Dict[str, LocationStat]
+    battery: Stats
+    temperature: Stats
+
+    session_key: str
+    start_ts: int
+    end_ts: int
+    dur: str
+    sub: List[str]
+
+    def query_dynamic_session(
+        self, client: &#34;CloudClient&#34;, sub: str
+    ) -&gt; &#34;DynamicSessionModelResp&#34;:
+        &#34;&#34;&#34;
+        Queries a dynamic session that is associated with this session.
+        :param client: An instance of the cloud client.
+        :param sub: The dynamic session key.
+        :return: A DynamicSessionModelResp.
+        &#34;&#34;&#34;
+        ts_parts: List[int] = list(map(int, sub.split(&#34;:&#34;)))
+        return client.request_dynamic_session_model(
+            self.session_key, ts_parts[0], ts_parts[1]
+        )
+
+    # TODO
+    def query_packet(self, client: &#34;CloudClient&#34;, sub: str):
+        &#34;&#34;&#34;
+        Queries individual packets assuming this is an hourly dynamic session.
+        :param client: An instance of the cloud client.
+        :param sub: The packet key.
+        :return: TODO
+        &#34;&#34;&#34;
+        raise RedVoxError(&#34;Method not yet implemented&#34;)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSession.battery"><code class="name">var <span class="ident">battery</span> : <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.dur"><code class="name">var <span class="ident">dur</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.end_ts"><code class="name">var <span class="ident">end_ts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.location"><code class="name">var <span class="ident">location</span> : Dict[str, <a title="redvox.cloud.session_model_api.LocationStat" href="#redvox.cloud.session_model_api.LocationStat">LocationStat</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.n_pkts"><code class="name">var <span class="ident">n_pkts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.session_key"><code class="name">var <span class="ident">session_key</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.start_ts"><code class="name">var <span class="ident">start_ts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.sub"><code class="name">var <span class="ident">sub</span> : List[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.temperature"><code class="name">var <span class="ident">temperature</span> : <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSession.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSession.query_dynamic_session"><code class="name flex">
+<span>def <span class="ident">query_dynamic_session</span></span>(<span>self, client: CloudClient, sub: str) ‑> <a title="redvox.cloud.session_model_api.DynamicSessionModelResp" href="#redvox.cloud.session_model_api.DynamicSessionModelResp">DynamicSessionModelResp</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Queries a dynamic session that is associated with this session.
+:param client: An instance of the cloud client.
+:param sub: The dynamic session key.
+:return: A DynamicSessionModelResp.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def query_dynamic_session(
+    self, client: &#34;CloudClient&#34;, sub: str
+) -&gt; &#34;DynamicSessionModelResp&#34;:
+    &#34;&#34;&#34;
+    Queries a dynamic session that is associated with this session.
+    :param client: An instance of the cloud client.
+    :param sub: The dynamic session key.
+    :return: A DynamicSessionModelResp.
+    &#34;&#34;&#34;
+    ts_parts: List[int] = list(map(int, sub.split(&#34;:&#34;)))
+    return client.request_dynamic_session_model(
+        self.session_key, ts_parts[0], ts_parts[1]
+    )</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.query_packet"><code class="name flex">
+<span>def <span class="ident">query_packet</span></span>(<span>self, client: CloudClient, sub: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Queries individual packets assuming this is an hourly dynamic session.
+:param client: An instance of the cloud client.
+:param sub: The packet key.
+:return: TODO</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def query_packet(self, client: &#34;CloudClient&#34;, sub: str):
+    &#34;&#34;&#34;
+    Queries individual packets assuming this is an hourly dynamic session.
+    :param client: An instance of the cloud client.
+    :param sub: The packet key.
+    :return: TODO
+    &#34;&#34;&#34;
+    raise RedVoxError(&#34;Method not yet implemented&#34;)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSession.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq"><code class="flex name class">
+<span>class <span class="ident">DynamicSessionModelReq</span></span>
+<span>(</span><span>auth_token: str, session_key: str, start_ts: int, end_ts: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request object for querying a dynamic session.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class DynamicSessionModelReq:
+    &#34;&#34;&#34;
+    Request object for querying a dynamic session.
+    &#34;&#34;&#34;
+
+    auth_token: str
+    session_key: str
+    start_ts: int
+    end_ts: int</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.auth_token"><code class="name">var <span class="ident">auth_token</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.end_ts"><code class="name">var <span class="ident">end_ts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.session_key"><code class="name">var <span class="ident">session_key</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.start_ts"><code class="name">var <span class="ident">start_ts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelReq.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp"><code class="flex name class">
+<span>class <span class="ident">DynamicSessionModelResp</span></span>
+<span>(</span><span>err: Optional[str], dynamic_session: Optional[<a title="redvox.cloud.session_model_api.DynamicSession" href="#redvox.cloud.session_model_api.DynamicSession">DynamicSession</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Response object of querying a dynamic session.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class DynamicSessionModelResp:
+    &#34;&#34;&#34;
+    Response object of querying a dynamic session.
+    &#34;&#34;&#34;
+
+    err: Optional[str]
+    dynamic_session: Optional[DynamicSession]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.dynamic_session"><code class="name">var <span class="ident">dynamic_session</span> : Optional[<a title="redvox.cloud.session_model_api.DynamicSession" href="#redvox.cloud.session_model_api.DynamicSession">DynamicSession</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.err"><code class="name">var <span class="ident">err</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.DynamicSessionModelResp.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation"><code class="flex name class">
+<span>class <span class="ident">FirstLastBufLocation</span></span>
+<span>(</span><span>fst: List[Tuple[int, <a title="redvox.cloud.session_model_api.Location" href="#redvox.cloud.session_model_api.Location">Location</a>]], fst_max_size: int, lst: List[Tuple[int, <a title="redvox.cloud.session_model_api.Location" href="#redvox.cloud.session_model_api.Location">Location</a>]], lst_max_size: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A bounded buffer that stores the first and last location points.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class FirstLastBufLocation:
+    &#34;&#34;&#34;
+    A bounded buffer that stores the first and last location points.
+    &#34;&#34;&#34;
+
+    fst: List[Tuple[int, Location]]
+    fst_max_size: int
+    lst: List[Tuple[int, Location]]
+    lst_max_size: int</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.fst"><code class="name">var <span class="ident">fst</span> : List[Tuple[int, <a title="redvox.cloud.session_model_api.Location" href="#redvox.cloud.session_model_api.Location">Location</a>]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.fst_max_size"><code class="name">var <span class="ident">fst_max_size</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.lst"><code class="name">var <span class="ident">lst</span> : List[Tuple[int, <a title="redvox.cloud.session_model_api.Location" href="#redvox.cloud.session_model_api.Location">Location</a>]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.lst_max_size"><code class="name">var <span class="ident">lst_max_size</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufLocation.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync"><code class="flex name class">
+<span>class <span class="ident">FirstLastBufTimeSync</span></span>
+<span>(</span><span>fst: List[Tuple[int, <a title="redvox.cloud.session_model_api.TimeSyncData" href="#redvox.cloud.session_model_api.TimeSyncData">TimeSyncData</a>]], fst_max_size: int, lst: List[Tuple[int, <a title="redvox.cloud.session_model_api.TimeSyncData" href="#redvox.cloud.session_model_api.TimeSyncData">TimeSyncData</a>]], lst_max_size: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A bounded buffer that stores the first and last N samples of time synchronization data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class FirstLastBufTimeSync:
+    &#34;&#34;&#34;
+    A bounded buffer that stores the first and last N samples of time synchronization data.
+    &#34;&#34;&#34;
+
+    fst: List[Tuple[int, TimeSyncData]]
+    fst_max_size: int
+    lst: List[Tuple[int, TimeSyncData]]
+    lst_max_size: int</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.fst"><code class="name">var <span class="ident">fst</span> : List[Tuple[int, <a title="redvox.cloud.session_model_api.TimeSyncData" href="#redvox.cloud.session_model_api.TimeSyncData">TimeSyncData</a>]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.fst_max_size"><code class="name">var <span class="ident">fst_max_size</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.lst"><code class="name">var <span class="ident">lst</span> : List[Tuple[int, <a title="redvox.cloud.session_model_api.TimeSyncData" href="#redvox.cloud.session_model_api.TimeSyncData">TimeSyncData</a>]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.lst_max_size"><code class="name">var <span class="ident">lst_max_size</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.FirstLastBufTimeSync.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.Location"><code class="flex name class">
+<span>class <span class="ident">Location</span></span>
+<span>(</span><span>lat: float, lng: float, alt: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Described a single location.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class Location:
+    &#34;&#34;&#34;
+    Described a single location.
+    &#34;&#34;&#34;
+
+    lat: float
+    lng: float
+    alt: float</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Location.alt"><code class="name">var <span class="ident">alt</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Location.lat"><code class="name">var <span class="ident">lat</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Location.lng"><code class="name">var <span class="ident">lng</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Location.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Location.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Location.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Location.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Location.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat"><code class="flex name class">
+<span>class <span class="ident">LocationStat</span></span>
+<span>(</span><span>fst_lst: <a title="redvox.cloud.session_model_api.FirstLastBufLocation" href="#redvox.cloud.session_model_api.FirstLastBufLocation">FirstLastBufLocation</a>, lat: <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a>, lng: <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a>, alt: <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Location statistics.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class LocationStat:
+    &#34;&#34;&#34;
+    Location statistics.
+    &#34;&#34;&#34;
+
+    fst_lst: FirstLastBufLocation
+    lat: Stats
+    lng: Stats
+    alt: Stats</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.LocationStat.alt"><code class="name">var <span class="ident">alt</span> : <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat.fst_lst"><code class="name">var <span class="ident">fst_lst</span> : <a title="redvox.cloud.session_model_api.FirstLastBufLocation" href="#redvox.cloud.session_model_api.FirstLastBufLocation">FirstLastBufLocation</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat.lat"><code class="name">var <span class="ident">lat</span> : <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat.lng"><code class="name">var <span class="ident">lng</span> : <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.LocationStat.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.LocationStat.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.LocationStat.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.Sensor"><code class="flex name class">
+<span>class <span class="ident">Sensor</span></span>
+<span>(</span><span>name: str, description: str, sample_rate_stats: <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Describes a station's sensor.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class Sensor:
+    &#34;&#34;&#34;
+    Describes a station&#39;s sensor.
+    &#34;&#34;&#34;
+
+    name: str
+    description: str
+    sample_rate_stats: Stats</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Sensor.description"><code class="name">var <span class="ident">description</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Sensor.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Sensor.sample_rate_stats"><code class="name">var <span class="ident">sample_rate_stats</span> : <a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Sensor.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Sensor.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Sensor.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Sensor.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Sensor.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session"><code class="flex name class">
+<span>class <span class="ident">Session</span></span>
+<span>(</span><span>id: str, uuid: str, desc: str, start_ts: int, client: str, client_ver: str, session_ver: str, app: str, api: int, sub_api: int, make: str, model: str, app_ver: str, owner: str, private: bool, packet_dur: float, sensors: List[<a title="redvox.cloud.session_model_api.Sensor" href="#redvox.cloud.session_model_api.Sensor">Sensor</a>], n_pkts: int, timing: <a title="redvox.cloud.session_model_api.Timing" href="#redvox.cloud.session_model_api.Timing">Timing</a>, sub: List[str])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Describes a single station's recording session.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class Session:
+    &#34;&#34;&#34;
+    Describes a single station&#39;s recording session.
+    &#34;&#34;&#34;
+
+    id: str
+    uuid: str
+    desc: str
+    start_ts: int
+    client: str
+    client_ver: str
+    session_ver: str
+    app: str
+    api: int
+    sub_api: int
+    make: str
+    model: str
+    app_ver: str
+    owner: str
+    private: bool
+    packet_dur: float
+    sensors: List[Sensor]
+    n_pkts: int
+    timing: Timing
+    sub: List[str]
+
+    def session_key(self) -&gt; str:
+        &#34;&#34;&#34;
+        :return: The key associated with this session.
+        &#34;&#34;&#34;
+        return f&#34;{self.id}:{self.uuid}:{self.start_ts}&#34;
+
+    def query_dynamic_session(
+        self, client: &#34;CloudClient&#34;, sub: str
+    ) -&gt; &#34;DynamicSessionModelResp&#34;:
+        &#34;&#34;&#34;
+        Queries a dynamic session that is associated with this session.
+        :param client: An instance of the cloud client.
+        :param sub: The dynamic session key/
+        :return: A DynamicSessionModelResp.
+        &#34;&#34;&#34;
+        ts_parts: List[int] = list(map(int, sub.split(&#34;:&#34;)))
+        return client.request_dynamic_session_model(
+            self.session_key(), ts_parts[0], ts_parts[1]
+        )</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Session.api"><code class="name">var <span class="ident">api</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.app"><code class="name">var <span class="ident">app</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.app_ver"><code class="name">var <span class="ident">app_ver</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.client"><code class="name">var <span class="ident">client</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.client_ver"><code class="name">var <span class="ident">client_ver</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.desc"><code class="name">var <span class="ident">desc</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.id"><code class="name">var <span class="ident">id</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.make"><code class="name">var <span class="ident">make</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.model"><code class="name">var <span class="ident">model</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.n_pkts"><code class="name">var <span class="ident">n_pkts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.owner"><code class="name">var <span class="ident">owner</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.packet_dur"><code class="name">var <span class="ident">packet_dur</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.private"><code class="name">var <span class="ident">private</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.sensors"><code class="name">var <span class="ident">sensors</span> : List[<a title="redvox.cloud.session_model_api.Sensor" href="#redvox.cloud.session_model_api.Sensor">Sensor</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.session_ver"><code class="name">var <span class="ident">session_ver</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.start_ts"><code class="name">var <span class="ident">start_ts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.sub"><code class="name">var <span class="ident">sub</span> : List[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.sub_api"><code class="name">var <span class="ident">sub_api</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.timing"><code class="name">var <span class="ident">timing</span> : <a title="redvox.cloud.session_model_api.Timing" href="#redvox.cloud.session_model_api.Timing">Timing</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.uuid"><code class="name">var <span class="ident">uuid</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Session.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Session.query_dynamic_session"><code class="name flex">
+<span>def <span class="ident">query_dynamic_session</span></span>(<span>self, client: CloudClient, sub: str) ‑> <a title="redvox.cloud.session_model_api.DynamicSessionModelResp" href="#redvox.cloud.session_model_api.DynamicSessionModelResp">DynamicSessionModelResp</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Queries a dynamic session that is associated with this session.
+:param client: An instance of the cloud client.
+:param sub: The dynamic session key/
+:return: A DynamicSessionModelResp.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def query_dynamic_session(
+    self, client: &#34;CloudClient&#34;, sub: str
+) -&gt; &#34;DynamicSessionModelResp&#34;:
+    &#34;&#34;&#34;
+    Queries a dynamic session that is associated with this session.
+    :param client: An instance of the cloud client.
+    :param sub: The dynamic session key/
+    :return: A DynamicSessionModelResp.
+    &#34;&#34;&#34;
+    ts_parts: List[int] = list(map(int, sub.split(&#34;:&#34;)))
+    return client.request_dynamic_session_model(
+        self.session_key(), ts_parts[0], ts_parts[1]
+    )</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.session_key"><code class="name flex">
+<span>def <span class="ident">session_key</span></span>(<span>self) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: The key associated with this session.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def session_key(self) -&gt; str:
+    &#34;&#34;&#34;
+    :return: The key associated with this session.
+    &#34;&#34;&#34;
+    return f&#34;{self.id}:{self.uuid}:{self.start_ts}&#34;</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Session.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelReq"><code class="flex name class">
+<span>class <span class="ident">SessionModelReq</span></span>
+<span>(</span><span>auth_token: str, session_key: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request object for directly querying sessions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class SessionModelReq:
+    &#34;&#34;&#34;
+    Request object for directly querying sessions.
+    &#34;&#34;&#34;
+
+    auth_token: str
+    session_key: str</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.auth_token"><code class="name">var <span class="ident">auth_token</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.session_key"><code class="name">var <span class="ident">session_key</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelReq.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelResp"><code class="flex name class">
+<span>class <span class="ident">SessionModelResp</span></span>
+<span>(</span><span>err: Optional[str], session: Optional[<a title="redvox.cloud.session_model_api.Session" href="#redvox.cloud.session_model_api.Session">Session</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Response of directly queried session.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class SessionModelResp:
+    &#34;&#34;&#34;
+    Response of directly queried session.
+    &#34;&#34;&#34;
+
+    err: Optional[str]
+    session: Optional[Session]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.err"><code class="name">var <span class="ident">err</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.session"><code class="name">var <span class="ident">session</span> : Optional[<a title="redvox.cloud.session_model_api.Session" href="#redvox.cloud.session_model_api.Session">Session</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelResp.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq"><code class="flex name class">
+<span>class <span class="ident">SessionModelsReq</span></span>
+<span>(</span><span>auth_token: str, id_uuids: Optional[List[str]] = None, owner: Optional[str] = None, start_ts: Optional[int] = None, end_ts: Optional[int] = None, include_public: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Request object for querying a range of sessions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class SessionModelsReq:
+    &#34;&#34;&#34;
+    Request object for querying a range of sessions.
+    &#34;&#34;&#34;
+
+    auth_token: str
+    id_uuids: Optional[List[str]] = None
+    owner: Optional[str] = None
+    start_ts: Optional[int] = None
+    end_ts: Optional[int] = None
+    include_public: bool = False</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.auth_token"><code class="name">var <span class="ident">auth_token</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.end_ts"><code class="name">var <span class="ident">end_ts</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.id_uuids"><code class="name">var <span class="ident">id_uuids</span> : Optional[List[str]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.include_public"><code class="name">var <span class="ident">include_public</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.owner"><code class="name">var <span class="ident">owner</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.start_ts"><code class="name">var <span class="ident">start_ts</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsReq.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp"><code class="flex name class">
+<span>class <span class="ident">SessionModelsResp</span></span>
+<span>(</span><span>err: Optional[str], sessions: List[<a title="redvox.cloud.session_model_api.Session" href="#redvox.cloud.session_model_api.Session">Session</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Response object from querying a range of sessions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class SessionModelsResp:
+    &#34;&#34;&#34;
+    Response object from querying a range of sessions.
+    &#34;&#34;&#34;
+
+    err: Optional[str]
+    sessions: List[Session]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.err"><code class="name">var <span class="ident">err</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.sessions"><code class="name">var <span class="ident">sessions</span> : List[<a title="redvox.cloud.session_model_api.Session" href="#redvox.cloud.session_model_api.Session">Session</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.SessionModelsResp.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.Stats"><code class="flex name class">
+<span>class <span class="ident">Stats</span></span>
+<span>(</span><span>min: float, max: float, welford: <a title="redvox.cloud.session_model_api.WelfordAggregator" href="#redvox.cloud.session_model_api.WelfordAggregator">WelfordAggregator</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Contains the minimum and maximum values of a collection as well as the statistics provided by Welford's online
+algorithm.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class Stats:
+    &#34;&#34;&#34;
+    Contains the minimum and maximum values of a collection as well as the statistics provided by Welford&#39;s online
+    algorithm.
+    &#34;&#34;&#34;
+
+    min: float
+    max: float
+    welford: WelfordAggregator</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Stats.max"><code class="name">var <span class="ident">max</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Stats.min"><code class="name">var <span class="ident">min</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Stats.welford"><code class="name">var <span class="ident">welford</span> : <a title="redvox.cloud.session_model_api.WelfordAggregator" href="#redvox.cloud.session_model_api.WelfordAggregator">WelfordAggregator</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Stats.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Stats.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Stats.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Stats.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Stats.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.TimeSyncData"><code class="flex name class">
+<span>class <span class="ident">TimeSyncData</span></span>
+<span>(</span><span>ts: float, lat: float, off: float)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Summarized time synchronization data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class TimeSyncData:
+    &#34;&#34;&#34;
+    Summarized time synchronization data.
+    &#34;&#34;&#34;
+
+    ts: float
+    lat: float
+    off: float</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.lat"><code class="name">var <span class="ident">lat</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.off"><code class="name">var <span class="ident">off</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.ts"><code class="name">var <span class="ident">ts</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.TimeSyncData.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing"><code class="flex name class">
+<span>class <span class="ident">Timing</span></span>
+<span>(</span><span>first_data_ts: float, last_data_ts: float, n_ex: int, mean_lat: float, mean_off: float, fst_lst: <a title="redvox.cloud.session_model_api.FirstLastBufTimeSync" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync">FirstLastBufTimeSync</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>High-level timing information.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class Timing:
+    &#34;&#34;&#34;
+    High-level timing information.
+    &#34;&#34;&#34;
+
+    first_data_ts: float
+    last_data_ts: float
+    n_ex: int
+    mean_lat: float
+    mean_off: float
+    fst_lst: FirstLastBufTimeSync
+
+    def first_data_dt(self) -&gt; datetime:
+        &#34;&#34;&#34;
+        :return: The datatime that represents the first datum.
+        &#34;&#34;&#34;
+        return us2dt(self.first_data_ts)
+
+    def last_data_dt(self) -&gt; datetime:
+        &#34;&#34;&#34;
+        :return: The datatime that represents the last datum.
+        &#34;&#34;&#34;
+        return us2dt(self.last_data_ts)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Timing.first_data_ts"><code class="name">var <span class="ident">first_data_ts</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.fst_lst"><code class="name">var <span class="ident">fst_lst</span> : <a title="redvox.cloud.session_model_api.FirstLastBufTimeSync" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync">FirstLastBufTimeSync</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.last_data_ts"><code class="name">var <span class="ident">last_data_ts</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.mean_lat"><code class="name">var <span class="ident">mean_lat</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.mean_off"><code class="name">var <span class="ident">mean_off</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.n_ex"><code class="name">var <span class="ident">n_ex</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Timing.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.Timing.first_data_dt"><code class="name flex">
+<span>def <span class="ident">first_data_dt</span></span>(<span>self) ‑> datetime.datetime</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: The datatime that represents the first datum.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first_data_dt(self) -&gt; datetime:
+    &#34;&#34;&#34;
+    :return: The datatime that represents the first datum.
+    &#34;&#34;&#34;
+    return us2dt(self.first_data_ts)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.last_data_dt"><code class="name flex">
+<span>def <span class="ident">last_data_dt</span></span>(<span>self) ‑> datetime.datetime</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: The datatime that represents the last datum.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def last_data_dt(self) -&gt; datetime:
+    &#34;&#34;&#34;
+    :return: The datatime that represents the last datum.
+    &#34;&#34;&#34;
+    return us2dt(self.last_data_ts)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.Timing.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator"><code class="flex name class">
+<span>class <span class="ident">WelfordAggregator</span></span>
+<span>(</span><span>m2: float, mean: float, cnt: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fields required for computing the online Welford algorithm.
+See: <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm">https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm</a></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class WelfordAggregator:
+    &#34;&#34;&#34;
+    Fields required for computing the online Welford algorithm.
+    See: https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford&#39;s_online_algorithm
+    &#34;&#34;&#34;
+
+    m2: float
+    mean: float
+    cnt: int
+
+    def finalize(self) -&gt; Tuple[float, float, float]:
+        &#34;&#34;&#34;
+        Computes the running variance.
+        :return: A tuple containing the mean, variance, and sample variance.
+        &#34;&#34;&#34;
+        if self.cnt &lt; 2:
+            raise RedVoxError(&#34;Not enough values to compute statistics from&#34;)
+        variance: float = self.m2 / float(self.cnt)
+        sample_variance: float = self.m2 / float(self.cnt - 1)
+        return self.mean, variance, sample_variance</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.cnt"><code class="name">var <span class="ident">cnt</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.m2"><code class="name">var <span class="ident">m2</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.mean"><code class="name">var <span class="ident">mean</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.finalize"><code class="name flex">
+<span>def <span class="ident">finalize</span></span>(<span>self) ‑> Tuple[float, float, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the running variance.
+:return: A tuple containing the mean, variance, and sample variance.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def finalize(self) -&gt; Tuple[float, float, float]:
+    &#34;&#34;&#34;
+    Computes the running variance.
+    :return: A tuple containing the mean, variance, and sample variance.
+    &#34;&#34;&#34;
+    if self.cnt &lt; 2:
+        raise RedVoxError(&#34;Not enough values to compute statistics from&#34;)
+    variance: float = self.m2 / float(self.cnt)
+    sample_variance: float = self.m2 / float(self.cnt - 1)
+    return self.mean, variance, sample_variance</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.cloud.session_model_api.WelfordAggregator.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="redvox.cloud" href="index.html">redvox.cloud</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="redvox.cloud.session_model_api.request_dynamic_session" href="#redvox.cloud.session_model_api.request_dynamic_session">request_dynamic_session</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.request_session" href="#redvox.cloud.session_model_api.request_session">request_session</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.request_sessions" href="#redvox.cloud.session_model_api.request_sessions">request_sessions</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.session_key_from_packet" href="#redvox.cloud.session_model_api.session_key_from_packet">session_key_from_packet</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.DynamicSession" href="#redvox.cloud.session_model_api.DynamicSession">DynamicSession</a></code></h4>
+<ul class="">
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.battery" href="#redvox.cloud.session_model_api.DynamicSession.battery">battery</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.dur" href="#redvox.cloud.session_model_api.DynamicSession.dur">dur</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.end_ts" href="#redvox.cloud.session_model_api.DynamicSession.end_ts">end_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.from_dict" href="#redvox.cloud.session_model_api.DynamicSession.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.from_json" href="#redvox.cloud.session_model_api.DynamicSession.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.location" href="#redvox.cloud.session_model_api.DynamicSession.location">location</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.n_pkts" href="#redvox.cloud.session_model_api.DynamicSession.n_pkts">n_pkts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.query_dynamic_session" href="#redvox.cloud.session_model_api.DynamicSession.query_dynamic_session">query_dynamic_session</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.query_packet" href="#redvox.cloud.session_model_api.DynamicSession.query_packet">query_packet</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.schema" href="#redvox.cloud.session_model_api.DynamicSession.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.session_key" href="#redvox.cloud.session_model_api.DynamicSession.session_key">session_key</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.start_ts" href="#redvox.cloud.session_model_api.DynamicSession.start_ts">start_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.sub" href="#redvox.cloud.session_model_api.DynamicSession.sub">sub</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.temperature" href="#redvox.cloud.session_model_api.DynamicSession.temperature">temperature</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.to_dict" href="#redvox.cloud.session_model_api.DynamicSession.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSession.to_json" href="#redvox.cloud.session_model_api.DynamicSession.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq" href="#redvox.cloud.session_model_api.DynamicSessionModelReq">DynamicSessionModelReq</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.auth_token" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.auth_token">auth_token</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.end_ts" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.end_ts">end_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.from_dict" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.from_json" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.schema" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.session_key" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.session_key">session_key</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.start_ts" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.start_ts">start_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.to_dict" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelReq.to_json" href="#redvox.cloud.session_model_api.DynamicSessionModelReq.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp" href="#redvox.cloud.session_model_api.DynamicSessionModelResp">DynamicSessionModelResp</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.dynamic_session" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.dynamic_session">dynamic_session</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.err" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.err">err</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.from_dict" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.from_json" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.schema" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.to_dict" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.DynamicSessionModelResp.to_json" href="#redvox.cloud.session_model_api.DynamicSessionModelResp.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation" href="#redvox.cloud.session_model_api.FirstLastBufLocation">FirstLastBufLocation</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.from_dict" href="#redvox.cloud.session_model_api.FirstLastBufLocation.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.from_json" href="#redvox.cloud.session_model_api.FirstLastBufLocation.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.fst" href="#redvox.cloud.session_model_api.FirstLastBufLocation.fst">fst</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.fst_max_size" href="#redvox.cloud.session_model_api.FirstLastBufLocation.fst_max_size">fst_max_size</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.lst" href="#redvox.cloud.session_model_api.FirstLastBufLocation.lst">lst</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.lst_max_size" href="#redvox.cloud.session_model_api.FirstLastBufLocation.lst_max_size">lst_max_size</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.schema" href="#redvox.cloud.session_model_api.FirstLastBufLocation.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.to_dict" href="#redvox.cloud.session_model_api.FirstLastBufLocation.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufLocation.to_json" href="#redvox.cloud.session_model_api.FirstLastBufLocation.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync">FirstLastBufTimeSync</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.from_dict" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.from_json" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.fst" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.fst">fst</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.fst_max_size" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.fst_max_size">fst_max_size</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.lst" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.lst">lst</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.lst_max_size" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.lst_max_size">lst_max_size</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.schema" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.to_dict" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.FirstLastBufTimeSync.to_json" href="#redvox.cloud.session_model_api.FirstLastBufTimeSync.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.Location" href="#redvox.cloud.session_model_api.Location">Location</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.Location.alt" href="#redvox.cloud.session_model_api.Location.alt">alt</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.from_dict" href="#redvox.cloud.session_model_api.Location.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.from_json" href="#redvox.cloud.session_model_api.Location.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.lat" href="#redvox.cloud.session_model_api.Location.lat">lat</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.lng" href="#redvox.cloud.session_model_api.Location.lng">lng</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.schema" href="#redvox.cloud.session_model_api.Location.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.to_dict" href="#redvox.cloud.session_model_api.Location.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Location.to_json" href="#redvox.cloud.session_model_api.Location.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.LocationStat" href="#redvox.cloud.session_model_api.LocationStat">LocationStat</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.alt" href="#redvox.cloud.session_model_api.LocationStat.alt">alt</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.from_dict" href="#redvox.cloud.session_model_api.LocationStat.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.from_json" href="#redvox.cloud.session_model_api.LocationStat.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.fst_lst" href="#redvox.cloud.session_model_api.LocationStat.fst_lst">fst_lst</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.lat" href="#redvox.cloud.session_model_api.LocationStat.lat">lat</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.lng" href="#redvox.cloud.session_model_api.LocationStat.lng">lng</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.schema" href="#redvox.cloud.session_model_api.LocationStat.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.to_dict" href="#redvox.cloud.session_model_api.LocationStat.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.LocationStat.to_json" href="#redvox.cloud.session_model_api.LocationStat.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.Sensor" href="#redvox.cloud.session_model_api.Sensor">Sensor</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.Sensor.description" href="#redvox.cloud.session_model_api.Sensor.description">description</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.from_dict" href="#redvox.cloud.session_model_api.Sensor.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.from_json" href="#redvox.cloud.session_model_api.Sensor.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.name" href="#redvox.cloud.session_model_api.Sensor.name">name</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.sample_rate_stats" href="#redvox.cloud.session_model_api.Sensor.sample_rate_stats">sample_rate_stats</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.schema" href="#redvox.cloud.session_model_api.Sensor.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.to_dict" href="#redvox.cloud.session_model_api.Sensor.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Sensor.to_json" href="#redvox.cloud.session_model_api.Sensor.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.Session" href="#redvox.cloud.session_model_api.Session">Session</a></code></h4>
+<ul class="">
+<li><code><a title="redvox.cloud.session_model_api.Session.api" href="#redvox.cloud.session_model_api.Session.api">api</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.app" href="#redvox.cloud.session_model_api.Session.app">app</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.app_ver" href="#redvox.cloud.session_model_api.Session.app_ver">app_ver</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.client" href="#redvox.cloud.session_model_api.Session.client">client</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.client_ver" href="#redvox.cloud.session_model_api.Session.client_ver">client_ver</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.desc" href="#redvox.cloud.session_model_api.Session.desc">desc</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.from_dict" href="#redvox.cloud.session_model_api.Session.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.from_json" href="#redvox.cloud.session_model_api.Session.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.id" href="#redvox.cloud.session_model_api.Session.id">id</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.make" href="#redvox.cloud.session_model_api.Session.make">make</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.model" href="#redvox.cloud.session_model_api.Session.model">model</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.n_pkts" href="#redvox.cloud.session_model_api.Session.n_pkts">n_pkts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.owner" href="#redvox.cloud.session_model_api.Session.owner">owner</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.packet_dur" href="#redvox.cloud.session_model_api.Session.packet_dur">packet_dur</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.private" href="#redvox.cloud.session_model_api.Session.private">private</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.query_dynamic_session" href="#redvox.cloud.session_model_api.Session.query_dynamic_session">query_dynamic_session</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.schema" href="#redvox.cloud.session_model_api.Session.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.sensors" href="#redvox.cloud.session_model_api.Session.sensors">sensors</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.session_key" href="#redvox.cloud.session_model_api.Session.session_key">session_key</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.session_ver" href="#redvox.cloud.session_model_api.Session.session_ver">session_ver</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.start_ts" href="#redvox.cloud.session_model_api.Session.start_ts">start_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.sub" href="#redvox.cloud.session_model_api.Session.sub">sub</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.sub_api" href="#redvox.cloud.session_model_api.Session.sub_api">sub_api</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.timing" href="#redvox.cloud.session_model_api.Session.timing">timing</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.to_dict" href="#redvox.cloud.session_model_api.Session.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.to_json" href="#redvox.cloud.session_model_api.Session.to_json">to_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Session.uuid" href="#redvox.cloud.session_model_api.Session.uuid">uuid</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.SessionModelReq" href="#redvox.cloud.session_model_api.SessionModelReq">SessionModelReq</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.auth_token" href="#redvox.cloud.session_model_api.SessionModelReq.auth_token">auth_token</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.from_dict" href="#redvox.cloud.session_model_api.SessionModelReq.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.from_json" href="#redvox.cloud.session_model_api.SessionModelReq.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.schema" href="#redvox.cloud.session_model_api.SessionModelReq.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.session_key" href="#redvox.cloud.session_model_api.SessionModelReq.session_key">session_key</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.to_dict" href="#redvox.cloud.session_model_api.SessionModelReq.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelReq.to_json" href="#redvox.cloud.session_model_api.SessionModelReq.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.SessionModelResp" href="#redvox.cloud.session_model_api.SessionModelResp">SessionModelResp</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.err" href="#redvox.cloud.session_model_api.SessionModelResp.err">err</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.from_dict" href="#redvox.cloud.session_model_api.SessionModelResp.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.from_json" href="#redvox.cloud.session_model_api.SessionModelResp.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.schema" href="#redvox.cloud.session_model_api.SessionModelResp.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.session" href="#redvox.cloud.session_model_api.SessionModelResp.session">session</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.to_dict" href="#redvox.cloud.session_model_api.SessionModelResp.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelResp.to_json" href="#redvox.cloud.session_model_api.SessionModelResp.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.SessionModelsReq" href="#redvox.cloud.session_model_api.SessionModelsReq">SessionModelsReq</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.auth_token" href="#redvox.cloud.session_model_api.SessionModelsReq.auth_token">auth_token</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.end_ts" href="#redvox.cloud.session_model_api.SessionModelsReq.end_ts">end_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.from_dict" href="#redvox.cloud.session_model_api.SessionModelsReq.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.from_json" href="#redvox.cloud.session_model_api.SessionModelsReq.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.id_uuids" href="#redvox.cloud.session_model_api.SessionModelsReq.id_uuids">id_uuids</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.include_public" href="#redvox.cloud.session_model_api.SessionModelsReq.include_public">include_public</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.owner" href="#redvox.cloud.session_model_api.SessionModelsReq.owner">owner</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.schema" href="#redvox.cloud.session_model_api.SessionModelsReq.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.start_ts" href="#redvox.cloud.session_model_api.SessionModelsReq.start_ts">start_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.to_dict" href="#redvox.cloud.session_model_api.SessionModelsReq.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsReq.to_json" href="#redvox.cloud.session_model_api.SessionModelsReq.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.SessionModelsResp" href="#redvox.cloud.session_model_api.SessionModelsResp">SessionModelsResp</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.err" href="#redvox.cloud.session_model_api.SessionModelsResp.err">err</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.from_dict" href="#redvox.cloud.session_model_api.SessionModelsResp.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.from_json" href="#redvox.cloud.session_model_api.SessionModelsResp.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.schema" href="#redvox.cloud.session_model_api.SessionModelsResp.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.sessions" href="#redvox.cloud.session_model_api.SessionModelsResp.sessions">sessions</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.to_dict" href="#redvox.cloud.session_model_api.SessionModelsResp.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.SessionModelsResp.to_json" href="#redvox.cloud.session_model_api.SessionModelsResp.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.Stats" href="#redvox.cloud.session_model_api.Stats">Stats</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.Stats.from_dict" href="#redvox.cloud.session_model_api.Stats.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.from_json" href="#redvox.cloud.session_model_api.Stats.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.max" href="#redvox.cloud.session_model_api.Stats.max">max</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.min" href="#redvox.cloud.session_model_api.Stats.min">min</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.schema" href="#redvox.cloud.session_model_api.Stats.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.to_dict" href="#redvox.cloud.session_model_api.Stats.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.to_json" href="#redvox.cloud.session_model_api.Stats.to_json">to_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Stats.welford" href="#redvox.cloud.session_model_api.Stats.welford">welford</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.TimeSyncData" href="#redvox.cloud.session_model_api.TimeSyncData">TimeSyncData</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.from_dict" href="#redvox.cloud.session_model_api.TimeSyncData.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.from_json" href="#redvox.cloud.session_model_api.TimeSyncData.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.lat" href="#redvox.cloud.session_model_api.TimeSyncData.lat">lat</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.off" href="#redvox.cloud.session_model_api.TimeSyncData.off">off</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.schema" href="#redvox.cloud.session_model_api.TimeSyncData.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.to_dict" href="#redvox.cloud.session_model_api.TimeSyncData.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.to_json" href="#redvox.cloud.session_model_api.TimeSyncData.to_json">to_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.TimeSyncData.ts" href="#redvox.cloud.session_model_api.TimeSyncData.ts">ts</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.Timing" href="#redvox.cloud.session_model_api.Timing">Timing</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.Timing.first_data_dt" href="#redvox.cloud.session_model_api.Timing.first_data_dt">first_data_dt</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.first_data_ts" href="#redvox.cloud.session_model_api.Timing.first_data_ts">first_data_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.from_dict" href="#redvox.cloud.session_model_api.Timing.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.from_json" href="#redvox.cloud.session_model_api.Timing.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.fst_lst" href="#redvox.cloud.session_model_api.Timing.fst_lst">fst_lst</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.last_data_dt" href="#redvox.cloud.session_model_api.Timing.last_data_dt">last_data_dt</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.last_data_ts" href="#redvox.cloud.session_model_api.Timing.last_data_ts">last_data_ts</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.mean_lat" href="#redvox.cloud.session_model_api.Timing.mean_lat">mean_lat</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.mean_off" href="#redvox.cloud.session_model_api.Timing.mean_off">mean_off</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.n_ex" href="#redvox.cloud.session_model_api.Timing.n_ex">n_ex</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.schema" href="#redvox.cloud.session_model_api.Timing.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.to_dict" href="#redvox.cloud.session_model_api.Timing.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.Timing.to_json" href="#redvox.cloud.session_model_api.Timing.to_json">to_json</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="redvox.cloud.session_model_api.WelfordAggregator" href="#redvox.cloud.session_model_api.WelfordAggregator">WelfordAggregator</a></code></h4>
+<ul class="two-column">
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.cnt" href="#redvox.cloud.session_model_api.WelfordAggregator.cnt">cnt</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.finalize" href="#redvox.cloud.session_model_api.WelfordAggregator.finalize">finalize</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.from_dict" href="#redvox.cloud.session_model_api.WelfordAggregator.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.from_json" href="#redvox.cloud.session_model_api.WelfordAggregator.from_json">from_json</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.m2" href="#redvox.cloud.session_model_api.WelfordAggregator.m2">m2</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.mean" href="#redvox.cloud.session_model_api.WelfordAggregator.mean">mean</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.schema" href="#redvox.cloud.session_model_api.WelfordAggregator.schema">schema</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.to_dict" href="#redvox.cloud.session_model_api.WelfordAggregator.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.cloud.session_model_api.WelfordAggregator.to_json" href="#redvox.cloud.session_model_api.WelfordAggregator.to_json">to_json</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
