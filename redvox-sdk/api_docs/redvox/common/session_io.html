@@ -38,8 +38,6 @@ from typing import (
     TYPE_CHECKING,
 )
 
-from redvox.common.io import get_json_file, json_file_to_dict, json_to_dict
-
 
 if TYPE_CHECKING:
     from redvox.common.session_model import SessionModel
@@ -52,9 +50,7 @@ def session_model_to_json(session: &#34;SessionModel&#34;) -&gt; str:
     return json.dumps(session.as_dict())
 
 
-def session_model_to_json_file(session: &#34;SessionModel&#34;,
-                               out_dir: str = &#34;.&#34;,
-                               file_name: Optional[str] = None) -&gt; Path:
+def session_model_to_json_file(session: &#34;SessionModel&#34;, out_dir: str = &#34;.&#34;, file_name: Optional[str] = None) -&gt; Path:
     &#34;&#34;&#34;
     saves the SessionModel as json.
 
@@ -64,11 +60,7 @@ def session_model_to_json_file(session: &#34;SessionModel&#34;,
                         If None, uses the default [id]_[startdate].json
     :return: path to json file
     &#34;&#34;&#34;
-    _file_name: str = (
-        file_name
-        if file_name is not None
-        else session.default_file_name()
-    ) + &#34;.json&#34;
+    _file_name: str = (file_name if file_name is not None else session.default_file_name()) + &#34;.json&#34;
 
     file_path: Path = Path(out_dir).joinpath(_file_name)
     with open(file_path, &#34;w&#34;) as f_p:
@@ -78,8 +70,6 @@ def session_model_to_json_file(session: &#34;SessionModel&#34;,
 
 def session_model_dict_from_json(json_str: str) -&gt; dict:
     &#34;&#34;&#34;
-    Convert a json file to a dictionary that can create a SessionModel
-
     :param json_str: string of json to read
     :return: dictionary of SessionModel from json
     &#34;&#34;&#34;
@@ -88,20 +78,14 @@ def session_model_dict_from_json(json_str: str) -&gt; dict:
 
 def session_model_dict_from_json_file(file_path: str) -&gt; dict:
     &#34;&#34;&#34;
-    Read the contents of a json file and convert it into a dictionary of a SessionModel
-
     :param file_path: full path to the file, including file name and extension
-    :return: dictionary of SessionModel from json
+    :return: dictionary of SessionModel from json file
     &#34;&#34;&#34;
     with open(file_path, &#34;r&#34;) as f_p:
         return session_model_dict_from_json(f_p.read())
 
 
-def compress_session_model(
-        session: &#34;SessionModel&#34;,
-        base_dir: str = &#34;.&#34;,
-        file_name: Optional[str] = None
-) -&gt; Path:
+def compress_session_model(session: &#34;SessionModel&#34;, base_dir: str = &#34;.&#34;, file_name: Optional[str] = None) -&gt; Path:
     &#34;&#34;&#34;
     Compresses a SessionModel to a pkl file.
 
@@ -112,11 +96,7 @@ def compress_session_model(
     :return: The path to the written compressed file.
     &#34;&#34;&#34;
 
-    _file_name: str = (
-        file_name
-        if file_name is not None
-        else session.default_file_name()
-    ) + &#34;.pkl&#34;
+    _file_name: str = (file_name if file_name is not None else session.default_file_name()) + &#34;.pkl&#34;
 
     file_path: Path = Path(base_dir).joinpath(_file_name)
 
@@ -158,11 +138,7 @@ If None, a default filename with the following format is used: [id]_[start_ts]_m
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def compress_session_model(
-        session: &#34;SessionModel&#34;,
-        base_dir: str = &#34;.&#34;,
-        file_name: Optional[str] = None
-) -&gt; Path:
+<pre><code class="python">def compress_session_model(session: &#34;SessionModel&#34;, base_dir: str = &#34;.&#34;, file_name: Optional[str] = None) -&gt; Path:
     &#34;&#34;&#34;
     Compresses a SessionModel to a pkl file.
 
@@ -173,11 +149,7 @@ If None, a default filename with the following format is used: [id]_[start_ts]_m
     :return: The path to the written compressed file.
     &#34;&#34;&#34;
 
-    _file_name: str = (
-        file_name
-        if file_name is not None
-        else session.default_file_name()
-    ) + &#34;.pkl&#34;
+    _file_name: str = (file_name if file_name is not None else session.default_file_name()) + &#34;.pkl&#34;
 
     file_path: Path = Path(base_dir).joinpath(_file_name)
 
@@ -213,8 +185,7 @@ If None, a default filename with the following format is used: [id]_[start_ts]_m
 <span>def <span class="ident">session_model_dict_from_json</span></span>(<span>json_str: str) ‑> dict</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Convert a json file to a dictionary that can create a SessionModel</p>
-<p>:param json_str: string of json to read
+<div class="desc"><p>:param json_str: string of json to read
 :return: dictionary of SessionModel from json</p></div>
 <details class="source">
 <summary>
@@ -222,8 +193,6 @@ If None, a default filename with the following format is used: [id]_[start_ts]_m
 </summary>
 <pre><code class="python">def session_model_dict_from_json(json_str: str) -&gt; dict:
     &#34;&#34;&#34;
-    Convert a json file to a dictionary that can create a SessionModel
-
     :param json_str: string of json to read
     :return: dictionary of SessionModel from json
     &#34;&#34;&#34;
@@ -234,19 +203,16 @@ If None, a default filename with the following format is used: [id]_[start_ts]_m
 <span>def <span class="ident">session_model_dict_from_json_file</span></span>(<span>file_path: str) ‑> dict</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Read the contents of a json file and convert it into a dictionary of a SessionModel</p>
-<p>:param file_path: full path to the file, including file name and extension
-:return: dictionary of SessionModel from json</p></div>
+<div class="desc"><p>:param file_path: full path to the file, including file name and extension
+:return: dictionary of SessionModel from json file</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def session_model_dict_from_json_file(file_path: str) -&gt; dict:
     &#34;&#34;&#34;
-    Read the contents of a json file and convert it into a dictionary of a SessionModel
-
     :param file_path: full path to the file, including file name and extension
-    :return: dictionary of SessionModel from json
+    :return: dictionary of SessionModel from json file
     &#34;&#34;&#34;
     with open(file_path, &#34;r&#34;) as f_p:
         return session_model_dict_from_json(f_p.read())</code></pre>
@@ -284,9 +250,7 @@ If None, uses the default [id]_[startdate].json
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def session_model_to_json_file(session: &#34;SessionModel&#34;,
-                               out_dir: str = &#34;.&#34;,
-                               file_name: Optional[str] = None) -&gt; Path:
+<pre><code class="python">def session_model_to_json_file(session: &#34;SessionModel&#34;, out_dir: str = &#34;.&#34;, file_name: Optional[str] = None) -&gt; Path:
     &#34;&#34;&#34;
     saves the SessionModel as json.
 
@@ -296,11 +260,7 @@ If None, uses the default [id]_[startdate].json
                         If None, uses the default [id]_[startdate].json
     :return: path to json file
     &#34;&#34;&#34;
-    _file_name: str = (
-        file_name
-        if file_name is not None
-        else session.default_file_name()
-    ) + &#34;.json&#34;
+    _file_name: str = (file_name if file_name is not None else session.default_file_name()) + &#34;.json&#34;
 
     file_path: Path = Path(out_dir).joinpath(_file_name)
     with open(file_path, &#34;w&#34;) as f_p:

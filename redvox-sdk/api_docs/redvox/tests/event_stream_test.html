@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>redvox.common.sensor_io API documentation</title>
-<meta name="description" content="This module provides IO primitives for working with sensor data." />
+<title>redvox.tests.event_stream_test API documentation</title>
+<meta name="description" content="* There is a known issue when exiting programs in which a DataWindow has been created.
+This issue can be mitigated by
+explicitly deleting the …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,52 +21,111 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>redvox.common.sensor_io</code></h1>
+<h1 class="title">Module <code>redvox.tests.event_stream_test</code></h1>
 </header>
 <section id="section-intro">
-<p>This module provides IO primitives for working with sensor data.</p>
+<ul>
+<li>There is a known issue when exiting programs in which a DataWindow has been created.
+This issue can be mitigated by
+explicitly deleting the DataWindow that was created.
+<code># example code
+my_dw: DataWindow
+# do stuff with my_dw
+del my_dw</code></li>
+</ul>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-This module provides IO primitives for working with sensor data.
+* There is a known issue when exiting programs in which a DataWindow has been created.  This issue can be mitigated by
+  explicitly deleting the DataWindow that was created.
+  ```
+  # example code
+  my_dw: DataWindow
+  # do stuff with my_dw
+  del my_dw
+  ```
 &#34;&#34;&#34;
-from pathlib import Path
-import json
-from typing import (
-    Optional,
-    TYPE_CHECKING,
-)
 
-if TYPE_CHECKING:
-    from redvox.common.sensor_data import SensorData
+import os
+
+from redvox.common import data_window as dw
+import redvox.common.date_time_utils as dtu
 
 
-def to_json(
-    sensor: &#34;SensorData&#34;,
-) -&gt; str:
-    &#34;&#34;&#34;
-    :return: sensor as json string
-    &#34;&#34;&#34;
-    return json.dumps(sensor.as_dict())
+if __name__ == &#34;__main__&#34;:
+    # my_dw = &#34;/Users/tyler/Downloads/dw_1647024780000029_1.pkl.lz4&#34;
+    # dw_test = dw.DataWindow.deserialize(my_dw)
+    #
+    # st = dw_test.first_station()
+    #
+    # evs = st.event_data()
+    #
+    # if &#34;yamnet&#34; in evs.get_stream_names():
+    #     print(evs.get_stream(&#34;yamnet&#34;).events[0].get_timestamp())
+    #     print(evs.get_stream(&#34;yamnet&#34;).events[-1].get_timestamp())
+    #
+    # print(&#39;test&#39;)
+    # exit(1)
 
+    mydir = &#34;/Users/tyler/Downloads&#34;
+    #
+    out_dir = &#34;/Users/tyler/Documents/pyarrowreadertest/inl_test2&#34;
+    # # ev_name = &#34;examples&#34;
+    # ev_name2 = &#34;real_data&#34;
+    #
+    # print(os.getcwd())
+    #
+    # cfg = dw.DataWindowConfig(input_dir=os.path.join(mydir), structured_layout=True, station_ids=[&#34;1637110702&#34;],
+    #                           start_datetime=dtu.datetime_from_epoch_seconds_utc(1656368600),
+    #                           end_datetime=dtu.datetime_from_epoch_seconds_utc(1656369120))
+    #
+    # dw_e = dw.DataWindow(&#34;events_test&#34;, config=cfg,
+    #                      # output_dir=out_dir, out_type=&#34;PARQUET&#34;,
+    #                      debug=True)
 
-def to_json_file(sensor: &#34;SensorData&#34;, file_name: Optional[str] = None) -&gt; Path:
-    &#34;&#34;&#34;
-    saves the sensor as json and data in the same directory.
+    # dw_e.save()
+    #
+    # dw_e = dw.DataWindow.load(os.path.join(out_dir, &#34;events_test.json&#34;))
+    dw_e = dw.DataWindow.deserialize(os.path.join(mydir, &#34;dw_1661195700001081_1.pkl.lz4&#34;))
+    # print(dw_e)
 
-    :param sensor: SensorData to save
-    :param file_name: the optional base file name.  Do not include a file extension.
-                        If None, a default file name is created using this format:
-                        [sensor_type]_[first_timestamp].json
-    :return: path to json file
-    &#34;&#34;&#34;
-    _file_name: str = file_name if file_name is not None else sensor.file_name()
-    file_path: Path = sensor.fs_writer().json_path()
-    with open(file_path, &#34;w&#34;) as f_p:
-        f_p.write(to_json(sensor))
-        return file_path.resolve(False)</code></pre>
+    # st = dw_e.first_station()
+    for st in dw_e.stations():
+        print(st.id())
+        print(st.first_data_timestamp(), st.last_data_timestamp())
+        vals = st.audio_sensor().get_microphone_data()
+        print(vals[0], vals[1], vals[-2], vals[-1])
+
+        res = st.event_data().get_stream(&#34;inference&#34;)
+        if res:
+            print(res.input_sample_rate, res.samples_per_window, res.samples_per_hop, res.model_version)
+            if res.has_events():
+                # print(res.get_data_column(&#34;fail&#34;))
+                print(res.get_event(0).get_timestamp(), res.get_event(-1).get_timestamp())
+                # print(res.get_event(0).get_schema(), res.get_event(-1).get_schema())
+            # print(res.get_data_column(&#34;class_0&#34;))
+            # print(res.get_data_column(&#34;score_0&#34;))
+            # print(res)
+        print(&#34;*********************************&#34;)
+
+        # res.set_schema({&#34;oops&#34;: [&#34;will fail&#34;, &#34;not properly formatted&#34;]})
+        #
+        # if res:
+        #     ev = res.get_event()
+        #
+        #     if ev:
+        #         print(ev.get_byte_item(&#34;failure&#34;))
+        #         print(ev.get_numeric_item(&#34;score&#34;))
+        #         print(ev.get_string_item(&#34;class&#34;))
+        #
+        #         print(ev.get_byte_column(&#34;failure&#34;))
+        #         print(ev.get_numeric_column(&#34;score&#34;))
+        #         print(ev.get_string_column(&#34;class&#34;))
+        #
+        #     print(res)
+    # del dw_e</code></pre>
 </details>
 </section>
 <section>
@@ -72,59 +133,6 @@ def to_json_file(sensor: &#34;SensorData&#34;, file_name: Optional[str] = None) 
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="redvox.common.sensor_io.to_json"><code class="name flex">
-<span>def <span class="ident">to_json</span></span>(<span>sensor: SensorData) ‑> str</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: sensor as json string</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_json(
-    sensor: &#34;SensorData&#34;,
-) -&gt; str:
-    &#34;&#34;&#34;
-    :return: sensor as json string
-    &#34;&#34;&#34;
-    return json.dumps(sensor.as_dict())</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.sensor_io.to_json_file"><code class="name flex">
-<span>def <span class="ident">to_json_file</span></span>(<span>sensor: SensorData, file_name: Optional[str] = None) ‑> pathlib.Path</span>
-</code></dt>
-<dd>
-<div class="desc"><p>saves the sensor as json and data in the same directory.</p>
-<p>:param sensor: SensorData to save
-:param file_name: the optional base file name.
-Do not include a file extension.
-If None, a default file name is created using this format:
-[sensor_type]_[first_timestamp].json
-:return: path to json file</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_json_file(sensor: &#34;SensorData&#34;, file_name: Optional[str] = None) -&gt; Path:
-    &#34;&#34;&#34;
-    saves the sensor as json and data in the same directory.
-
-    :param sensor: SensorData to save
-    :param file_name: the optional base file name.  Do not include a file extension.
-                        If None, a default file name is created using this format:
-                        [sensor_type]_[first_timestamp].json
-    :return: path to json file
-    &#34;&#34;&#34;
-    _file_name: str = file_name if file_name is not None else sensor.file_name()
-    file_path: Path = sensor.fs_writer().json_path()
-    with open(file_path, &#34;w&#34;) as f_p:
-        f_p.write(to_json(sensor))
-        return file_path.resolve(False)</code></pre>
-</details>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -137,13 +145,7 @@ If None, a default file name is created using this format:
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="redvox.common" href="index.html">redvox.common</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="redvox.common.sensor_io.to_json" href="#redvox.common.sensor_io.to_json">to_json</a></code></li>
-<li><code><a title="redvox.common.sensor_io.to_json_file" href="#redvox.common.sensor_io.to_json_file">to_json_file</a></code></li>
+<li><code><a title="redvox.tests" href="index.html">redvox.tests</a></code></li>
 </ul>
 </li>
 </ul>

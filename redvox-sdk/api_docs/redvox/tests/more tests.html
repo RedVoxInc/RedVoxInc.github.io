@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>redvox.tests.more tests API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>redvox.tests.more tests</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import timeit
+import os.path
+
+import numpy as np
+import pprint
+import pickle
+import psutil
+import pandas as pd
+import redpandas.redpd_df
+
+import redpandas.redpd_filter as rpd_filter
+import redpandas.redpd_xcorr as rpd_xcorr
+import redpandas.redpd_plot.wiggles as rpd_plt
+
+import redpandas.redpd_tfr as rpd_tfr
+import redpandas.redpd_plot.mesh as rpd_plt_tfr
+
+from redvox.common.data_window import DataWindow, DataWindowConfig
+import redvox.common.date_time_utils as dt
+import redvox.settings as settings
+from redvox.common.event_stream import EventStreams
+from redvox.common.api_reader import ApiReader
+import redvox.api1000.wrapped_redvox_packet.wrapped_packet as wp
+
+
+def main():
+    # compressed data to DW is 4.68-4.32 times
+    # up to 6 times for 8k sample rate
+    # higher sample rate means larger multiplication
+
+    # 2.5 mins with disk write to temp (lower RAM Usage)
+    # 1.5 mins with mem write (high ram usage)
+
+    settings.set_parallelism_enabled(False)
+
+    print(&#34;parallel: &#34;, settings.is_parallelism_enabled())
+
+    save_path = &#34;/Users/tyler/Documents/ml_export&#34;
+    # path = &#34;/Users/tyler/Documents/pyarrowreadertest/inl_test&#34;
+    # path = &#34;/Users/tyler/Documents/snl_21_9_27&#34;
+    # path = &#34;/Users/tyler/Documents/tss_test&#34;
+    path = &#34;/Users/tyler/Documents/ml_export/test_wamv&#34;
+    out_pkl = os.path.join(path, &#34;out22.pkl&#34;)
+    config = DataWindowConfig(
+        path,
+        True,
+        # use_model_correction=False,
+        # station_ids=[&#34;1637610022&#34;]
+        # station_ids=[&#34;1637610022&#34;]
+        # station_ids=[&#34;1637681007&#34;]
+        # station_ids=[&#34;1637665009&#34;]
+        # start_datetime=dt.datetime_from_epoch_seconds_utc(1661203100),
+        # end_datetime=dt.datetime_from_epoch_seconds_utc(1661203200)
+    )
+
+    s = timeit.default_timer()
+    # sf_test = DataWindow.deserialize(&#34;/Users/tyler/Documents/pyarrowreadertest/large_test/large_test_lz4.pkl.lz4&#34;)
+    # lz4 = 1542448.119 KB uncompressed
+    # parquet = 1565174.924 KB uncompressed
+    sf_test = DataWindow(&#34;test&#34;, config=config, out_type=&#34;NONE&#34;, make_runme=False, debug=False)
+    # sf_test.save()
+    # sf_test = DataWindow.load(os.path.join(save_path, &#34;test.json&#34;))
+    e = timeit.default_timer()
+    # sf_test = DataWindow.deserialize(&#34;/Users/tyler/Documents/duplicate_test/dw_1641329393000278_3.pkl.lz4&#34;)
+    # print(&#34;audio_rate&#34;, sf_test.first_station().audio_sample_rate_nominal_hz())
+    print(&#34;load dw&#34;, e - s)
+    for t in sf_test.stations():
+        print(t.id())
+        for i in range(3):
+            print(t.event_data().ml_data.windows[i].retain_top(3))
+
+    exit(1)
+
+    # sf_test = DataWindow.deserialize(&#34;/Users/tyler/Documents/perf_tests/dw_1661472735001221_1.pkl.lz4&#34;)
+
+    # print(sf_test.first_station().audio_sensor().get_microphone_data()[-50:-1])
+
+    import matplotlib.pyplot as plt
+
+    print(&#34;Plotting data&#34;)
+    plts = plt.subplots(1, 1, figsize=(8, 6), sharex=True)
+    fig = plts[0]
+    axes = plts[1]
+    axes.set_title(&#34;Audio Data&#34;)
+
+    cur_i = 0
+
+    for s in sf_test.stations():
+        print(s.id())
+        # if s.id() == &#34;1637610022&#34;:
+        #     ltcs = s.timesync_data().best_latency_per_exchange()
+        #     new_best_latency = np.min([n for n in ltcs if n &gt; 500])
+        #     s.timesync_data()._best_latency = new_best_latency
+        #     s.timesync_data()._best_latency_index = int(np.where(ltcs == new_best_latency)[0][0])
+        #     # s.timesync_data()._best_offset = s.timesync_data().offsets()[1][s.timesync_data().best_latency_index()]
+        #     s.timesync_data()._best_offset = -50464006.0
+        # s._correct_timestamps = True
+        # s.update_timestamps()
+
+        print(s.first_data_timestamp())
+        print(s.last_data_timestamp())
+
+        # axes.plot(s.audio_sensor().data_timestamps() - 1632753420000000 + new_offset,
+        #                  s.audio_sensor().get_microphone_data())
+
+        with open(out_pkl, &#34;wb&#34;) as outs:
+            pickle.dump(
+                [
+                    s.audio_sensor().data_timestamps() - 1632753420000000 + new_offset,
+                    s.audio_sensor().get_microphone_data(),
+                ],
+                outs,
+            )
+        axes.set_ylabel(s.id())
+        cur_i += 1
+        # tsync = s.timesync_data()
+        #
+        # best_exchanges = tsync.sync_exchanges()
+        #
+        # print(&#34;server:&#34;)
+        # print(best_exchanges[0][tsync.best_latency_index()])
+        # print(best_exchanges[1][tsync.best_latency_index()])
+        # print(best_exchanges[2][tsync.best_latency_index()])
+        # print(&#34;device:&#34;)
+        # print(best_exchanges[3][tsync.best_latency_index()])
+        # print(best_exchanges[4][tsync.best_latency_index()])
+        # print(best_exchanges[5][tsync.best_latency_index()])
+        # print(s.location_sensor().get_location_provider_data())
+        # print(s.location_sensor().data_timestamps())
+        # print(s.location_sensor().get_gps_timestamps_data())
+    plt.xlabel(&#34;Time&#34;)
+    plt.show()
+    exit(1)
+
+    # asdfasdf = [1.0000014 ** n for n in range(9999999)]
+    # print(asdfasdf.__sizeof__())
+
+    EPISODE_START_DATETIME = dt.datetime_from_epoch_seconds_utc(1568132940)
+    EPISODE_END_DATETIME = dt.datetime_from_epoch_seconds_utc(1568132984)
+    INPUT_DIR = &#34;/Users/tyler/Downloads/data&#34;
+    # # Absolute path for output pickle and parquet files
+    RPD_DIR = &#34;rpd_files_sdk31&#34;
+    OUTPUT_DIR = os.path.join(INPUT_DIR, RPD_DIR)
+
+    dw_config = DataWindowConfig(
+        input_dir=INPUT_DIR,
+        start_datetime=EPISODE_START_DATETIME,
+        end_datetime=EPISODE_END_DATETIME,
+        start_buffer_td=dt.timedelta(minutes=3),
+        station_ids=[&#34;0000000021&#34;],
+    )
+    # station_ids=[&#39;0000000011&#39;, &#39;0000000012&#39;, &#39;0000000013&#39;, &#39;0000000021&#39;,
+    #              &#39;0000000022&#39;, &#39;0000000023&#39;, &#39;0000000024&#39;])
+
+    # dw = DataWindow(event_name=&#34;rdvx_flight2&#34;, config=dw_config, debug=False,
+    #                 out_dir=OUTPUT_DIR, out_type=&#34;NONE&#34;)
+
+    # dw.save()
+    # asdahfs = dw.load(os.path.join(OUTPUT_DIR, &#34;rdvx_flight2.json&#34;))
+    # print(asdahfs.pretty())
+    exit(1)
+
+
+if __name__ == &#34;__main__&#34;:
+    main()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="redvox.tests.more tests.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    # compressed data to DW is 4.68-4.32 times
+    # up to 6 times for 8k sample rate
+    # higher sample rate means larger multiplication
+
+    # 2.5 mins with disk write to temp (lower RAM Usage)
+    # 1.5 mins with mem write (high ram usage)
+
+    settings.set_parallelism_enabled(False)
+
+    print(&#34;parallel: &#34;, settings.is_parallelism_enabled())
+
+    save_path = &#34;/Users/tyler/Documents/ml_export&#34;
+    # path = &#34;/Users/tyler/Documents/pyarrowreadertest/inl_test&#34;
+    # path = &#34;/Users/tyler/Documents/snl_21_9_27&#34;
+    # path = &#34;/Users/tyler/Documents/tss_test&#34;
+    path = &#34;/Users/tyler/Documents/ml_export/test_wamv&#34;
+    out_pkl = os.path.join(path, &#34;out22.pkl&#34;)
+    config = DataWindowConfig(
+        path,
+        True,
+        # use_model_correction=False,
+        # station_ids=[&#34;1637610022&#34;]
+        # station_ids=[&#34;1637610022&#34;]
+        # station_ids=[&#34;1637681007&#34;]
+        # station_ids=[&#34;1637665009&#34;]
+        # start_datetime=dt.datetime_from_epoch_seconds_utc(1661203100),
+        # end_datetime=dt.datetime_from_epoch_seconds_utc(1661203200)
+    )
+
+    s = timeit.default_timer()
+    # sf_test = DataWindow.deserialize(&#34;/Users/tyler/Documents/pyarrowreadertest/large_test/large_test_lz4.pkl.lz4&#34;)
+    # lz4 = 1542448.119 KB uncompressed
+    # parquet = 1565174.924 KB uncompressed
+    sf_test = DataWindow(&#34;test&#34;, config=config, out_type=&#34;NONE&#34;, make_runme=False, debug=False)
+    # sf_test.save()
+    # sf_test = DataWindow.load(os.path.join(save_path, &#34;test.json&#34;))
+    e = timeit.default_timer()
+    # sf_test = DataWindow.deserialize(&#34;/Users/tyler/Documents/duplicate_test/dw_1641329393000278_3.pkl.lz4&#34;)
+    # print(&#34;audio_rate&#34;, sf_test.first_station().audio_sample_rate_nominal_hz())
+    print(&#34;load dw&#34;, e - s)
+    for t in sf_test.stations():
+        print(t.id())
+        for i in range(3):
+            print(t.event_data().ml_data.windows[i].retain_top(3))
+
+    exit(1)
+
+    # sf_test = DataWindow.deserialize(&#34;/Users/tyler/Documents/perf_tests/dw_1661472735001221_1.pkl.lz4&#34;)
+
+    # print(sf_test.first_station().audio_sensor().get_microphone_data()[-50:-1])
+
+    import matplotlib.pyplot as plt
+
+    print(&#34;Plotting data&#34;)
+    plts = plt.subplots(1, 1, figsize=(8, 6), sharex=True)
+    fig = plts[0]
+    axes = plts[1]
+    axes.set_title(&#34;Audio Data&#34;)
+
+    cur_i = 0
+
+    for s in sf_test.stations():
+        print(s.id())
+        # if s.id() == &#34;1637610022&#34;:
+        #     ltcs = s.timesync_data().best_latency_per_exchange()
+        #     new_best_latency = np.min([n for n in ltcs if n &gt; 500])
+        #     s.timesync_data()._best_latency = new_best_latency
+        #     s.timesync_data()._best_latency_index = int(np.where(ltcs == new_best_latency)[0][0])
+        #     # s.timesync_data()._best_offset = s.timesync_data().offsets()[1][s.timesync_data().best_latency_index()]
+        #     s.timesync_data()._best_offset = -50464006.0
+        # s._correct_timestamps = True
+        # s.update_timestamps()
+
+        print(s.first_data_timestamp())
+        print(s.last_data_timestamp())
+
+        # axes.plot(s.audio_sensor().data_timestamps() - 1632753420000000 + new_offset,
+        #                  s.audio_sensor().get_microphone_data())
+
+        with open(out_pkl, &#34;wb&#34;) as outs:
+            pickle.dump(
+                [
+                    s.audio_sensor().data_timestamps() - 1632753420000000 + new_offset,
+                    s.audio_sensor().get_microphone_data(),
+                ],
+                outs,
+            )
+        axes.set_ylabel(s.id())
+        cur_i += 1
+        # tsync = s.timesync_data()
+        #
+        # best_exchanges = tsync.sync_exchanges()
+        #
+        # print(&#34;server:&#34;)
+        # print(best_exchanges[0][tsync.best_latency_index()])
+        # print(best_exchanges[1][tsync.best_latency_index()])
+        # print(best_exchanges[2][tsync.best_latency_index()])
+        # print(&#34;device:&#34;)
+        # print(best_exchanges[3][tsync.best_latency_index()])
+        # print(best_exchanges[4][tsync.best_latency_index()])
+        # print(best_exchanges[5][tsync.best_latency_index()])
+        # print(s.location_sensor().get_location_provider_data())
+        # print(s.location_sensor().data_timestamps())
+        # print(s.location_sensor().get_gps_timestamps_data())
+    plt.xlabel(&#34;Time&#34;)
+    plt.show()
+    exit(1)
+
+    # asdfasdf = [1.0000014 ** n for n in range(9999999)]
+    # print(asdfasdf.__sizeof__())
+
+    EPISODE_START_DATETIME = dt.datetime_from_epoch_seconds_utc(1568132940)
+    EPISODE_END_DATETIME = dt.datetime_from_epoch_seconds_utc(1568132984)
+    INPUT_DIR = &#34;/Users/tyler/Downloads/data&#34;
+    # # Absolute path for output pickle and parquet files
+    RPD_DIR = &#34;rpd_files_sdk31&#34;
+    OUTPUT_DIR = os.path.join(INPUT_DIR, RPD_DIR)
+
+    dw_config = DataWindowConfig(
+        input_dir=INPUT_DIR,
+        start_datetime=EPISODE_START_DATETIME,
+        end_datetime=EPISODE_END_DATETIME,
+        start_buffer_td=dt.timedelta(minutes=3),
+        station_ids=[&#34;0000000021&#34;],
+    )
+    # station_ids=[&#39;0000000011&#39;, &#39;0000000012&#39;, &#39;0000000013&#39;, &#39;0000000021&#39;,
+    #              &#39;0000000022&#39;, &#39;0000000023&#39;, &#39;0000000024&#39;])
+
+    # dw = DataWindow(event_name=&#34;rdvx_flight2&#34;, config=dw_config, debug=False,
+    #                 out_dir=OUTPUT_DIR, out_type=&#34;NONE&#34;)
+
+    # dw.save()
+    # asdahfs = dw.load(os.path.join(OUTPUT_DIR, &#34;rdvx_flight2.json&#34;))
+    # print(asdahfs.pretty())
+    exit(1)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="redvox.tests" href="index.html">redvox.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="redvox.tests.more tests.main" href="#redvox.tests.more tests.main">main</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

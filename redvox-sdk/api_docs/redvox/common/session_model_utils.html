@@ -30,489 +30,387 @@
 <pre><code class="python">&#34;&#34;&#34;
 This module contains classes and functions that support SessionModel.
 &#34;&#34;&#34;
-from typing import List, Optional, Tuple, Dict
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+from typing import List, Optional, Tuple, Dict, Union, Callable
 from bisect import insort
-import enum
 
 import numpy as np
 
-from redvox.common.offset_model import OffsetModel
+import redvox.api1000.proto.redvox_api_m_pb2 as api_m
+from redvox.api1000.wrapped_redvox_packet.sensors.location import LocationProvider
+from redvox.cloud import session_model_api as sm
 from redvox.common.timesync import TimeSync
-from redvox.common.stats_helper import WelfordStatsContainer
 
 
-class SensorModel:
+NUM_BUFFER_POINTS = 3  # number of data points to keep in a buffer
+COLUMN_TO_ENUM_FN = {&#34;location_provider&#34;: lambda l: LocationProvider(l).name}
+
+# These are used for checking if a field is present or not
+_ACCELEROMETER_FIELD_NAME: str = &#34;accelerometer&#34;
+_AMBIENT_TEMPERATURE_FIELD_NAME: str = &#34;ambient_temperature&#34;
+_AUDIO_FIELD_NAME: str = &#34;audio&#34;
+_COMPRESSED_AUDIO_FIELD_NAME: str = &#34;compressed_audio&#34;
+_GRAVITY_FIELD_NAME: str = &#34;gravity&#34;
+_GYROSCOPE_FIELD_NAME: str = &#34;gyroscope&#34;
+_IMAGE_FIELD_NAME: str = &#34;image&#34;
+_LIGHT_FIELD_NAME: str = &#34;light&#34;
+_LINEAR_ACCELERATION_FIELD_NAME: str = &#34;linear_acceleration&#34;
+_LOCATION_FIELD_NAME: str = &#34;location&#34;
+_MAGNETOMETER_FIELD_NAME: str = &#34;magnetometer&#34;
+_ORIENTATION_FIELD_NAME: str = &#34;orientation&#34;
+_PRESSURE_FIELD_NAME: str = &#34;pressure&#34;
+_PROXIMITY_FIELD_NAME: str = &#34;proximity&#34;
+_RELATIVE_HUMIDITY_FIELD_NAME: str = &#34;relative_humidity&#34;
+_ROTATION_VECTOR_FIELD_NAME: str = &#34;rotation_vector&#34;
+_VELOCITY_FIELD_NAME: str = &#34;velocity&#34;
+_HEALTH_FIELD_NAME: str = &#34;health&#34;
+
+
+Sensor = Union[
+    api_m.RedvoxPacketM.Sensors.Xyz,
+    api_m.RedvoxPacketM.Sensors.Single,
+    api_m.RedvoxPacketM.Sensors.Audio,
+    api_m.RedvoxPacketM.Sensors.Image,
+    api_m.RedvoxPacketM.Sensors.Location,
+    api_m.RedvoxPacketM.Sensors.CompressedAudio,
+    api_m.RedvoxPacketM.StationInformation.StationMetrics,
+]
+
+__SENSOR_NAME_TO_SENSOR_FN: Dict[
+    str,
+    Optional[
+        Callable[
+            [api_m.RedvoxPacketM],
+            Union[Sensor],
+        ]
+    ],
+] = {
+    &#34;unknown&#34;: None,
+    _HEALTH_FIELD_NAME: lambda packet: packet.station_information.station_metrics,
+    _ACCELEROMETER_FIELD_NAME: lambda packet: packet.sensors.accelerometer,
+    _AMBIENT_TEMPERATURE_FIELD_NAME: lambda packet: packet.sensors.ambient_temperature,
+    _AUDIO_FIELD_NAME: lambda packet: packet.sensors.audio,
+    _COMPRESSED_AUDIO_FIELD_NAME: lambda packet: packet.sensors.compressed_audio,
+    _GRAVITY_FIELD_NAME: lambda packet: packet.sensors.gravity,
+    _GYROSCOPE_FIELD_NAME: lambda packet: packet.sensors.gyroscope,
+    _IMAGE_FIELD_NAME: lambda packet: packet.sensors.image,
+    _LIGHT_FIELD_NAME: lambda packet: packet.sensors.light,
+    _LINEAR_ACCELERATION_FIELD_NAME: lambda packet: packet.sensors.linear_acceleration,
+    _LOCATION_FIELD_NAME: lambda packet: packet.sensors.location,
+    _MAGNETOMETER_FIELD_NAME: lambda packet: packet.sensors.magnetometer,
+    _ORIENTATION_FIELD_NAME: lambda packet: packet.sensors.orientation,
+    _PRESSURE_FIELD_NAME: lambda packet: packet.sensors.pressure,
+    _PROXIMITY_FIELD_NAME: lambda packet: packet.sensors.proximity,
+    _RELATIVE_HUMIDITY_FIELD_NAME: lambda packet: packet.sensors.relative_humidity,
+    _ROTATION_VECTOR_FIELD_NAME: lambda packet: packet.sensors.rotation_vector,
+    _VELOCITY_FIELD_NAME: lambda packet: packet.sensors.velocity,
+}
+
+
+def _get_sensor_for_data_extraction(sensor_name: str, packet: api_m.RedvoxPacketM) -&gt; Optional[Sensor]:
     &#34;&#34;&#34;
-    A simple representation of a Sensor.  Sample rate data is in Hz
-
-    Properties:
-        name: str, name of the Sensor
-
-        description: str, description of the Sensor
-
-        sample_rate_stats: WelfordStatsContainer used to calculate the mean, std deviation, variance, etc. of the
-        sensor&#39;s sample rate
+    :param sensor_name: name of sensor to return
+    :param packet: the data packet to get the sensor from
+    :return: Sensor that matches the sensor_name or None if that Sensor doesn&#39;t exist
     &#34;&#34;&#34;
-    def __init__(self, name: str, desc: str, mean_sample_rate: float):
-        &#34;&#34;&#34;
-        initialize SensorModel
-
-        :param name: name of the sensor
-        :param desc: description of the sensor
-        :param mean_sample_rate: mean sample rate of the sensor in Hz
-        &#34;&#34;&#34;
-        self.name: str = name
-        self.description: str = desc
-        self.sample_rate_stats: WelfordStatsContainer = WelfordStatsContainer()
-        self.sample_rate_stats.update(mean_sample_rate)
-
-    def __repr__(self):
-        return f&#34;name: {self.name}, &#34; \
-               f&#34;description: {self.description}, &#34; \
-               f&#34;sample_rate_stats: {self.sample_rate_stats}&#34;
-
-    def to_dict(self) -&gt; Dict:
-        &#34;&#34;&#34;
-        :return: sensor model as dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;name&#34;: self.name,
-            &#34;description&#34;: self.description,
-            &#34;sample_rate_stats&#34;: self.sample_rate_stats.to_dict()
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;SensorModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read
-        :return: SensorModel from dictionary
-        &#34;&#34;&#34;
-        result = SensorModel(source[&#34;name&#34;], source[&#34;description&#34;], 0)
-        result.sample_rate_stats = WelfordStatsContainer.from_dict(source[&#34;sample_rate_stats&#34;])
-        return result
-
-    def update(self, new_mean_sr: float):
-        &#34;&#34;&#34;
-        adds a new mean sample rate to the SensorModel
-
-        :param new_mean_sr: new mean sample rate to add
-        &#34;&#34;&#34;
-        self.sample_rate_stats.update(new_mean_sr)
-
-    def finalized(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the sample rate stats
-        &#34;&#34;&#34;
-        return self.sample_rate_stats.finalized()
+    sensor_fn: Optional[Callable[[api_m.RedvoxPacketM], Sensor]] = __SENSOR_NAME_TO_SENSOR_FN[sensor_name]
+    if (sensor_name == _HEALTH_FIELD_NAME or _has_sensor(packet, sensor_name)) and sensor_fn is not None:
+        return sensor_fn(packet)
 
 
-class FirstLastBuffer:
+def _get_mean_sample_rate_from_sensor(sensor: Sensor) -&gt; float:
     &#34;&#34;&#34;
-    Holds data in two fixed size queues.  You can put more than the maximum capacity of elements into a
-    queue, but it will remove elements until it reaches the capacity.
-
-    Properties:
-        capacity: int, maximum size of the queue
-
-        data: List of Tuples; Tuples consist of timestamp in microseconds since epoch UTC
-        and the actual data being stored
-
-        debug: bool, if True, will output additional messages when errors occur.  Default False
+    :param sensor: Sensor to get data from
+    :return: mean sample rate of the sensor or np.nan if sample rate doesn&#39;t exist
     &#34;&#34;&#34;
-    def __init__(self, capacity: int, debug: bool = False):
-        &#34;&#34;&#34;
-        Initialize the queue.
-        Remember to only put the same type of data points into the queue.
-
-        :param capacity: size of the queue
-        :param debug: if True, output additional messages when errors occur, default False
-        &#34;&#34;&#34;
-        self.capacity: int = capacity
-        self.first_data: List[Tuple] = [] * (capacity + 1)
-        self.last_data: List[Tuple] = [] * (capacity + 1)
-        self.debug: bool = debug
-
-    def __repr__(self):
-        return f&#34;capacity: {self.capacity}, &#34; \
-               f&#34;first_data: {self.first_data}, &#34; \
-               f&#34;last_data: {self.last_data}&#34;
-
-    def __str__(self):
-        return f&#34;capacity: {self.capacity}, &#34; \
-               f&#34;\nfirst_data: [\n{self.first_data_as_string()}], &#34; \
-               f&#34;\nlast_data: [\n{self.last_data_as_string()}]\n&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: FirstLastBuffer as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;capacity&#34;: self.capacity,
-            &#34;first_data&#34;: self.first_data,
-            &#34;last_data&#34;: self.last_data
-        }
-
-    @staticmethod
-    def from_dict(data: dict) -&gt; &#34;FirstLastBuffer&#34;:
-        &#34;&#34;&#34;
-        :param data: dictionary to read from
-        :return: FirstLastBuffer defined by the dictionary
-        &#34;&#34;&#34;
-        result = FirstLastBuffer(data[&#34;capacity&#34;])
-        result.first_data = data[&#34;first_data&#34;]
-        result.last_data = data[&#34;last_data&#34;]
-        return result
-
-    def first_data_as_string(self) -&gt; str:
-        &#34;&#34;&#34;
-        :return: string representation of the first_data queue
-        &#34;&#34;&#34;
-        return self._data_as_string(self.first_data)
-
-    def last_data_as_string(self) -&gt; str:
-        &#34;&#34;&#34;
-        :return: string representation of the last_data queue
-        &#34;&#34;&#34;
-        return self._data_as_string(self.last_data)
-
-    @staticmethod
-    def _data_as_string(data_list: List[Tuple]) -&gt; str:
-        &#34;&#34;&#34;
-        :param data_list: the list of tuples to return as a string
-        :return: list as a string
-        &#34;&#34;&#34;
-        result = &#34;&#34;
-        for t, v in data_list:
-            result += f&#34;{t}: {str(v)}\n&#34;
-        return result
-
-    @staticmethod
-    def __ordered_insert(buffer: List, value: Tuple):
-        &#34;&#34;&#34;
-        inserts the value into the buffer using the timestamp as the key
-
-        :param value: value to add.  Must include a timestamp and the same data type as the other buffer elements
-        &#34;&#34;&#34;
-        if len(buffer) &lt; 1:
-            buffer.append(value)
-        else:
-            insort(buffer, value)
-
-    def add(self, timestamp: float, value):
-        &#34;&#34;&#34;
-        add a value into one or more queues.
-        If a queue is not full, the value is added automatically
-        If the first_data queue is full, the value is only added if it comes before the last element.
-        If the last_data queue is full, the value is only added if it comes after the first element.
-
-        :param timestamp: timestamp in microseconds since epoch UTC to add.
-        :param value: value to add.  Must be the same type of data as the other elements in the queue.
-        &#34;&#34;&#34;
-        if len(self.first_data) &lt; self.capacity or timestamp &lt; self.first_data[-1][0]:
-            self.__ordered_insert(self.first_data, (timestamp, value))
-            while len(self.first_data) &gt; self.capacity:
-                self.first_data.pop()
-        if len(self.last_data) &lt; self.capacity or timestamp &gt; self.last_data[0][0]:
-            self.__ordered_insert(self.last_data, (timestamp, value))
-            while len(self.last_data) &gt; self.capacity:
-                self.last_data.pop(0)
+    return sensor.timestamps.mean_sample_rate if int(sensor.timestamps.timestamp_statistics.count) &gt; 1 else np.nan
 
 
-class TimeSyncModel:
+def _has_sensor(data: Union[api_m.RedvoxPacketM, api_m.RedvoxPacketM.Sensors], field_name: str) -&gt; bool:
     &#34;&#34;&#34;
-    TimeSync data used to build models
-    All times and timestamps are in microseconds since epoch UTC
+    Returns true if the given packet or sensors instance contains the valid sensor.
 
-    Properties:
-        first_timesync_timestamp: float, the first timestamp of the TimeSync data.  Default infinity
-
-        last_timesync_timestamp: float, the last timestamp of the TimeSync data.  Default 0.0
-
-        mean_latency: float, the mean latency of the TimeSync data.  Default 0.0
-
-        mean_offset: float, the mean offset of the TimeSync data.  Default 0.0
-
-        num_exchanges: int, number of exchanges in the TimeSync data.  Default 0
-
-        first_last_timesync_data: FirstLastBuffer of TimeSync data, a fixed size list of timesync exchanges used to
-                                    calculate the offset model.
+    :param data: Either a packet or a packet&#39;s sensors message.
+    :param field_name: The name of the sensor being checked.
+    :return: True if the sensor exists, False otherwise.
     &#34;&#34;&#34;
-    def __init__(self,
-                 capacity: int,
-                 first_timesync_timestamp: float = float(&#34;inf&#34;),
-                 last_timesync_timestamp: float = 0.0,
-                 mean_latency: float = 0.0,
-                 mean_offset: float = 0.0,
-                 num_exchanges: int = 0
-                 ):
-        &#34;&#34;&#34;
-        Initialize the TimeSyncModel
+    if isinstance(data, api_m.RedvoxPacketM):
+        # noinspection Mypy,PyTypeChecker
+        return data.sensors.HasField(field_name)
 
-        :param capacity: the number of data points to keep in each of the first and last data buffers
-        :param first_timesync_timestamp: the first timestamp of the TimeSync data.  Default infinity
-        :param last_timesync_timestamp: the last timestamp of the TimeSync data.  Default 0.0
-        :param mean_latency: the mean latency of the TimeSync data.  Default 0.0
-        :param mean_offset: the mean offset of the TimeSync data.  Default 0.0
-        :param num_exchanges: the number of exchanges in the TimeSync data.  Default 0
-        &#34;&#34;&#34;
-        self.first_timesync_timestamp = first_timesync_timestamp
-        self.last_timesync_timestamp = last_timesync_timestamp
-        self.mean_latency = mean_latency
-        self.mean_offset = mean_offset
-        self.num_exchanges = num_exchanges
-        self.first_last_timesync_data: FirstLastBuffer = FirstLastBuffer(capacity)
+    if isinstance(data, api_m.RedvoxPacketM.Sensors):
+        # noinspection Mypy,PyTypeChecker
+        return data.HasField(field_name)
 
-    def __repr__(self):
-        return f&#34;first_timesync_timestamp: {self.first_timesync_timestamp}, &#34; \
-               f&#34;last_timesync_timestamp: {self.last_timesync_timestamp}, &#34; \
-               f&#34;mean_latency: {self.mean_latency}, &#34; \
-               f&#34;mean_offset: {self.mean_offset}, &#34; \
-               f&#34;num_exchanges: {self.num_exchanges}, &#34; \
-               f&#34;first_last_timesync_data: {self.first_last_timesync_data.to_dict()}&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: TimeSyncModel as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;first_timesync_timestamp&#34;: self.first_timesync_timestamp,
-            &#34;last_timesync_timestamp&#34;: self.last_timesync_timestamp,
-            &#34;mean_latency&#34;: self.mean_latency,
-            &#34;mean_offset&#34;: self.mean_offset,
-            &#34;num_exchanges&#34;: self.num_exchanges,
-            &#34;first_last_timesync_data&#34;: self.first_last_timesync_data.to_dict()
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;TimeSyncModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read from
-        :return: TimeSyncModel from dictionary
-        &#34;&#34;&#34;
-        flb = FirstLastBuffer.from_dict(source[&#34;first_last_timesync_data&#34;])
-        result = TimeSyncModel(0, source[&#34;first_timesync_timestamp&#34;],
-                               source[&#34;last_timesync_timestamp&#34;], source[&#34;mean_latency&#34;], source[&#34;mean_offset&#34;],
-                               source[&#34;num_exchanges&#34;])
-        result.first_last_timesync_data = flb
-        return result
-
-    def update_model(self, ts: TimeSync):
-        &#34;&#34;&#34;
-        Use a TimeSync object to update the TimeSyncModel
-
-        :param ts: TimeSync object to update the model with
-        &#34;&#34;&#34;
-        if ts.num_tri_messages() &gt; 0:
-            self.num_exchanges += ts.num_tri_messages()
-            self.mean_latency = \
-                (self.mean_latency * self.num_exchanges + ts.best_latency()) / (self.num_exchanges + 1)
-            self.mean_offset = \
-                (self.mean_offset * self.num_exchanges + ts.best_offset()) / (self.num_exchanges + 1)
-            _ts_latencies = ts.latencies().flatten()
-            _ts_offsets = ts.offsets().flatten()
-            _ts_timestamps = ts.get_device_exchanges_timestamps()
-            if ts.data_start_timestamp() &lt; self.first_timesync_timestamp:
-                self.first_timesync_timestamp = ts.data_start_timestamp()
-            if ts.data_end_timestamp() &gt; self.last_timesync_timestamp:
-                self.last_timesync_timestamp = ts.data_end_timestamp()
-            # add data to the buffers
-            for i in range(len(_ts_timestamps)):
-                self.first_last_timesync_data.add(_ts_timestamps[i], (_ts_latencies[i], _ts_offsets[i]))
-
-    def create_offset_model(self) -&gt; OffsetModel:
-        &#34;&#34;&#34;
-        :return: OffsetModel using the data in the TimeSyncModel
-        &#34;&#34;&#34;
-        latencies = []
-        offsets = []
-        timestamps = []
-        for n in self.first_last_timesync_data.first_data:
-            latencies.append(n[1][0])
-            offsets.append(n[1][0])
-            timestamps.append(n[0])
-        for n in self.first_last_timesync_data.last_data:
-            latencies.append(n[1][0])
-            offsets.append(n[1][0])
-            timestamps.append(n[0])
-        return OffsetModel(np.array(latencies), np.array(offsets), np.array(timestamps),
-                           self.first_timesync_timestamp, self.last_timesync_timestamp,
-                           min_samples_per_bin=1)
+    return False
 
 
-class LocationModel:
+def get_all_sensors_in_packet(packet: api_m.RedvoxPacketM) -&gt; List[Tuple[str, str, float]]:
     &#34;&#34;&#34;
-    Location data used to build models
-    All times and timestamps are in microseconds since epoch UTC
-
-    Properties:
-        latitudes: WelfordStatsContainer for latitude values
-
-        longitudes: WelfordStatsContainer for longitude values
-
-        altitudes: WelfordStatsContainer for altitude values
-
-        first_last_location_data: FirstLastBuffer of Location data, a fixed size list of location data points.
+    :param packet: packet to check
+    :return: list of all sensors as tuple of name, description, and mean sample rate in the packet
     &#34;&#34;&#34;
-    def __init__(self, capacity: int):
-        &#34;&#34;&#34;
-        initialize a LocationModel
-
-        :param capacity: int, number of data points to store in the first and last buffers.
-        &#34;&#34;&#34;
-        self.latitudes = WelfordStatsContainer()
-        self.longitudes = WelfordStatsContainer()
-        self.altitudes = WelfordStatsContainer()
-        self.first_last_location_data = FirstLastBuffer(capacity)
-
-    def __repr__(self):
-        return f&#34;latitudes: {self.latitudes}, &#34; \
-               f&#34;longitudes: {self.longitudes}, &#34; \
-               f&#34;altitudes: {self.altitudes}, &#34; \
-               f&#34;first_last_location_data: {self.first_last_location_data}&#34;
-
-    def __str__(self):
-        return f&#34;latitudes: {self.latitudes}, &#34; \
-               f&#34;longitudes: {self.longitudes}, &#34; \
-               f&#34;altitudes: {self.altitudes}, &#34; \
-               f&#34;location data: {self.first_last_location_data}&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: LocationModel as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;latitudes&#34;: self.latitudes.to_dict(),
-            &#34;longitudes&#34;: self.longitudes.to_dict(),
-            &#34;altitudes&#34;: self.altitudes.to_dict(),
-            &#34;first_last_location_data&#34;: self.first_last_location_data.to_dict(),
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;LocationModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read from
-        :return: LocationModel
-        &#34;&#34;&#34;
-        flb = FirstLastBuffer.from_dict(source[&#34;first_last_location_data&#34;])
-        result = LocationModel(0)
-        result.latitudes = WelfordStatsContainer.from_dict(source[&#34;latitudes&#34;])
-        result.longitudes = WelfordStatsContainer.from_dict(source[&#34;longitudes&#34;])
-        result.altitudes = WelfordStatsContainer.from_dict(source[&#34;altitudes&#34;])
-        result.first_last_location_data = flb
-        return result
-
-    def update_location(self, lat: float, lon: float, alt: float, timestamp: float):
-        &#34;&#34;&#34;
-        Add a location to the LocationStats
-
-        :param lat: float, latitude in degrees
-        :param lon: float, longitude in degrees
-        :param alt: float, altitude in meters
-        :param timestamp: float, timestamp of location in microseconds since epoch UTC
-        &#34;&#34;&#34;
-        self.latitudes.update(lat)
-        self.longitudes.update(lon)
-        self.altitudes.update(alt)
-        self.first_last_location_data.add(timestamp, (lat, lon, alt))
-
-    def finalized_latitude(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the latitude
-        &#34;&#34;&#34;
-        return self.latitudes.finalized()
-
-    def finalized_longitude(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the longitude
-        &#34;&#34;&#34;
-        return self.longitudes.finalized()
-
-    def finalized_altitude(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the altitude
-        &#34;&#34;&#34;
-        return self.altitudes.finalized()
+    result: List[Tuple] = []
+    for s in [_AUDIO_FIELD_NAME, _COMPRESSED_AUDIO_FIELD_NAME]:
+        if _has_sensor(packet, s):
+            sensor = _get_sensor_for_data_extraction(s, packet)
+            result.append((s, sensor.sensor_description, sensor.sample_rate))
+    for s in [
+        _PRESSURE_FIELD_NAME,
+        _LOCATION_FIELD_NAME,
+        _ACCELEROMETER_FIELD_NAME,
+        _AMBIENT_TEMPERATURE_FIELD_NAME,
+        _GRAVITY_FIELD_NAME,
+        _GYROSCOPE_FIELD_NAME,
+        _IMAGE_FIELD_NAME,
+        _LIGHT_FIELD_NAME,
+        _LINEAR_ACCELERATION_FIELD_NAME,
+        _MAGNETOMETER_FIELD_NAME,
+        _ORIENTATION_FIELD_NAME,
+        _PROXIMITY_FIELD_NAME,
+        _RELATIVE_HUMIDITY_FIELD_NAME,
+        _ROTATION_VECTOR_FIELD_NAME,
+        _VELOCITY_FIELD_NAME,
+    ]:
+        if _has_sensor(packet, s):
+            sensor = _get_sensor_for_data_extraction(s, packet)
+            result.append((s, sensor.sensor_description, sensor.timestamps.mean_sample_rate))
+    if packet.station_information.HasField(&#34;station_metrics&#34;):
+        result.insert(
+            2,
+            (
+                _HEALTH_FIELD_NAME,
+                &#34;station_metrics&#34;,
+                packet.station_information.station_metrics.timestamps.mean_sample_rate,
+            ),
+        )
+    return result
 
 
-class MetricsSessionModel:
+def __ordered_insert(buffer: List, value: Tuple):
     &#34;&#34;&#34;
-    Metrics stored by the SessionModel
+    inserts the value into the buffer using the timestamp as the key
+
+    :param value: value to add.  Must include a timestamp and the same data type as the other buffer elements
     &#34;&#34;&#34;
-    def __init__(self, capacity: int):
-        &#34;&#34;&#34;
-        initialize the metrics stored by the session model
+    if len(buffer) &lt; 1:
+        buffer.append(value)
+    else:
+        insort(buffer, value)
 
-        :param capacity: int, number of data points to store
-        &#34;&#34;&#34;
-        self.capacity: int = capacity
-        self.location: Dict[str, LocationModel] = {}
-        self.battery: WelfordStatsContainer = WelfordStatsContainer()
-        self.temperature: WelfordStatsContainer = WelfordStatsContainer()
 
-    def __repr__(self):
-        return f&#34;location: {self.location}, &#34; \
-               f&#34;battery: {self.battery}, &#34; \
-               f&#34;temperature: {self.temperature}&#34;
+def add_to_fst_buffer(buffer: List, buf_max_size: int, timestamp: float, value):
+    &#34;&#34;&#34;
+    Add a value into the first buffer.
 
-    def __str__(self):
-        return f&#34;location: {self.location}, &#34; \
-               f&#34;battery percent: {self.battery}, &#34; \
-               f&#34;temperature (C): {self.temperature}&#34;
+    * If the buffer is not full, the value is added automatically
+    * If the buffer is full, the value is only added if it comes before the last element.
 
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: MetricsSessionModel as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;capacity&#34;: self.capacity,
-            &#34;location&#34;: {n: m.to_dict() for n, m in self.location.items()},
-            &#34;battery&#34;: self.battery.to_dict(),
-            &#34;temperature&#34;: self.temperature.to_dict()
-        }
+    :param buffer: the buffer to add the value to
+    :param buf_max_size: the maximum size of the buffer
+    :param timestamp: timestamp in microseconds since epoch UTC to add.
+    :param value: value to add.  Must be the same type of data as the other elements in the queue.
+    &#34;&#34;&#34;
+    if len(buffer) &lt; buf_max_size or timestamp &lt; buffer[-1][0]:
+        __ordered_insert(buffer, (timestamp, value))
+        while len(buffer) &gt; buf_max_size:
+            buffer.pop()
 
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;MetricsSessionModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read from
-        :return: MetricsSessionModel from dictionary
-        &#34;&#34;&#34;
-        result = MetricsSessionModel(source[&#34;capacity&#34;])
-        result.location = {n: LocationModel.from_dict(m) for n, m in source[&#34;location&#34;].items()}
-        result.battery = WelfordStatsContainer.from_dict(source[&#34;battery&#34;])
-        result.temperature = WelfordStatsContainer.from_dict(source[&#34;temperature&#34;])
-        return result
 
-    def add_location(self, source: str, lat: float, lon: float, alt: float, timestamp: float):
-        &#34;&#34;&#34;
-        add a location from the named source to the session model
+def add_to_lst_buffer(buffer: List, buf_max_size: int, timestamp: float, value):
+    &#34;&#34;&#34;
+    Add a value into the last buffer.
 
-        :param source: str, name of the location data source
-        :param lat: float, latitude in degrees
-        :param lon: float, longitude in degrees
-        :param alt: float, altitude in meters
-        :param timestamp: float, timestamp of location in microseconds since epoch UTC
-        &#34;&#34;&#34;
-        if source not in self.location.keys():
-            self.location[source] = LocationModel(self.capacity)
-        self.location[source].update_location(lat, lon, alt, timestamp)
+    * If the buffer is not full, the value is added automatically
+    * If the buffer is full, the value is only added if it comes after the first element.
 
-    def add_battery(self, data: float):
-        &#34;&#34;&#34;
-        add battery data to the session model
+    :param buffer: the buffer to add the value to
+    :param buf_max_size: the maximum size of the buffer
+    :param timestamp: timestamp in microseconds since epoch UTC to add.
+    :param value: value to add.  Must be the same type of data as the other elements in the queue.
+    &#34;&#34;&#34;
+    if len(buffer) &lt; buf_max_size or timestamp &gt; buffer[0][0]:
+        __ordered_insert(buffer, (timestamp, value))
+        while len(buffer) &gt; buf_max_size:
+            buffer.pop(0)
 
-        :param data: float, battery percentage to add
-        &#34;&#34;&#34;
-        self.battery.update(data)
 
-    def add_temperature(self, data: float):
-        &#34;&#34;&#34;
-        add temperature data to the session model
+def get_local_timesync(packet: api_m.RedvoxPacketM) -&gt; Optional[Tuple]:
+    &#34;&#34;&#34;
+    if the data exists, the returning tuple looks like:
 
-        :param data: float, temperature in Celsius to add
-        &#34;&#34;&#34;
-        self.temperature.update(data)</code></pre>
+    (start_timestamp, end_timestamp, num_exchanges, best_latency, best_offset, list of TimeSyncData)
+
+    :param packet: packet to get timesync data from
+    :return: Timing object using data from packet or None
+    &#34;&#34;&#34;
+    ts = TimeSync().from_raw_packets([packet])
+    if ts.num_tri_messages() &gt; 0:
+        _ts_latencies = ts.latencies().flatten()
+        _ts_offsets = ts.offsets().flatten()
+        _ts_timestamps = ts.get_device_exchanges_timestamps()
+        # add data to the buffers
+        _ts_data = [
+            sm.TimeSyncData(_ts_timestamps[i], _ts_latencies[i], _ts_offsets[i]) for i in range(len(_ts_timestamps))
+        ]
+        return (
+            ts.data_start_timestamp(),
+            ts.data_end_timestamp(),
+            ts.num_tri_messages(),
+            ts.best_latency(),
+            ts.best_offset(),
+            _ts_data,
+        )
+    return None
+
+
+def add_to_welford(value: float, welford: Optional[sm.WelfordAggregator] = None) -&gt; sm.WelfordAggregator:
+    &#34;&#34;&#34;
+    adds the value to the welford, then returns the updated object.
+
+    If welford is None, creates a new WelfordAggregator object and returns it.
+
+    :param value: the value to add
+    :param welford: optional WelfordAggregator object to update.  if not given, will make a new one.  Default None
+    :return: updated or new WelfordAggregator object
+    &#34;&#34;&#34;
+    if welford is None:
+        return sm.WelfordAggregator(0.0, value, 1)
+    welford.cnt += 1
+    delta = value - welford.mean
+    welford.mean += delta / float(welford.cnt)
+    delta2 = value - welford.mean
+    welford.m2 += delta * delta2
+    return welford
+
+
+def add_to_stats(value: float, stats: Optional[sm.Stats] = None) -&gt; sm.Stats:
+    &#34;&#34;&#34;
+    adds the value to the stats, then returns the updated object.
+
+    If stats is None, creates a new Stats object and returns it.
+
+    :param value: the value to add
+    :param stats: optional Stats object to update.  if not given, will make a new one.  Default None
+    :return: updated or new Stats object
+    &#34;&#34;&#34;
+    if stats is None:
+        return sm.Stats(value, value, add_to_welford(value))
+    if value &lt; stats.min:
+        stats.min = value
+    if value &gt; stats.max:
+        stats.max = value
+    add_to_welford(value, stats.welford)
+    return stats
+
+
+def get_location_data(packet: api_m.RedvoxPacketM) -&gt; List[Tuple[str, float, float, float, float]]:
+    &#34;&#34;&#34;
+    :param packet: packet to get location data from
+    :return: List of location data as a tuples from the packet
+    &#34;&#34;&#34;
+    locations = []
+    loc = packet.sensors.location
+    lat = lon = alt = ts = 0.0
+    source = &#34;UNKNOWN&#34;
+    num_pts = int(loc.timestamps.timestamp_statistics.count)
+    # check for actual location values
+    if len(loc.location_providers) &lt; 1:
+        lat = loc.latitude_samples.value_statistics.mean
+        lon = loc.longitude_samples.value_statistics.mean
+        alt = loc.altitude_samples.value_statistics.mean
+        ts = loc.timestamps.timestamp_statistics.mean
+    elif (
+        num_pts &gt; 0
+        and loc.latitude_samples.value_statistics.count &gt; 0
+        and loc.longitude_samples.value_statistics.count &gt; 0
+        and loc.altitude_samples.value_statistics.count &gt; 0
+        and num_pts == loc.latitude_samples.value_statistics.count
+        and num_pts == loc.altitude_samples.value_statistics.count
+        and num_pts == loc.longitude_samples.value_statistics.count
+    ):
+        lats = loc.latitude_samples.values
+        lons = loc.longitude_samples.values
+        alts = loc.altitude_samples.values
+        tstp = loc.timestamps.timestamps
+        for i in range(num_pts):
+            source = (
+                &#34;UNKNOWN&#34;
+                if len(loc.location_providers) != num_pts
+                else COLUMN_TO_ENUM_FN[&#34;location_provider&#34;](loc.location_providers[i])
+            )
+            locations.append((source, lats[i], lons[i], alts[i], tstp[i]))
+        # set a special flag for later, so we don&#39;t add an extra location value
+        source = None
+    elif loc.last_best_location is not None:
+        ts = loc.last_best_location.latitude_longitude_timestamp.mach
+        source = loc.last_best_location.location_provider
+        lat = loc.last_best_location.latitude
+        lon = loc.last_best_location.longitude
+        alt = loc.last_best_location.altitude
+    elif loc.overall_best_location is not None:
+        ts = loc.overall_best_location.latitude_longitude_timestamp.mach
+        source = loc.overall_best_location.location_provider
+        lat = loc.overall_best_location.latitude
+        lon = loc.overall_best_location.longitude
+        alt = loc.overall_best_location.altitude
+    # source is not None if we got only one location through non-usual methods
+    if source is not None:
+        locations.append((source, lat, lon, alt, ts))
+    return locations
+
+
+def get_dynamic_data(packet: api_m.RedvoxPacketM) -&gt; Dict:
+    &#34;&#34;&#34;
+    :param packet: packet to get data from
+    :return: Dictionary of all dynamic session data from the packet
+    &#34;&#34;&#34;
+    location = get_location_data(packet)
+    battery = packet.station_information.station_metrics.battery.value_statistics.mean
+    temperature = packet.station_information.station_metrics.temperature.value_statistics.mean
+    return {&#34;location&#34;: location, &#34;battery&#34;: battery, &#34;temperature&#34;: temperature}
+
+
+def add_to_location(
+    lat: float, lon: float, alt: float, timestamp: float, loc_stat: Optional[sm.LocationStat] = None
+) -&gt; sm.LocationStat:
+    &#34;&#34;&#34;
+    update a LocationStat object with the location, or make a new one
+
+    :param lat: latitude in degrees
+    :param lon: longitude in degrees
+    :param alt: altitude in meters
+    :param timestamp: timestamp in microseconds from epoch UTC
+    :param loc_stat: optional LocationStat object to update.  if not given, will make a new one.  Default None
+    :return: updated or new LocationStat object
+    &#34;&#34;&#34;
+    if loc_stat is None:
+        fst_lst = sm.FirstLastBufLocation([], NUM_BUFFER_POINTS, [], NUM_BUFFER_POINTS)
+        add_to_fst_buffer(fst_lst.fst, fst_lst.fst_max_size, timestamp, sm.Location(lat, lon, alt))
+        add_to_lst_buffer(fst_lst.lst, fst_lst.lst_max_size, timestamp, sm.Location(lat, lon, alt))
+        return sm.LocationStat(fst_lst, add_to_stats(lat), add_to_stats(lon), add_to_stats(alt))
+    add_to_fst_buffer(loc_stat.fst_lst.fst, loc_stat.fst_lst.fst_max_size, timestamp, sm.Location(lat, lon, alt))
+    add_to_lst_buffer(loc_stat.fst_lst.lst, loc_stat.fst_lst.lst_max_size, timestamp, sm.Location(lat, lon, alt))
+    loc_stat.lat = add_to_stats(lat, loc_stat.lat)
+    loc_stat.lng = add_to_stats(lon, loc_stat.lng)
+    loc_stat.alt = add_to_stats(alt, loc_stat.alt)
+    return loc_stat
+
+
+def add_location_data(
+    data: List[Tuple[str, float, float, float, float]], loc_dict: Optional[Dict[str, sm.LocationStat]] = None
+) -&gt; Dict[str, sm.LocationStat]:
+    &#34;&#34;&#34;
+    update a dictionary of LocationStat or make a new dictionary
+
+    :param data: the data to add
+    :param loc_dict: the location dictionary to update
+    :return: the updated or new location dictionary
+    &#34;&#34;&#34;
+    if loc_dict is None:
+        loc_dict = {}
+    for s in data:
+        loc_dict[s[0]] = add_to_location(s[1], s[2], s[3], s[4], loc_dict[s[0]] if s[0] in loc_dict.keys() else None)
+    return loc_dict</code></pre>
 </details>
 </section>
 <section>
@@ -520,1149 +418,405 @@ class MetricsSessionModel:
 <section>
 </section>
 <section>
-</section>
-<section>
-<h2 class="section-title" id="header-classes">Classes</h2>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="redvox.common.session_model_utils.FirstLastBuffer"><code class="flex name class">
-<span>class <span class="ident">FirstLastBuffer</span></span>
-<span>(</span><span>capacity: int, debug: bool = False)</span>
+<dt id="redvox.common.session_model_utils.add_location_data"><code class="name flex">
+<span>def <span class="ident">add_location_data</span></span>(<span>data: List[Tuple[str, float, float, float, float]], loc_dict: Optional[Dict[str, <a title="redvox.cloud.session_model_api.LocationStat" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.LocationStat">LocationStat</a>]] = None) ‑> Dict[str, <a title="redvox.cloud.session_model_api.LocationStat" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.LocationStat">LocationStat</a>]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Holds data in two fixed size queues.
-You can put more than the maximum capacity of elements into a
-queue, but it will remove elements until it reaches the capacity.</p>
-<h2 id="properties">Properties</h2>
-<p>capacity: int, maximum size of the queue</p>
-<p>data: List of Tuples; Tuples consist of timestamp in microseconds since epoch UTC
-and the actual data being stored</p>
-<p>debug: bool, if True, will output additional messages when errors occur.
-Default False</p>
-<p>Initialize the queue.
-Remember to only put the same type of data points into the queue.</p>
-<p>:param capacity: size of the queue
-:param debug: if True, output additional messages when errors occur, default False</p></div>
+<div class="desc"><p>update a dictionary of LocationStat or make a new dictionary</p>
+<p>:param data: the data to add
+:param loc_dict: the location dictionary to update
+:return: the updated or new location dictionary</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FirstLastBuffer:
+<pre><code class="python">def add_location_data(
+    data: List[Tuple[str, float, float, float, float]], loc_dict: Optional[Dict[str, sm.LocationStat]] = None
+) -&gt; Dict[str, sm.LocationStat]:
     &#34;&#34;&#34;
-    Holds data in two fixed size queues.  You can put more than the maximum capacity of elements into a
-    queue, but it will remove elements until it reaches the capacity.
+    update a dictionary of LocationStat or make a new dictionary
 
-    Properties:
-        capacity: int, maximum size of the queue
-
-        data: List of Tuples; Tuples consist of timestamp in microseconds since epoch UTC
-        and the actual data being stored
-
-        debug: bool, if True, will output additional messages when errors occur.  Default False
+    :param data: the data to add
+    :param loc_dict: the location dictionary to update
+    :return: the updated or new location dictionary
     &#34;&#34;&#34;
-    def __init__(self, capacity: int, debug: bool = False):
-        &#34;&#34;&#34;
-        Initialize the queue.
-        Remember to only put the same type of data points into the queue.
-
-        :param capacity: size of the queue
-        :param debug: if True, output additional messages when errors occur, default False
-        &#34;&#34;&#34;
-        self.capacity: int = capacity
-        self.first_data: List[Tuple] = [] * (capacity + 1)
-        self.last_data: List[Tuple] = [] * (capacity + 1)
-        self.debug: bool = debug
-
-    def __repr__(self):
-        return f&#34;capacity: {self.capacity}, &#34; \
-               f&#34;first_data: {self.first_data}, &#34; \
-               f&#34;last_data: {self.last_data}&#34;
-
-    def __str__(self):
-        return f&#34;capacity: {self.capacity}, &#34; \
-               f&#34;\nfirst_data: [\n{self.first_data_as_string()}], &#34; \
-               f&#34;\nlast_data: [\n{self.last_data_as_string()}]\n&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: FirstLastBuffer as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;capacity&#34;: self.capacity,
-            &#34;first_data&#34;: self.first_data,
-            &#34;last_data&#34;: self.last_data
-        }
-
-    @staticmethod
-    def from_dict(data: dict) -&gt; &#34;FirstLastBuffer&#34;:
-        &#34;&#34;&#34;
-        :param data: dictionary to read from
-        :return: FirstLastBuffer defined by the dictionary
-        &#34;&#34;&#34;
-        result = FirstLastBuffer(data[&#34;capacity&#34;])
-        result.first_data = data[&#34;first_data&#34;]
-        result.last_data = data[&#34;last_data&#34;]
-        return result
-
-    def first_data_as_string(self) -&gt; str:
-        &#34;&#34;&#34;
-        :return: string representation of the first_data queue
-        &#34;&#34;&#34;
-        return self._data_as_string(self.first_data)
-
-    def last_data_as_string(self) -&gt; str:
-        &#34;&#34;&#34;
-        :return: string representation of the last_data queue
-        &#34;&#34;&#34;
-        return self._data_as_string(self.last_data)
-
-    @staticmethod
-    def _data_as_string(data_list: List[Tuple]) -&gt; str:
-        &#34;&#34;&#34;
-        :param data_list: the list of tuples to return as a string
-        :return: list as a string
-        &#34;&#34;&#34;
-        result = &#34;&#34;
-        for t, v in data_list:
-            result += f&#34;{t}: {str(v)}\n&#34;
-        return result
-
-    @staticmethod
-    def __ordered_insert(buffer: List, value: Tuple):
-        &#34;&#34;&#34;
-        inserts the value into the buffer using the timestamp as the key
-
-        :param value: value to add.  Must include a timestamp and the same data type as the other buffer elements
-        &#34;&#34;&#34;
-        if len(buffer) &lt; 1:
-            buffer.append(value)
-        else:
-            insort(buffer, value)
-
-    def add(self, timestamp: float, value):
-        &#34;&#34;&#34;
-        add a value into one or more queues.
-        If a queue is not full, the value is added automatically
-        If the first_data queue is full, the value is only added if it comes before the last element.
-        If the last_data queue is full, the value is only added if it comes after the first element.
-
-        :param timestamp: timestamp in microseconds since epoch UTC to add.
-        :param value: value to add.  Must be the same type of data as the other elements in the queue.
-        &#34;&#34;&#34;
-        if len(self.first_data) &lt; self.capacity or timestamp &lt; self.first_data[-1][0]:
-            self.__ordered_insert(self.first_data, (timestamp, value))
-            while len(self.first_data) &gt; self.capacity:
-                self.first_data.pop()
-        if len(self.last_data) &lt; self.capacity or timestamp &gt; self.last_data[0][0]:
-            self.__ordered_insert(self.last_data, (timestamp, value))
-            while len(self.last_data) &gt; self.capacity:
-                self.last_data.pop(0)</code></pre>
-</details>
-<h3>Static methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.FirstLastBuffer.from_dict"><code class="name flex">
-<span>def <span class="ident">from_dict</span></span>(<span>data: dict) ‑> <a title="redvox.common.session_model_utils.FirstLastBuffer" href="#redvox.common.session_model_utils.FirstLastBuffer">FirstLastBuffer</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>:param data: dictionary to read from
-:return: FirstLastBuffer defined by the dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def from_dict(data: dict) -&gt; &#34;FirstLastBuffer&#34;:
-    &#34;&#34;&#34;
-    :param data: dictionary to read from
-    :return: FirstLastBuffer defined by the dictionary
-    &#34;&#34;&#34;
-    result = FirstLastBuffer(data[&#34;capacity&#34;])
-    result.first_data = data[&#34;first_data&#34;]
-    result.last_data = data[&#34;last_data&#34;]
-    return result</code></pre>
+    if loc_dict is None:
+        loc_dict = {}
+    for s in data:
+        loc_dict[s[0]] = add_to_location(s[1], s[2], s[3], s[4], loc_dict[s[0]] if s[0] in loc_dict.keys() else None)
+    return loc_dict</code></pre>
 </details>
 </dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.FirstLastBuffer.add"><code class="name flex">
-<span>def <span class="ident">add</span></span>(<span>self, timestamp: float, value)</span>
+<dt id="redvox.common.session_model_utils.add_to_fst_buffer"><code class="name flex">
+<span>def <span class="ident">add_to_fst_buffer</span></span>(<span>buffer: List, buf_max_size: int, timestamp: float, value)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>add a value into one or more queues.
-If a queue is not full, the value is added automatically
-If the first_data queue is full, the value is only added if it comes before the last element.
-If the last_data queue is full, the value is only added if it comes after the first element.</p>
-<p>:param timestamp: timestamp in microseconds since epoch UTC to add.
+<div class="desc"><p>Add a value into the first buffer.</p>
+<ul>
+<li>If the buffer is not full, the value is added automatically</li>
+<li>If the buffer is full, the value is only added if it comes before the last element.</li>
+</ul>
+<p>:param buffer: the buffer to add the value to
+:param buf_max_size: the maximum size of the buffer
+:param timestamp: timestamp in microseconds since epoch UTC to add.
 :param value: value to add.
 Must be the same type of data as the other elements in the queue.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add(self, timestamp: float, value):
+<pre><code class="python">def add_to_fst_buffer(buffer: List, buf_max_size: int, timestamp: float, value):
     &#34;&#34;&#34;
-    add a value into one or more queues.
-    If a queue is not full, the value is added automatically
-    If the first_data queue is full, the value is only added if it comes before the last element.
-    If the last_data queue is full, the value is only added if it comes after the first element.
+    Add a value into the first buffer.
 
+    * If the buffer is not full, the value is added automatically
+    * If the buffer is full, the value is only added if it comes before the last element.
+
+    :param buffer: the buffer to add the value to
+    :param buf_max_size: the maximum size of the buffer
     :param timestamp: timestamp in microseconds since epoch UTC to add.
     :param value: value to add.  Must be the same type of data as the other elements in the queue.
     &#34;&#34;&#34;
-    if len(self.first_data) &lt; self.capacity or timestamp &lt; self.first_data[-1][0]:
-        self.__ordered_insert(self.first_data, (timestamp, value))
-        while len(self.first_data) &gt; self.capacity:
-            self.first_data.pop()
-    if len(self.last_data) &lt; self.capacity or timestamp &gt; self.last_data[0][0]:
-        self.__ordered_insert(self.last_data, (timestamp, value))
-        while len(self.last_data) &gt; self.capacity:
-            self.last_data.pop(0)</code></pre>
+    if len(buffer) &lt; buf_max_size or timestamp &lt; buffer[-1][0]:
+        __ordered_insert(buffer, (timestamp, value))
+        while len(buffer) &gt; buf_max_size:
+            buffer.pop()</code></pre>
 </details>
 </dd>
-<dt id="redvox.common.session_model_utils.FirstLastBuffer.first_data_as_string"><code class="name flex">
-<span>def <span class="ident">first_data_as_string</span></span>(<span>self) ‑> str</span>
+<dt id="redvox.common.session_model_utils.add_to_location"><code class="name flex">
+<span>def <span class="ident">add_to_location</span></span>(<span>lat: float, lon: float, alt: float, timestamp: float, loc_stat: Optional[<a title="redvox.cloud.session_model_api.LocationStat" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.LocationStat">LocationStat</a>] = None) ‑> <a title="redvox.cloud.session_model_api.LocationStat" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.LocationStat">LocationStat</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: string representation of the first_data queue</p></div>
+<div class="desc"><p>update a LocationStat object with the location, or make a new one</p>
+<p>:param lat: latitude in degrees
+:param lon: longitude in degrees
+:param alt: altitude in meters
+:param timestamp: timestamp in microseconds from epoch UTC
+:param loc_stat: optional LocationStat object to update.
+if not given, will make a new one.
+Default None
+:return: updated or new LocationStat object</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def first_data_as_string(self) -&gt; str:
+<pre><code class="python">def add_to_location(
+    lat: float, lon: float, alt: float, timestamp: float, loc_stat: Optional[sm.LocationStat] = None
+) -&gt; sm.LocationStat:
     &#34;&#34;&#34;
-    :return: string representation of the first_data queue
+    update a LocationStat object with the location, or make a new one
+
+    :param lat: latitude in degrees
+    :param lon: longitude in degrees
+    :param alt: altitude in meters
+    :param timestamp: timestamp in microseconds from epoch UTC
+    :param loc_stat: optional LocationStat object to update.  if not given, will make a new one.  Default None
+    :return: updated or new LocationStat object
     &#34;&#34;&#34;
-    return self._data_as_string(self.first_data)</code></pre>
+    if loc_stat is None:
+        fst_lst = sm.FirstLastBufLocation([], NUM_BUFFER_POINTS, [], NUM_BUFFER_POINTS)
+        add_to_fst_buffer(fst_lst.fst, fst_lst.fst_max_size, timestamp, sm.Location(lat, lon, alt))
+        add_to_lst_buffer(fst_lst.lst, fst_lst.lst_max_size, timestamp, sm.Location(lat, lon, alt))
+        return sm.LocationStat(fst_lst, add_to_stats(lat), add_to_stats(lon), add_to_stats(alt))
+    add_to_fst_buffer(loc_stat.fst_lst.fst, loc_stat.fst_lst.fst_max_size, timestamp, sm.Location(lat, lon, alt))
+    add_to_lst_buffer(loc_stat.fst_lst.lst, loc_stat.fst_lst.lst_max_size, timestamp, sm.Location(lat, lon, alt))
+    loc_stat.lat = add_to_stats(lat, loc_stat.lat)
+    loc_stat.lng = add_to_stats(lon, loc_stat.lng)
+    loc_stat.alt = add_to_stats(alt, loc_stat.alt)
+    return loc_stat</code></pre>
 </details>
 </dd>
-<dt id="redvox.common.session_model_utils.FirstLastBuffer.last_data_as_string"><code class="name flex">
-<span>def <span class="ident">last_data_as_string</span></span>(<span>self) ‑> str</span>
+<dt id="redvox.common.session_model_utils.add_to_lst_buffer"><code class="name flex">
+<span>def <span class="ident">add_to_lst_buffer</span></span>(<span>buffer: List, buf_max_size: int, timestamp: float, value)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: string representation of the last_data queue</p></div>
+<div class="desc"><p>Add a value into the last buffer.</p>
+<ul>
+<li>If the buffer is not full, the value is added automatically</li>
+<li>If the buffer is full, the value is only added if it comes after the first element.</li>
+</ul>
+<p>:param buffer: the buffer to add the value to
+:param buf_max_size: the maximum size of the buffer
+:param timestamp: timestamp in microseconds since epoch UTC to add.
+:param value: value to add.
+Must be the same type of data as the other elements in the queue.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def last_data_as_string(self) -&gt; str:
+<pre><code class="python">def add_to_lst_buffer(buffer: List, buf_max_size: int, timestamp: float, value):
     &#34;&#34;&#34;
-    :return: string representation of the last_data queue
+    Add a value into the last buffer.
+
+    * If the buffer is not full, the value is added automatically
+    * If the buffer is full, the value is only added if it comes after the first element.
+
+    :param buffer: the buffer to add the value to
+    :param buf_max_size: the maximum size of the buffer
+    :param timestamp: timestamp in microseconds since epoch UTC to add.
+    :param value: value to add.  Must be the same type of data as the other elements in the queue.
     &#34;&#34;&#34;
-    return self._data_as_string(self.last_data)</code></pre>
+    if len(buffer) &lt; buf_max_size or timestamp &gt; buffer[0][0]:
+        __ordered_insert(buffer, (timestamp, value))
+        while len(buffer) &gt; buf_max_size:
+            buffer.pop(0)</code></pre>
 </details>
 </dd>
-<dt id="redvox.common.session_model_utils.FirstLastBuffer.to_dict"><code class="name flex">
-<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict</span>
+<dt id="redvox.common.session_model_utils.add_to_stats"><code class="name flex">
+<span>def <span class="ident">add_to_stats</span></span>(<span>value: float, stats: Optional[<a title="redvox.cloud.session_model_api.Stats" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.Stats">Stats</a>] = None) ‑> <a title="redvox.cloud.session_model_api.Stats" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.Stats">Stats</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: FirstLastBuffer as a dictionary</p></div>
+<div class="desc"><p>adds the value to the stats, then returns the updated object.</p>
+<p>If stats is None, creates a new Stats object and returns it.</p>
+<p>:param value: the value to add
+:param stats: optional Stats object to update.
+if not given, will make a new one.
+Default None
+:return: updated or new Stats object</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_dict(self) -&gt; dict:
+<pre><code class="python">def add_to_stats(value: float, stats: Optional[sm.Stats] = None) -&gt; sm.Stats:
     &#34;&#34;&#34;
-    :return: FirstLastBuffer as a dictionary
+    adds the value to the stats, then returns the updated object.
+
+    If stats is None, creates a new Stats object and returns it.
+
+    :param value: the value to add
+    :param stats: optional Stats object to update.  if not given, will make a new one.  Default None
+    :return: updated or new Stats object
     &#34;&#34;&#34;
-    return {
-        &#34;capacity&#34;: self.capacity,
-        &#34;first_data&#34;: self.first_data,
-        &#34;last_data&#34;: self.last_data
-    }</code></pre>
+    if stats is None:
+        return sm.Stats(value, value, add_to_welford(value))
+    if value &lt; stats.min:
+        stats.min = value
+    if value &gt; stats.max:
+        stats.max = value
+    add_to_welford(value, stats.welford)
+    return stats</code></pre>
 </details>
 </dd>
-</dl>
-</dd>
-<dt id="redvox.common.session_model_utils.LocationModel"><code class="flex name class">
-<span>class <span class="ident">LocationModel</span></span>
-<span>(</span><span>capacity: int)</span>
+<dt id="redvox.common.session_model_utils.add_to_welford"><code class="name flex">
+<span>def <span class="ident">add_to_welford</span></span>(<span>value: float, welford: Optional[<a title="redvox.cloud.session_model_api.WelfordAggregator" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.WelfordAggregator">WelfordAggregator</a>] = None) ‑> <a title="redvox.cloud.session_model_api.WelfordAggregator" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.WelfordAggregator">WelfordAggregator</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Location data used to build models
-All times and timestamps are in microseconds since epoch UTC</p>
-<h2 id="properties">Properties</h2>
-<p>latitudes: WelfordStatsContainer for latitude values</p>
-<p>longitudes: WelfordStatsContainer for longitude values</p>
-<p>altitudes: WelfordStatsContainer for altitude values</p>
-<p>first_last_location_data: FirstLastBuffer of Location data, a fixed size list of location data points.</p>
-<p>initialize a LocationModel</p>
-<p>:param capacity: int, number of data points to store in the first and last buffers.</p></div>
+<div class="desc"><p>adds the value to the welford, then returns the updated object.</p>
+<p>If welford is None, creates a new WelfordAggregator object and returns it.</p>
+<p>:param value: the value to add
+:param welford: optional WelfordAggregator object to update.
+if not given, will make a new one.
+Default None
+:return: updated or new WelfordAggregator object</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class LocationModel:
+<pre><code class="python">def add_to_welford(value: float, welford: Optional[sm.WelfordAggregator] = None) -&gt; sm.WelfordAggregator:
     &#34;&#34;&#34;
-    Location data used to build models
-    All times and timestamps are in microseconds since epoch UTC
+    adds the value to the welford, then returns the updated object.
 
-    Properties:
-        latitudes: WelfordStatsContainer for latitude values
+    If welford is None, creates a new WelfordAggregator object and returns it.
 
-        longitudes: WelfordStatsContainer for longitude values
-
-        altitudes: WelfordStatsContainer for altitude values
-
-        first_last_location_data: FirstLastBuffer of Location data, a fixed size list of location data points.
+    :param value: the value to add
+    :param welford: optional WelfordAggregator object to update.  if not given, will make a new one.  Default None
+    :return: updated or new WelfordAggregator object
     &#34;&#34;&#34;
-    def __init__(self, capacity: int):
-        &#34;&#34;&#34;
-        initialize a LocationModel
-
-        :param capacity: int, number of data points to store in the first and last buffers.
-        &#34;&#34;&#34;
-        self.latitudes = WelfordStatsContainer()
-        self.longitudes = WelfordStatsContainer()
-        self.altitudes = WelfordStatsContainer()
-        self.first_last_location_data = FirstLastBuffer(capacity)
-
-    def __repr__(self):
-        return f&#34;latitudes: {self.latitudes}, &#34; \
-               f&#34;longitudes: {self.longitudes}, &#34; \
-               f&#34;altitudes: {self.altitudes}, &#34; \
-               f&#34;first_last_location_data: {self.first_last_location_data}&#34;
-
-    def __str__(self):
-        return f&#34;latitudes: {self.latitudes}, &#34; \
-               f&#34;longitudes: {self.longitudes}, &#34; \
-               f&#34;altitudes: {self.altitudes}, &#34; \
-               f&#34;location data: {self.first_last_location_data}&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: LocationModel as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;latitudes&#34;: self.latitudes.to_dict(),
-            &#34;longitudes&#34;: self.longitudes.to_dict(),
-            &#34;altitudes&#34;: self.altitudes.to_dict(),
-            &#34;first_last_location_data&#34;: self.first_last_location_data.to_dict(),
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;LocationModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read from
-        :return: LocationModel
-        &#34;&#34;&#34;
-        flb = FirstLastBuffer.from_dict(source[&#34;first_last_location_data&#34;])
-        result = LocationModel(0)
-        result.latitudes = WelfordStatsContainer.from_dict(source[&#34;latitudes&#34;])
-        result.longitudes = WelfordStatsContainer.from_dict(source[&#34;longitudes&#34;])
-        result.altitudes = WelfordStatsContainer.from_dict(source[&#34;altitudes&#34;])
-        result.first_last_location_data = flb
-        return result
-
-    def update_location(self, lat: float, lon: float, alt: float, timestamp: float):
-        &#34;&#34;&#34;
-        Add a location to the LocationStats
-
-        :param lat: float, latitude in degrees
-        :param lon: float, longitude in degrees
-        :param alt: float, altitude in meters
-        :param timestamp: float, timestamp of location in microseconds since epoch UTC
-        &#34;&#34;&#34;
-        self.latitudes.update(lat)
-        self.longitudes.update(lon)
-        self.altitudes.update(alt)
-        self.first_last_location_data.add(timestamp, (lat, lon, alt))
-
-    def finalized_latitude(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the latitude
-        &#34;&#34;&#34;
-        return self.latitudes.finalized()
-
-    def finalized_longitude(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the longitude
-        &#34;&#34;&#34;
-        return self.longitudes.finalized()
-
-    def finalized_altitude(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the altitude
-        &#34;&#34;&#34;
-        return self.altitudes.finalized()</code></pre>
+    if welford is None:
+        return sm.WelfordAggregator(0.0, value, 1)
+    welford.cnt += 1
+    delta = value - welford.mean
+    welford.mean += delta / float(welford.cnt)
+    delta2 = value - welford.mean
+    welford.m2 += delta * delta2
+    return welford</code></pre>
 </details>
-<h3>Static methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.LocationModel.from_dict"><code class="name flex">
-<span>def <span class="ident">from_dict</span></span>(<span>source: dict) ‑> <a title="redvox.common.session_model_utils.LocationModel" href="#redvox.common.session_model_utils.LocationModel">LocationModel</a></span>
+</dd>
+<dt id="redvox.common.session_model_utils.get_all_sensors_in_packet"><code class="name flex">
+<span>def <span class="ident">get_all_sensors_in_packet</span></span>(<span>packet: src.redvox_api_m.redvox_api_m_pb2.RedvoxPacketM) ‑> List[Tuple[str, str, float]]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:param source: dictionary to read from
-:return: LocationModel</p></div>
+<div class="desc"><p>:param packet: packet to check
+:return: list of all sensors as tuple of name, description, and mean sample rate in the packet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@staticmethod
-def from_dict(source: dict) -&gt; &#34;LocationModel&#34;:
+<pre><code class="python">def get_all_sensors_in_packet(packet: api_m.RedvoxPacketM) -&gt; List[Tuple[str, str, float]]:
     &#34;&#34;&#34;
-    :param source: dictionary to read from
-    :return: LocationModel
+    :param packet: packet to check
+    :return: list of all sensors as tuple of name, description, and mean sample rate in the packet
     &#34;&#34;&#34;
-    flb = FirstLastBuffer.from_dict(source[&#34;first_last_location_data&#34;])
-    result = LocationModel(0)
-    result.latitudes = WelfordStatsContainer.from_dict(source[&#34;latitudes&#34;])
-    result.longitudes = WelfordStatsContainer.from_dict(source[&#34;longitudes&#34;])
-    result.altitudes = WelfordStatsContainer.from_dict(source[&#34;altitudes&#34;])
-    result.first_last_location_data = flb
+    result: List[Tuple] = []
+    for s in [_AUDIO_FIELD_NAME, _COMPRESSED_AUDIO_FIELD_NAME]:
+        if _has_sensor(packet, s):
+            sensor = _get_sensor_for_data_extraction(s, packet)
+            result.append((s, sensor.sensor_description, sensor.sample_rate))
+    for s in [
+        _PRESSURE_FIELD_NAME,
+        _LOCATION_FIELD_NAME,
+        _ACCELEROMETER_FIELD_NAME,
+        _AMBIENT_TEMPERATURE_FIELD_NAME,
+        _GRAVITY_FIELD_NAME,
+        _GYROSCOPE_FIELD_NAME,
+        _IMAGE_FIELD_NAME,
+        _LIGHT_FIELD_NAME,
+        _LINEAR_ACCELERATION_FIELD_NAME,
+        _MAGNETOMETER_FIELD_NAME,
+        _ORIENTATION_FIELD_NAME,
+        _PROXIMITY_FIELD_NAME,
+        _RELATIVE_HUMIDITY_FIELD_NAME,
+        _ROTATION_VECTOR_FIELD_NAME,
+        _VELOCITY_FIELD_NAME,
+    ]:
+        if _has_sensor(packet, s):
+            sensor = _get_sensor_for_data_extraction(s, packet)
+            result.append((s, sensor.sensor_description, sensor.timestamps.mean_sample_rate))
+    if packet.station_information.HasField(&#34;station_metrics&#34;):
+        result.insert(
+            2,
+            (
+                _HEALTH_FIELD_NAME,
+                &#34;station_metrics&#34;,
+                packet.station_information.station_metrics.timestamps.mean_sample_rate,
+            ),
+        )
     return result</code></pre>
 </details>
 </dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.LocationModel.finalized_altitude"><code class="name flex">
-<span>def <span class="ident">finalized_altitude</span></span>(<span>self) ‑> Tuple[float, float]</span>
+<dt id="redvox.common.session_model_utils.get_dynamic_data"><code class="name flex">
+<span>def <span class="ident">get_dynamic_data</span></span>(<span>packet: src.redvox_api_m.redvox_api_m_pb2.RedvoxPacketM) ‑> Dict</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: the mean and variance of the altitude</p></div>
+<div class="desc"><p>:param packet: packet to get data from
+:return: Dictionary of all dynamic session data from the packet</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def finalized_altitude(self) -&gt; Tuple[float, float]:
+<pre><code class="python">def get_dynamic_data(packet: api_m.RedvoxPacketM) -&gt; Dict:
     &#34;&#34;&#34;
-    :return: the mean and variance of the altitude
+    :param packet: packet to get data from
+    :return: Dictionary of all dynamic session data from the packet
     &#34;&#34;&#34;
-    return self.altitudes.finalized()</code></pre>
+    location = get_location_data(packet)
+    battery = packet.station_information.station_metrics.battery.value_statistics.mean
+    temperature = packet.station_information.station_metrics.temperature.value_statistics.mean
+    return {&#34;location&#34;: location, &#34;battery&#34;: battery, &#34;temperature&#34;: temperature}</code></pre>
 </details>
 </dd>
-<dt id="redvox.common.session_model_utils.LocationModel.finalized_latitude"><code class="name flex">
-<span>def <span class="ident">finalized_latitude</span></span>(<span>self) ‑> Tuple[float, float]</span>
+<dt id="redvox.common.session_model_utils.get_local_timesync"><code class="name flex">
+<span>def <span class="ident">get_local_timesync</span></span>(<span>packet: src.redvox_api_m.redvox_api_m_pb2.RedvoxPacketM) ‑> Optional[Tuple]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: the mean and variance of the latitude</p></div>
+<div class="desc"><p>if the data exists, the returning tuple looks like:</p>
+<p>(start_timestamp, end_timestamp, num_exchanges, best_latency, best_offset, list of TimeSyncData)</p>
+<p>:param packet: packet to get timesync data from
+:return: Timing object using data from packet or None</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def finalized_latitude(self) -&gt; Tuple[float, float]:
+<pre><code class="python">def get_local_timesync(packet: api_m.RedvoxPacketM) -&gt; Optional[Tuple]:
     &#34;&#34;&#34;
-    :return: the mean and variance of the latitude
+    if the data exists, the returning tuple looks like:
+
+    (start_timestamp, end_timestamp, num_exchanges, best_latency, best_offset, list of TimeSyncData)
+
+    :param packet: packet to get timesync data from
+    :return: Timing object using data from packet or None
     &#34;&#34;&#34;
-    return self.latitudes.finalized()</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.LocationModel.finalized_longitude"><code class="name flex">
-<span>def <span class="ident">finalized_longitude</span></span>(<span>self) ‑> Tuple[float, float]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: the mean and variance of the longitude</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def finalized_longitude(self) -&gt; Tuple[float, float]:
-    &#34;&#34;&#34;
-    :return: the mean and variance of the longitude
-    &#34;&#34;&#34;
-    return self.longitudes.finalized()</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.LocationModel.to_dict"><code class="name flex">
-<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: LocationModel as a dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_dict(self) -&gt; dict:
-    &#34;&#34;&#34;
-    :return: LocationModel as a dictionary
-    &#34;&#34;&#34;
-    return {
-        &#34;latitudes&#34;: self.latitudes.to_dict(),
-        &#34;longitudes&#34;: self.longitudes.to_dict(),
-        &#34;altitudes&#34;: self.altitudes.to_dict(),
-        &#34;first_last_location_data&#34;: self.first_last_location_data.to_dict(),
-    }</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.LocationModel.update_location"><code class="name flex">
-<span>def <span class="ident">update_location</span></span>(<span>self, lat: float, lon: float, alt: float, timestamp: float)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Add a location to the LocationStats</p>
-<p>:param lat: float, latitude in degrees
-:param lon: float, longitude in degrees
-:param alt: float, altitude in meters
-:param timestamp: float, timestamp of location in microseconds since epoch UTC</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_location(self, lat: float, lon: float, alt: float, timestamp: float):
-    &#34;&#34;&#34;
-    Add a location to the LocationStats
-
-    :param lat: float, latitude in degrees
-    :param lon: float, longitude in degrees
-    :param alt: float, altitude in meters
-    :param timestamp: float, timestamp of location in microseconds since epoch UTC
-    &#34;&#34;&#34;
-    self.latitudes.update(lat)
-    self.longitudes.update(lon)
-    self.altitudes.update(alt)
-    self.first_last_location_data.add(timestamp, (lat, lon, alt))</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
-<dt id="redvox.common.session_model_utils.MetricsSessionModel"><code class="flex name class">
-<span>class <span class="ident">MetricsSessionModel</span></span>
-<span>(</span><span>capacity: int)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Metrics stored by the SessionModel</p>
-<p>initialize the metrics stored by the session model</p>
-<p>:param capacity: int, number of data points to store</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class MetricsSessionModel:
-    &#34;&#34;&#34;
-    Metrics stored by the SessionModel
-    &#34;&#34;&#34;
-    def __init__(self, capacity: int):
-        &#34;&#34;&#34;
-        initialize the metrics stored by the session model
-
-        :param capacity: int, number of data points to store
-        &#34;&#34;&#34;
-        self.capacity: int = capacity
-        self.location: Dict[str, LocationModel] = {}
-        self.battery: WelfordStatsContainer = WelfordStatsContainer()
-        self.temperature: WelfordStatsContainer = WelfordStatsContainer()
-
-    def __repr__(self):
-        return f&#34;location: {self.location}, &#34; \
-               f&#34;battery: {self.battery}, &#34; \
-               f&#34;temperature: {self.temperature}&#34;
-
-    def __str__(self):
-        return f&#34;location: {self.location}, &#34; \
-               f&#34;battery percent: {self.battery}, &#34; \
-               f&#34;temperature (C): {self.temperature}&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: MetricsSessionModel as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;capacity&#34;: self.capacity,
-            &#34;location&#34;: {n: m.to_dict() for n, m in self.location.items()},
-            &#34;battery&#34;: self.battery.to_dict(),
-            &#34;temperature&#34;: self.temperature.to_dict()
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;MetricsSessionModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read from
-        :return: MetricsSessionModel from dictionary
-        &#34;&#34;&#34;
-        result = MetricsSessionModel(source[&#34;capacity&#34;])
-        result.location = {n: LocationModel.from_dict(m) for n, m in source[&#34;location&#34;].items()}
-        result.battery = WelfordStatsContainer.from_dict(source[&#34;battery&#34;])
-        result.temperature = WelfordStatsContainer.from_dict(source[&#34;temperature&#34;])
-        return result
-
-    def add_location(self, source: str, lat: float, lon: float, alt: float, timestamp: float):
-        &#34;&#34;&#34;
-        add a location from the named source to the session model
-
-        :param source: str, name of the location data source
-        :param lat: float, latitude in degrees
-        :param lon: float, longitude in degrees
-        :param alt: float, altitude in meters
-        :param timestamp: float, timestamp of location in microseconds since epoch UTC
-        &#34;&#34;&#34;
-        if source not in self.location.keys():
-            self.location[source] = LocationModel(self.capacity)
-        self.location[source].update_location(lat, lon, alt, timestamp)
-
-    def add_battery(self, data: float):
-        &#34;&#34;&#34;
-        add battery data to the session model
-
-        :param data: float, battery percentage to add
-        &#34;&#34;&#34;
-        self.battery.update(data)
-
-    def add_temperature(self, data: float):
-        &#34;&#34;&#34;
-        add temperature data to the session model
-
-        :param data: float, temperature in Celsius to add
-        &#34;&#34;&#34;
-        self.temperature.update(data)</code></pre>
-</details>
-<h3>Static methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.MetricsSessionModel.from_dict"><code class="name flex">
-<span>def <span class="ident">from_dict</span></span>(<span>source: dict) ‑> <a title="redvox.common.session_model_utils.MetricsSessionModel" href="#redvox.common.session_model_utils.MetricsSessionModel">MetricsSessionModel</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>:param source: dictionary to read from
-:return: MetricsSessionModel from dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def from_dict(source: dict) -&gt; &#34;MetricsSessionModel&#34;:
-    &#34;&#34;&#34;
-    :param source: dictionary to read from
-    :return: MetricsSessionModel from dictionary
-    &#34;&#34;&#34;
-    result = MetricsSessionModel(source[&#34;capacity&#34;])
-    result.location = {n: LocationModel.from_dict(m) for n, m in source[&#34;location&#34;].items()}
-    result.battery = WelfordStatsContainer.from_dict(source[&#34;battery&#34;])
-    result.temperature = WelfordStatsContainer.from_dict(source[&#34;temperature&#34;])
-    return result</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.MetricsSessionModel.add_battery"><code class="name flex">
-<span>def <span class="ident">add_battery</span></span>(<span>self, data: float)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add battery data to the session model</p>
-<p>:param data: float, battery percentage to add</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_battery(self, data: float):
-    &#34;&#34;&#34;
-    add battery data to the session model
-
-    :param data: float, battery percentage to add
-    &#34;&#34;&#34;
-    self.battery.update(data)</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.MetricsSessionModel.add_location"><code class="name flex">
-<span>def <span class="ident">add_location</span></span>(<span>self, source: str, lat: float, lon: float, alt: float, timestamp: float)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add a location from the named source to the session model</p>
-<p>:param source: str, name of the location data source
-:param lat: float, latitude in degrees
-:param lon: float, longitude in degrees
-:param alt: float, altitude in meters
-:param timestamp: float, timestamp of location in microseconds since epoch UTC</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_location(self, source: str, lat: float, lon: float, alt: float, timestamp: float):
-    &#34;&#34;&#34;
-    add a location from the named source to the session model
-
-    :param source: str, name of the location data source
-    :param lat: float, latitude in degrees
-    :param lon: float, longitude in degrees
-    :param alt: float, altitude in meters
-    :param timestamp: float, timestamp of location in microseconds since epoch UTC
-    &#34;&#34;&#34;
-    if source not in self.location.keys():
-        self.location[source] = LocationModel(self.capacity)
-    self.location[source].update_location(lat, lon, alt, timestamp)</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.MetricsSessionModel.add_temperature"><code class="name flex">
-<span>def <span class="ident">add_temperature</span></span>(<span>self, data: float)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>add temperature data to the session model</p>
-<p>:param data: float, temperature in Celsius to add</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def add_temperature(self, data: float):
-    &#34;&#34;&#34;
-    add temperature data to the session model
-
-    :param data: float, temperature in Celsius to add
-    &#34;&#34;&#34;
-    self.temperature.update(data)</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.MetricsSessionModel.to_dict"><code class="name flex">
-<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: MetricsSessionModel as a dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_dict(self) -&gt; dict:
-    &#34;&#34;&#34;
-    :return: MetricsSessionModel as a dictionary
-    &#34;&#34;&#34;
-    return {
-        &#34;capacity&#34;: self.capacity,
-        &#34;location&#34;: {n: m.to_dict() for n, m in self.location.items()},
-        &#34;battery&#34;: self.battery.to_dict(),
-        &#34;temperature&#34;: self.temperature.to_dict()
-    }</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
-<dt id="redvox.common.session_model_utils.SensorModel"><code class="flex name class">
-<span>class <span class="ident">SensorModel</span></span>
-<span>(</span><span>name: str, desc: str, mean_sample_rate: float)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>A simple representation of a Sensor.
-Sample rate data is in Hz</p>
-<h2 id="properties">Properties</h2>
-<p>name: str, name of the Sensor</p>
-<p>description: str, description of the Sensor</p>
-<p>sample_rate_stats: WelfordStatsContainer used to calculate the mean, std deviation, variance, etc. of the
-sensor's sample rate</p>
-<p>initialize SensorModel</p>
-<p>:param name: name of the sensor
-:param desc: description of the sensor
-:param mean_sample_rate: mean sample rate of the sensor in Hz</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class SensorModel:
-    &#34;&#34;&#34;
-    A simple representation of a Sensor.  Sample rate data is in Hz
-
-    Properties:
-        name: str, name of the Sensor
-
-        description: str, description of the Sensor
-
-        sample_rate_stats: WelfordStatsContainer used to calculate the mean, std deviation, variance, etc. of the
-        sensor&#39;s sample rate
-    &#34;&#34;&#34;
-    def __init__(self, name: str, desc: str, mean_sample_rate: float):
-        &#34;&#34;&#34;
-        initialize SensorModel
-
-        :param name: name of the sensor
-        :param desc: description of the sensor
-        :param mean_sample_rate: mean sample rate of the sensor in Hz
-        &#34;&#34;&#34;
-        self.name: str = name
-        self.description: str = desc
-        self.sample_rate_stats: WelfordStatsContainer = WelfordStatsContainer()
-        self.sample_rate_stats.update(mean_sample_rate)
-
-    def __repr__(self):
-        return f&#34;name: {self.name}, &#34; \
-               f&#34;description: {self.description}, &#34; \
-               f&#34;sample_rate_stats: {self.sample_rate_stats}&#34;
-
-    def to_dict(self) -&gt; Dict:
-        &#34;&#34;&#34;
-        :return: sensor model as dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;name&#34;: self.name,
-            &#34;description&#34;: self.description,
-            &#34;sample_rate_stats&#34;: self.sample_rate_stats.to_dict()
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;SensorModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read
-        :return: SensorModel from dictionary
-        &#34;&#34;&#34;
-        result = SensorModel(source[&#34;name&#34;], source[&#34;description&#34;], 0)
-        result.sample_rate_stats = WelfordStatsContainer.from_dict(source[&#34;sample_rate_stats&#34;])
-        return result
-
-    def update(self, new_mean_sr: float):
-        &#34;&#34;&#34;
-        adds a new mean sample rate to the SensorModel
-
-        :param new_mean_sr: new mean sample rate to add
-        &#34;&#34;&#34;
-        self.sample_rate_stats.update(new_mean_sr)
-
-    def finalized(self) -&gt; Tuple[float, float]:
-        &#34;&#34;&#34;
-        :return: the mean and variance of the sample rate stats
-        &#34;&#34;&#34;
-        return self.sample_rate_stats.finalized()</code></pre>
-</details>
-<h3>Static methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.SensorModel.from_dict"><code class="name flex">
-<span>def <span class="ident">from_dict</span></span>(<span>source: dict) ‑> <a title="redvox.common.session_model_utils.SensorModel" href="#redvox.common.session_model_utils.SensorModel">SensorModel</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>:param source: dictionary to read
-:return: SensorModel from dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def from_dict(source: dict) -&gt; &#34;SensorModel&#34;:
-    &#34;&#34;&#34;
-    :param source: dictionary to read
-    :return: SensorModel from dictionary
-    &#34;&#34;&#34;
-    result = SensorModel(source[&#34;name&#34;], source[&#34;description&#34;], 0)
-    result.sample_rate_stats = WelfordStatsContainer.from_dict(source[&#34;sample_rate_stats&#34;])
-    return result</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.SensorModel.finalized"><code class="name flex">
-<span>def <span class="ident">finalized</span></span>(<span>self) ‑> Tuple[float, float]</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: the mean and variance of the sample rate stats</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def finalized(self) -&gt; Tuple[float, float]:
-    &#34;&#34;&#34;
-    :return: the mean and variance of the sample rate stats
-    &#34;&#34;&#34;
-    return self.sample_rate_stats.finalized()</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.SensorModel.to_dict"><code class="name flex">
-<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> Dict</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: sensor model as dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_dict(self) -&gt; Dict:
-    &#34;&#34;&#34;
-    :return: sensor model as dictionary
-    &#34;&#34;&#34;
-    return {
-        &#34;name&#34;: self.name,
-        &#34;description&#34;: self.description,
-        &#34;sample_rate_stats&#34;: self.sample_rate_stats.to_dict()
-    }</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.SensorModel.update"><code class="name flex">
-<span>def <span class="ident">update</span></span>(<span>self, new_mean_sr: float)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>adds a new mean sample rate to the SensorModel</p>
-<p>:param new_mean_sr: new mean sample rate to add</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update(self, new_mean_sr: float):
-    &#34;&#34;&#34;
-    adds a new mean sample rate to the SensorModel
-
-    :param new_mean_sr: new mean sample rate to add
-    &#34;&#34;&#34;
-    self.sample_rate_stats.update(new_mean_sr)</code></pre>
-</details>
-</dd>
-</dl>
-</dd>
-<dt id="redvox.common.session_model_utils.TimeSyncModel"><code class="flex name class">
-<span>class <span class="ident">TimeSyncModel</span></span>
-<span>(</span><span>capacity: int, first_timesync_timestamp: float = inf, last_timesync_timestamp: float = 0.0, mean_latency: float = 0.0, mean_offset: float = 0.0, num_exchanges: int = 0)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>TimeSync data used to build models
-All times and timestamps are in microseconds since epoch UTC</p>
-<h2 id="properties">Properties</h2>
-<p>first_timesync_timestamp: float, the first timestamp of the TimeSync data.
-Default infinity</p>
-<p>last_timesync_timestamp: float, the last timestamp of the TimeSync data.
-Default 0.0</p>
-<p>mean_latency: float, the mean latency of the TimeSync data.
-Default 0.0</p>
-<p>mean_offset: float, the mean offset of the TimeSync data.
-Default 0.0</p>
-<p>num_exchanges: int, number of exchanges in the TimeSync data.
-Default 0</p>
-<p>first_last_timesync_data: FirstLastBuffer of TimeSync data, a fixed size list of timesync exchanges used to
-calculate the offset model.</p>
-<p>Initialize the TimeSyncModel</p>
-<p>:param capacity: the number of data points to keep in each of the first and last data buffers
-:param first_timesync_timestamp: the first timestamp of the TimeSync data.
-Default infinity
-:param last_timesync_timestamp: the last timestamp of the TimeSync data.
-Default 0.0
-:param mean_latency: the mean latency of the TimeSync data.
-Default 0.0
-:param mean_offset: the mean offset of the TimeSync data.
-Default 0.0
-:param num_exchanges: the number of exchanges in the TimeSync data.
-Default 0</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class TimeSyncModel:
-    &#34;&#34;&#34;
-    TimeSync data used to build models
-    All times and timestamps are in microseconds since epoch UTC
-
-    Properties:
-        first_timesync_timestamp: float, the first timestamp of the TimeSync data.  Default infinity
-
-        last_timesync_timestamp: float, the last timestamp of the TimeSync data.  Default 0.0
-
-        mean_latency: float, the mean latency of the TimeSync data.  Default 0.0
-
-        mean_offset: float, the mean offset of the TimeSync data.  Default 0.0
-
-        num_exchanges: int, number of exchanges in the TimeSync data.  Default 0
-
-        first_last_timesync_data: FirstLastBuffer of TimeSync data, a fixed size list of timesync exchanges used to
-                                    calculate the offset model.
-    &#34;&#34;&#34;
-    def __init__(self,
-                 capacity: int,
-                 first_timesync_timestamp: float = float(&#34;inf&#34;),
-                 last_timesync_timestamp: float = 0.0,
-                 mean_latency: float = 0.0,
-                 mean_offset: float = 0.0,
-                 num_exchanges: int = 0
-                 ):
-        &#34;&#34;&#34;
-        Initialize the TimeSyncModel
-
-        :param capacity: the number of data points to keep in each of the first and last data buffers
-        :param first_timesync_timestamp: the first timestamp of the TimeSync data.  Default infinity
-        :param last_timesync_timestamp: the last timestamp of the TimeSync data.  Default 0.0
-        :param mean_latency: the mean latency of the TimeSync data.  Default 0.0
-        :param mean_offset: the mean offset of the TimeSync data.  Default 0.0
-        :param num_exchanges: the number of exchanges in the TimeSync data.  Default 0
-        &#34;&#34;&#34;
-        self.first_timesync_timestamp = first_timesync_timestamp
-        self.last_timesync_timestamp = last_timesync_timestamp
-        self.mean_latency = mean_latency
-        self.mean_offset = mean_offset
-        self.num_exchanges = num_exchanges
-        self.first_last_timesync_data: FirstLastBuffer = FirstLastBuffer(capacity)
-
-    def __repr__(self):
-        return f&#34;first_timesync_timestamp: {self.first_timesync_timestamp}, &#34; \
-               f&#34;last_timesync_timestamp: {self.last_timesync_timestamp}, &#34; \
-               f&#34;mean_latency: {self.mean_latency}, &#34; \
-               f&#34;mean_offset: {self.mean_offset}, &#34; \
-               f&#34;num_exchanges: {self.num_exchanges}, &#34; \
-               f&#34;first_last_timesync_data: {self.first_last_timesync_data.to_dict()}&#34;
-
-    def to_dict(self) -&gt; dict:
-        &#34;&#34;&#34;
-        :return: TimeSyncModel as a dictionary
-        &#34;&#34;&#34;
-        return {
-            &#34;first_timesync_timestamp&#34;: self.first_timesync_timestamp,
-            &#34;last_timesync_timestamp&#34;: self.last_timesync_timestamp,
-            &#34;mean_latency&#34;: self.mean_latency,
-            &#34;mean_offset&#34;: self.mean_offset,
-            &#34;num_exchanges&#34;: self.num_exchanges,
-            &#34;first_last_timesync_data&#34;: self.first_last_timesync_data.to_dict()
-        }
-
-    @staticmethod
-    def from_dict(source: dict) -&gt; &#34;TimeSyncModel&#34;:
-        &#34;&#34;&#34;
-        :param source: dictionary to read from
-        :return: TimeSyncModel from dictionary
-        &#34;&#34;&#34;
-        flb = FirstLastBuffer.from_dict(source[&#34;first_last_timesync_data&#34;])
-        result = TimeSyncModel(0, source[&#34;first_timesync_timestamp&#34;],
-                               source[&#34;last_timesync_timestamp&#34;], source[&#34;mean_latency&#34;], source[&#34;mean_offset&#34;],
-                               source[&#34;num_exchanges&#34;])
-        result.first_last_timesync_data = flb
-        return result
-
-    def update_model(self, ts: TimeSync):
-        &#34;&#34;&#34;
-        Use a TimeSync object to update the TimeSyncModel
-
-        :param ts: TimeSync object to update the model with
-        &#34;&#34;&#34;
-        if ts.num_tri_messages() &gt; 0:
-            self.num_exchanges += ts.num_tri_messages()
-            self.mean_latency = \
-                (self.mean_latency * self.num_exchanges + ts.best_latency()) / (self.num_exchanges + 1)
-            self.mean_offset = \
-                (self.mean_offset * self.num_exchanges + ts.best_offset()) / (self.num_exchanges + 1)
-            _ts_latencies = ts.latencies().flatten()
-            _ts_offsets = ts.offsets().flatten()
-            _ts_timestamps = ts.get_device_exchanges_timestamps()
-            if ts.data_start_timestamp() &lt; self.first_timesync_timestamp:
-                self.first_timesync_timestamp = ts.data_start_timestamp()
-            if ts.data_end_timestamp() &gt; self.last_timesync_timestamp:
-                self.last_timesync_timestamp = ts.data_end_timestamp()
-            # add data to the buffers
-            for i in range(len(_ts_timestamps)):
-                self.first_last_timesync_data.add(_ts_timestamps[i], (_ts_latencies[i], _ts_offsets[i]))
-
-    def create_offset_model(self) -&gt; OffsetModel:
-        &#34;&#34;&#34;
-        :return: OffsetModel using the data in the TimeSyncModel
-        &#34;&#34;&#34;
-        latencies = []
-        offsets = []
-        timestamps = []
-        for n in self.first_last_timesync_data.first_data:
-            latencies.append(n[1][0])
-            offsets.append(n[1][0])
-            timestamps.append(n[0])
-        for n in self.first_last_timesync_data.last_data:
-            latencies.append(n[1][0])
-            offsets.append(n[1][0])
-            timestamps.append(n[0])
-        return OffsetModel(np.array(latencies), np.array(offsets), np.array(timestamps),
-                           self.first_timesync_timestamp, self.last_timesync_timestamp,
-                           min_samples_per_bin=1)</code></pre>
-</details>
-<h3>Static methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.TimeSyncModel.from_dict"><code class="name flex">
-<span>def <span class="ident">from_dict</span></span>(<span>source: dict) ‑> <a title="redvox.common.session_model_utils.TimeSyncModel" href="#redvox.common.session_model_utils.TimeSyncModel">TimeSyncModel</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>:param source: dictionary to read from
-:return: TimeSyncModel from dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@staticmethod
-def from_dict(source: dict) -&gt; &#34;TimeSyncModel&#34;:
-    &#34;&#34;&#34;
-    :param source: dictionary to read from
-    :return: TimeSyncModel from dictionary
-    &#34;&#34;&#34;
-    flb = FirstLastBuffer.from_dict(source[&#34;first_last_timesync_data&#34;])
-    result = TimeSyncModel(0, source[&#34;first_timesync_timestamp&#34;],
-                           source[&#34;last_timesync_timestamp&#34;], source[&#34;mean_latency&#34;], source[&#34;mean_offset&#34;],
-                           source[&#34;num_exchanges&#34;])
-    result.first_last_timesync_data = flb
-    return result</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="redvox.common.session_model_utils.TimeSyncModel.create_offset_model"><code class="name flex">
-<span>def <span class="ident">create_offset_model</span></span>(<span>self) ‑> <a title="redvox.common.offset_model.OffsetModel" href="offset_model.html#redvox.common.offset_model.OffsetModel">OffsetModel</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: OffsetModel using the data in the TimeSyncModel</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def create_offset_model(self) -&gt; OffsetModel:
-    &#34;&#34;&#34;
-    :return: OffsetModel using the data in the TimeSyncModel
-    &#34;&#34;&#34;
-    latencies = []
-    offsets = []
-    timestamps = []
-    for n in self.first_last_timesync_data.first_data:
-        latencies.append(n[1][0])
-        offsets.append(n[1][0])
-        timestamps.append(n[0])
-    for n in self.first_last_timesync_data.last_data:
-        latencies.append(n[1][0])
-        offsets.append(n[1][0])
-        timestamps.append(n[0])
-    return OffsetModel(np.array(latencies), np.array(offsets), np.array(timestamps),
-                       self.first_timesync_timestamp, self.last_timesync_timestamp,
-                       min_samples_per_bin=1)</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.TimeSyncModel.to_dict"><code class="name flex">
-<span>def <span class="ident">to_dict</span></span>(<span>self) ‑> dict</span>
-</code></dt>
-<dd>
-<div class="desc"><p>:return: TimeSyncModel as a dictionary</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_dict(self) -&gt; dict:
-    &#34;&#34;&#34;
-    :return: TimeSyncModel as a dictionary
-    &#34;&#34;&#34;
-    return {
-        &#34;first_timesync_timestamp&#34;: self.first_timesync_timestamp,
-        &#34;last_timesync_timestamp&#34;: self.last_timesync_timestamp,
-        &#34;mean_latency&#34;: self.mean_latency,
-        &#34;mean_offset&#34;: self.mean_offset,
-        &#34;num_exchanges&#34;: self.num_exchanges,
-        &#34;first_last_timesync_data&#34;: self.first_last_timesync_data.to_dict()
-    }</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.session_model_utils.TimeSyncModel.update_model"><code class="name flex">
-<span>def <span class="ident">update_model</span></span>(<span>self, ts: <a title="redvox.common.timesync.TimeSync" href="timesync.html#redvox.common.timesync.TimeSync">TimeSync</a>)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Use a TimeSync object to update the TimeSyncModel</p>
-<p>:param ts: TimeSync object to update the model with</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def update_model(self, ts: TimeSync):
-    &#34;&#34;&#34;
-    Use a TimeSync object to update the TimeSyncModel
-
-    :param ts: TimeSync object to update the model with
-    &#34;&#34;&#34;
+    ts = TimeSync().from_raw_packets([packet])
     if ts.num_tri_messages() &gt; 0:
-        self.num_exchanges += ts.num_tri_messages()
-        self.mean_latency = \
-            (self.mean_latency * self.num_exchanges + ts.best_latency()) / (self.num_exchanges + 1)
-        self.mean_offset = \
-            (self.mean_offset * self.num_exchanges + ts.best_offset()) / (self.num_exchanges + 1)
         _ts_latencies = ts.latencies().flatten()
         _ts_offsets = ts.offsets().flatten()
         _ts_timestamps = ts.get_device_exchanges_timestamps()
-        if ts.data_start_timestamp() &lt; self.first_timesync_timestamp:
-            self.first_timesync_timestamp = ts.data_start_timestamp()
-        if ts.data_end_timestamp() &gt; self.last_timesync_timestamp:
-            self.last_timesync_timestamp = ts.data_end_timestamp()
         # add data to the buffers
-        for i in range(len(_ts_timestamps)):
-            self.first_last_timesync_data.add(_ts_timestamps[i], (_ts_latencies[i], _ts_offsets[i]))</code></pre>
+        _ts_data = [
+            sm.TimeSyncData(_ts_timestamps[i], _ts_latencies[i], _ts_offsets[i]) for i in range(len(_ts_timestamps))
+        ]
+        return (
+            ts.data_start_timestamp(),
+            ts.data_end_timestamp(),
+            ts.num_tri_messages(),
+            ts.best_latency(),
+            ts.best_offset(),
+            _ts_data,
+        )
+    return None</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.session_model_utils.get_location_data"><code class="name flex">
+<span>def <span class="ident">get_location_data</span></span>(<span>packet: src.redvox_api_m.redvox_api_m_pb2.RedvoxPacketM) ‑> List[Tuple[str, float, float, float, float]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param packet: packet to get location data from
+:return: List of location data as a tuples from the packet</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_location_data(packet: api_m.RedvoxPacketM) -&gt; List[Tuple[str, float, float, float, float]]:
+    &#34;&#34;&#34;
+    :param packet: packet to get location data from
+    :return: List of location data as a tuples from the packet
+    &#34;&#34;&#34;
+    locations = []
+    loc = packet.sensors.location
+    lat = lon = alt = ts = 0.0
+    source = &#34;UNKNOWN&#34;
+    num_pts = int(loc.timestamps.timestamp_statistics.count)
+    # check for actual location values
+    if len(loc.location_providers) &lt; 1:
+        lat = loc.latitude_samples.value_statistics.mean
+        lon = loc.longitude_samples.value_statistics.mean
+        alt = loc.altitude_samples.value_statistics.mean
+        ts = loc.timestamps.timestamp_statistics.mean
+    elif (
+        num_pts &gt; 0
+        and loc.latitude_samples.value_statistics.count &gt; 0
+        and loc.longitude_samples.value_statistics.count &gt; 0
+        and loc.altitude_samples.value_statistics.count &gt; 0
+        and num_pts == loc.latitude_samples.value_statistics.count
+        and num_pts == loc.altitude_samples.value_statistics.count
+        and num_pts == loc.longitude_samples.value_statistics.count
+    ):
+        lats = loc.latitude_samples.values
+        lons = loc.longitude_samples.values
+        alts = loc.altitude_samples.values
+        tstp = loc.timestamps.timestamps
+        for i in range(num_pts):
+            source = (
+                &#34;UNKNOWN&#34;
+                if len(loc.location_providers) != num_pts
+                else COLUMN_TO_ENUM_FN[&#34;location_provider&#34;](loc.location_providers[i])
+            )
+            locations.append((source, lats[i], lons[i], alts[i], tstp[i]))
+        # set a special flag for later, so we don&#39;t add an extra location value
+        source = None
+    elif loc.last_best_location is not None:
+        ts = loc.last_best_location.latitude_longitude_timestamp.mach
+        source = loc.last_best_location.location_provider
+        lat = loc.last_best_location.latitude
+        lon = loc.last_best_location.longitude
+        alt = loc.last_best_location.altitude
+    elif loc.overall_best_location is not None:
+        ts = loc.overall_best_location.latitude_longitude_timestamp.mach
+        source = loc.overall_best_location.location_provider
+        lat = loc.overall_best_location.latitude
+        lon = loc.overall_best_location.longitude
+        alt = loc.overall_best_location.altitude
+    # source is not None if we got only one location through non-usual methods
+    if source is not None:
+        locations.append((source, lat, lon, alt, ts))
+    return locations</code></pre>
 </details>
 </dd>
 </dl>
-</dd>
-</dl>
+</section>
+<section>
 </section>
 </article>
 <nav id="sidebar">
@@ -1676,57 +830,18 @@ def from_dict(source: dict) -&gt; &#34;TimeSyncModel&#34;:
 <li><code><a title="redvox.common" href="index.html">redvox.common</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="redvox.common.session_model_utils.FirstLastBuffer" href="#redvox.common.session_model_utils.FirstLastBuffer">FirstLastBuffer</a></code></h4>
+<li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="redvox.common.session_model_utils.FirstLastBuffer.add" href="#redvox.common.session_model_utils.FirstLastBuffer.add">add</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.FirstLastBuffer.first_data_as_string" href="#redvox.common.session_model_utils.FirstLastBuffer.first_data_as_string">first_data_as_string</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.FirstLastBuffer.from_dict" href="#redvox.common.session_model_utils.FirstLastBuffer.from_dict">from_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.FirstLastBuffer.last_data_as_string" href="#redvox.common.session_model_utils.FirstLastBuffer.last_data_as_string">last_data_as_string</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.FirstLastBuffer.to_dict" href="#redvox.common.session_model_utils.FirstLastBuffer.to_dict">to_dict</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="redvox.common.session_model_utils.LocationModel" href="#redvox.common.session_model_utils.LocationModel">LocationModel</a></code></h4>
-<ul class="two-column">
-<li><code><a title="redvox.common.session_model_utils.LocationModel.finalized_altitude" href="#redvox.common.session_model_utils.LocationModel.finalized_altitude">finalized_altitude</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.LocationModel.finalized_latitude" href="#redvox.common.session_model_utils.LocationModel.finalized_latitude">finalized_latitude</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.LocationModel.finalized_longitude" href="#redvox.common.session_model_utils.LocationModel.finalized_longitude">finalized_longitude</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.LocationModel.from_dict" href="#redvox.common.session_model_utils.LocationModel.from_dict">from_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.LocationModel.to_dict" href="#redvox.common.session_model_utils.LocationModel.to_dict">to_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.LocationModel.update_location" href="#redvox.common.session_model_utils.LocationModel.update_location">update_location</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="redvox.common.session_model_utils.MetricsSessionModel" href="#redvox.common.session_model_utils.MetricsSessionModel">MetricsSessionModel</a></code></h4>
-<ul class="">
-<li><code><a title="redvox.common.session_model_utils.MetricsSessionModel.add_battery" href="#redvox.common.session_model_utils.MetricsSessionModel.add_battery">add_battery</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.MetricsSessionModel.add_location" href="#redvox.common.session_model_utils.MetricsSessionModel.add_location">add_location</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.MetricsSessionModel.add_temperature" href="#redvox.common.session_model_utils.MetricsSessionModel.add_temperature">add_temperature</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.MetricsSessionModel.from_dict" href="#redvox.common.session_model_utils.MetricsSessionModel.from_dict">from_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.MetricsSessionModel.to_dict" href="#redvox.common.session_model_utils.MetricsSessionModel.to_dict">to_dict</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="redvox.common.session_model_utils.SensorModel" href="#redvox.common.session_model_utils.SensorModel">SensorModel</a></code></h4>
-<ul class="">
-<li><code><a title="redvox.common.session_model_utils.SensorModel.finalized" href="#redvox.common.session_model_utils.SensorModel.finalized">finalized</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.SensorModel.from_dict" href="#redvox.common.session_model_utils.SensorModel.from_dict">from_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.SensorModel.to_dict" href="#redvox.common.session_model_utils.SensorModel.to_dict">to_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.SensorModel.update" href="#redvox.common.session_model_utils.SensorModel.update">update</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="redvox.common.session_model_utils.TimeSyncModel" href="#redvox.common.session_model_utils.TimeSyncModel">TimeSyncModel</a></code></h4>
-<ul class="">
-<li><code><a title="redvox.common.session_model_utils.TimeSyncModel.create_offset_model" href="#redvox.common.session_model_utils.TimeSyncModel.create_offset_model">create_offset_model</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.TimeSyncModel.from_dict" href="#redvox.common.session_model_utils.TimeSyncModel.from_dict">from_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.TimeSyncModel.to_dict" href="#redvox.common.session_model_utils.TimeSyncModel.to_dict">to_dict</a></code></li>
-<li><code><a title="redvox.common.session_model_utils.TimeSyncModel.update_model" href="#redvox.common.session_model_utils.TimeSyncModel.update_model">update_model</a></code></li>
-</ul>
-</li>
+<li><code><a title="redvox.common.session_model_utils.add_location_data" href="#redvox.common.session_model_utils.add_location_data">add_location_data</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.add_to_fst_buffer" href="#redvox.common.session_model_utils.add_to_fst_buffer">add_to_fst_buffer</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.add_to_location" href="#redvox.common.session_model_utils.add_to_location">add_to_location</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.add_to_lst_buffer" href="#redvox.common.session_model_utils.add_to_lst_buffer">add_to_lst_buffer</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.add_to_stats" href="#redvox.common.session_model_utils.add_to_stats">add_to_stats</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.add_to_welford" href="#redvox.common.session_model_utils.add_to_welford">add_to_welford</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.get_all_sensors_in_packet" href="#redvox.common.session_model_utils.get_all_sensors_in_packet">get_all_sensors_in_packet</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.get_dynamic_data" href="#redvox.common.session_model_utils.get_dynamic_data">get_dynamic_data</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.get_local_timesync" href="#redvox.common.session_model_utils.get_local_timesync">get_local_timesync</a></code></li>
+<li><code><a title="redvox.common.session_model_utils.get_location_data" href="#redvox.common.session_model_utils.get_location_data">get_location_data</a></code></li>
 </ul>
 </li>
 </ul>

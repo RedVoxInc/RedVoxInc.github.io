@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>redvox.common.reader_session_model API documentation</title>
+<meta name="description" content="This module describes methods to store session models from different sources.
+This information can be utilized by users as they see fit" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>redvox.common.reader_session_model</code></h1>
+</header>
+<section id="section-intro">
+<p>This module describes methods to store session models from different sources.
+This information can be utilized by users as they see fit</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+This module describes methods to store session models from different sources.
+This information can be utilized by users as they see fit
+&#34;&#34;&#34;
+
+from typing import List, Optional, Callable
+
+from redvox.common.session_model import SessionModel, LocalSessionModels
+from redvox.common.errors import RedVoxExceptions
+from redvox.cloud.client import cloud_client
+from redvox.cloud.session_model_api import SessionModelsResp, Session, DynamicSession
+from redvox.cloud.errors import CloudApiError
+
+
+class ModelsContainer:
+    &#34;&#34;&#34;
+    Helper module for ApiReader that manages the cloud and SDK session models requested by the ApiReader.
+
+    Cloud models take priority over local models.
+
+    Cloud and Local session models do not overlap.
+
+    Properties:
+        cloud_models: SessionModelsResp that contains all the cloud models
+
+        local_models: LocalSessionModels that contains all the locally created models
+    &#34;&#34;&#34;
+
+    def __init__(self, cloud: Optional[SessionModelsResp] = None, local: Optional[LocalSessionModels] = None):
+        &#34;&#34;&#34;
+        initialize the container.
+
+        :param cloud: SessionModelsResp containing all cloud session models
+        :param local: list of local session models
+        &#34;&#34;&#34;
+        self.cloud_models: Optional[SessionModelsResp] = cloud
+        self.local_models: Optional[LocalSessionModels] = local
+        self._errors: RedVoxExceptions = RedVoxExceptions(&#34;ModelsContainer&#34;)
+
+    def __repr__(self):
+        &#34;&#34;&#34;
+        :return: representation of ModelsContainer
+        &#34;&#34;&#34;
+        return f&#34;cloud_models: {self.cloud_models.__repr__()}, &#34; f&#34;local_models: {self.local_models.__repr__()}&#34;
+
+    def as_dict(self) -&gt; dict:
+        &#34;&#34;&#34;
+        :return: ModelsContainer as a dictionary
+        &#34;&#34;&#34;
+        return {
+            &#34;cloud_models&#34;: self.cloud_models.to_dict() if self.cloud_models else None,
+            &#34;local_models&#34;: self.local_models.as_dict() if self.local_models else None,
+            &#34;errors&#34;: self._errors.as_dict(),
+        }
+
+    @staticmethod
+    def from_dict(in_dict: dict) -&gt; &#34;ModelsContainer&#34;:
+        &#34;&#34;&#34;
+        :param in_dict: dictionary to convert into a ModelsContainer
+        :return: the ModelsContainer described by the dictionary
+        &#34;&#34;&#34;
+        result = ModelsContainer(
+            SessionModelsResp.from_dict(in_dict[&#34;cloud_models&#34;]) if &#34;cloud_models&#34; in in_dict.keys() else None,
+            LocalSessionModels.from_dict(in_dict[&#34;local_models&#34;]) if &#34;local_models&#34; in in_dict.keys() else None,
+        )
+        if &#34;errors&#34; in in_dict.keys():
+            result._errors = in_dict[&#34;errors&#34;]
+        return result
+
+    @staticmethod
+    def _model_operation(model: Session, func: Callable):
+        &#34;&#34;&#34;
+        :param model: Session model to operate on
+        :param func: function to perform; takes model as a parameter
+        :return: output of the function
+        &#34;&#34;&#34;
+        return func(model)
+
+    def get_model(self, session_key: str) -&gt; Optional[Session]:
+        &#34;&#34;&#34;
+        :param session_key: the key for the session.  format is: &#34;{STATION_ID}:{STATION_UUID}:{STATION_START_DATE}&#34;
+            where STATION_START_DATE is the integer start date of the station in microseconds since epoch UTC.
+        :return: cloud session model matching the key or None
+        &#34;&#34;&#34;
+        if self.cloud_models:
+            for n in self.cloud_models.sessions:
+                if session_key == n.session_key():
+                    return n
+        if self.local_models:
+            for n in self.local_models.sessions:
+                if session_key == n.cloud_session.session_key():
+                    return n.cloud_session
+        return None
+
+    def get_model_by_key(
+        self, station_id: str, uuid: Optional[str] = None, start_date: Optional[int] = None
+    ) -&gt; Optional[Session]:
+        &#34;&#34;&#34;
+        :param station_id: id of the station to get
+        :param uuid: uuid of station to get.  if None, gets the first station that matches other parameters.  Default
+                None
+        :param start_date: start date in epoch microseconds since epoch UTC of station.  if None, gets first station
+                that matches other parameters.  Default None
+        :return: First session that matches parameters or None
+        &#34;&#34;&#34;
+        # if uuid or start date given, check that it matches, if both given, check if both match
+        key_check_func = (
+            lambda x: (not uuid and not start_date)
+            or (uuid and x.uuid == uuid and not start_date)
+            or (start_date and x.start_ts == start_date and not uuid)
+            or (uuid and x.uuid == uuid and start_date and x.start_ts == start_date)
+        )
+        if self.cloud_models:
+            for n in self.cloud_models.sessions:
+                if n.id == station_id:
+                    if self._model_operation(n, key_check_func):
+                        return n
+        if self.local_models:
+            for n in self.local_models.sessions:
+                if n.cloud_session.id == station_id:
+                    if self._model_operation(n.cloud_session, key_check_func):
+                        return n.cloud_session
+        return None
+
+    def get_all_models(self) -&gt; List[Session]:
+        &#34;&#34;&#34;
+        :return: all session models in the container
+        &#34;&#34;&#34;
+        models = []
+        if self.cloud_models:
+            for n in self.cloud_models.sessions:
+                models.append(n)
+        if self.local_models:
+            for n in self.local_models.sessions:
+                models.append(n.cloud_session)
+        return models
+
+    def get_dynamic_session(self, key: str) -&gt; Optional[DynamicSession]:
+        &#34;&#34;&#34;
+        :param key: key to the dynamic session, formatted as: ID:UUID:SESSION_START_DATE:DYNAMIC_START:DYNAMIC_END
+                    where START and END values times as microseconds since epoch UTC.
+        :return: DynamicSession matching the key or None
+        &#34;&#34;&#34;
+        key_parts = key.split(&#34;:&#34;)
+        dynamic_session: Optional[DynamicSession] = None
+        try:
+            client: cloud_client.CloudClient
+            with cloud_client() as client:
+                dynamic_session: DynamicSession = client.request_dynamic_session_model(
+                    f&#34;{key_parts[0]}:{key_parts[1]}:{key_parts[2]}&#34;, int(key_parts[3]), int(key_parts[4])
+                ).dynamic_session
+        except CloudApiError:
+            pass
+        finally:
+            if not dynamic_session:
+                for n in self.local_models.sessions:
+                    for d, s in n.dynamic_sessions.items():
+                        if d == key:
+                            return s
+        return dynamic_session
+
+    def set_cloud_session(self, cloud_resp: SessionModelsResp):
+        &#34;&#34;&#34;
+        Set the cloud_models to the cloud_resp
+        :param cloud_resp: The new SessionModelsResp from a cloud query
+        &#34;&#34;&#34;
+        self.cloud_models = cloud_resp
+
+    def add_cloud_session(self, new_session: Session):
+        &#34;&#34;&#34;
+        Add a cloud Session to the container.  Does nothing if you try to add an existing key
+        :param new_session: session to add
+        &#34;&#34;&#34;
+        if self.cloud_models:
+            if self.get_model(new_session.session_key()):
+                self._errors.append(f&#34;Attempted to add existing key {new_session.session_key()}&#34;)
+            else:
+                self.cloud_models.sessions.append(new_session)
+        else:
+            self.set_cloud_session(SessionModelsResp(err=None, sessions=[new_session]))
+
+    def search_cloud_session(
+        self,
+        id_uuids: Optional[List[str]] = None,
+        owner: Optional[str] = None,
+        start_ts: Optional[int] = None,
+        end_ts: Optional[int] = None,
+        include_public: bool = False,
+    ):
+        &#34;&#34;&#34;
+        Search the cloud for a range of Session models and overwrites existing cloud_models if there are results.
+        Raises any exception found.
+
+        * All defaults are None except for include_public, which is False.
+        * Without any inputs, this function may add a large number of results.  We recommend you set at least one of
+          the parameters to reduce the number of results.
+
+        :param id_uuids: An optional list of IDs or ID:UUIDs.
+        :param owner: An optional owner.
+        :param start_ts: An optional start timestamp in microseconds since epoch UTC.
+        :param end_ts: An optional end timestamp in microseconds since epoch UTC.
+        :param include_public: Additionally include public sessions that may not be the same as the owner.
+        &#34;&#34;&#34;
+        try:
+            resp: Optional[SessionModelsResp]
+            with cloud_client() as client:
+                resp = client.request_session_models(id_uuids, owner, start_ts, end_ts, include_public)
+                if len(resp.sessions) &gt; 0:
+                    self.cloud_models = resp
+        except (CloudApiError, Exception):
+            raise
+
+    def set_local_session(self, local_sessions: List[SessionModel]):
+        &#34;&#34;&#34;
+        Set the local_models to the local_sessions
+        :param local_sessions: The list of new local SessionModel created from files
+        &#34;&#34;&#34;
+        self.local_models = local_sessions
+
+    def add_local_session(self, new_session: SessionModel):
+        &#34;&#34;&#34;
+        Add a local SessionModel to the container.  Does nothing if you try to add an existing key
+        :param new_session: session to add
+        &#34;&#34;&#34;
+        new_session_key = new_session.cloud_session.session_key()
+        if self.local_models:
+            if self.get_model(new_session_key):
+                self._errors.append(f&#34;Attempted to add existing key {new_session_key}&#34;)
+                return
+        else:
+            self.local_models = LocalSessionModels()
+        self.local_models.sessions.append(new_session)
+
+    def errors(self) -&gt; RedVoxExceptions:
+        &#34;&#34;&#34;
+        :return: errors from the ModelsContainer
+        &#34;&#34;&#34;
+        return self._errors
+
+    def list_keys(self) -&gt; List[str]:
+        &#34;&#34;&#34;
+        :return: all top-level session keys of the models
+        &#34;&#34;&#34;
+        keys = []
+        if self.cloud_models:
+            for k in self.cloud_models.sessions:
+                keys.append(k.session_key())
+        if self.local_models:
+            for k in self.local_models.sessions:
+                keys.append(k.cloud_session.session_key())
+        return keys
+
+    def list_ids(self) -&gt; List[str]:
+        &#34;&#34;&#34;
+        :return: all station ids in the models
+        &#34;&#34;&#34;
+        ids = []
+        if self.cloud_models:
+            for k in self.cloud_models.sessions:
+                if k.id not in ids:
+                    ids.append(k.id)
+        if self.local_models:
+            for k in self.local_models.sessions:
+                if k.cloud_session.id not in ids:
+                    ids.append(k.cloud_session.id)
+        return ids</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="redvox.common.reader_session_model.ModelsContainer"><code class="flex name class">
+<span>class <span class="ident">ModelsContainer</span></span>
+<span>(</span><span>cloud: Optional[<a title="redvox.cloud.session_model_api.SessionModelsResp" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.SessionModelsResp">SessionModelsResp</a>] = None, local: Optional[<a title="redvox.common.session_model.LocalSessionModels" href="session_model.html#redvox.common.session_model.LocalSessionModels">LocalSessionModels</a>] = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper module for ApiReader that manages the cloud and SDK session models requested by the ApiReader.</p>
+<p>Cloud models take priority over local models.</p>
+<p>Cloud and Local session models do not overlap.</p>
+<h2 id="properties">Properties</h2>
+<p>cloud_models: SessionModelsResp that contains all the cloud models</p>
+<p>local_models: LocalSessionModels that contains all the locally created models</p>
+<p>initialize the container.</p>
+<p>:param cloud: SessionModelsResp containing all cloud session models
+:param local: list of local session models</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ModelsContainer:
+    &#34;&#34;&#34;
+    Helper module for ApiReader that manages the cloud and SDK session models requested by the ApiReader.
+
+    Cloud models take priority over local models.
+
+    Cloud and Local session models do not overlap.
+
+    Properties:
+        cloud_models: SessionModelsResp that contains all the cloud models
+
+        local_models: LocalSessionModels that contains all the locally created models
+    &#34;&#34;&#34;
+
+    def __init__(self, cloud: Optional[SessionModelsResp] = None, local: Optional[LocalSessionModels] = None):
+        &#34;&#34;&#34;
+        initialize the container.
+
+        :param cloud: SessionModelsResp containing all cloud session models
+        :param local: list of local session models
+        &#34;&#34;&#34;
+        self.cloud_models: Optional[SessionModelsResp] = cloud
+        self.local_models: Optional[LocalSessionModels] = local
+        self._errors: RedVoxExceptions = RedVoxExceptions(&#34;ModelsContainer&#34;)
+
+    def __repr__(self):
+        &#34;&#34;&#34;
+        :return: representation of ModelsContainer
+        &#34;&#34;&#34;
+        return f&#34;cloud_models: {self.cloud_models.__repr__()}, &#34; f&#34;local_models: {self.local_models.__repr__()}&#34;
+
+    def as_dict(self) -&gt; dict:
+        &#34;&#34;&#34;
+        :return: ModelsContainer as a dictionary
+        &#34;&#34;&#34;
+        return {
+            &#34;cloud_models&#34;: self.cloud_models.to_dict() if self.cloud_models else None,
+            &#34;local_models&#34;: self.local_models.as_dict() if self.local_models else None,
+            &#34;errors&#34;: self._errors.as_dict(),
+        }
+
+    @staticmethod
+    def from_dict(in_dict: dict) -&gt; &#34;ModelsContainer&#34;:
+        &#34;&#34;&#34;
+        :param in_dict: dictionary to convert into a ModelsContainer
+        :return: the ModelsContainer described by the dictionary
+        &#34;&#34;&#34;
+        result = ModelsContainer(
+            SessionModelsResp.from_dict(in_dict[&#34;cloud_models&#34;]) if &#34;cloud_models&#34; in in_dict.keys() else None,
+            LocalSessionModels.from_dict(in_dict[&#34;local_models&#34;]) if &#34;local_models&#34; in in_dict.keys() else None,
+        )
+        if &#34;errors&#34; in in_dict.keys():
+            result._errors = in_dict[&#34;errors&#34;]
+        return result
+
+    @staticmethod
+    def _model_operation(model: Session, func: Callable):
+        &#34;&#34;&#34;
+        :param model: Session model to operate on
+        :param func: function to perform; takes model as a parameter
+        :return: output of the function
+        &#34;&#34;&#34;
+        return func(model)
+
+    def get_model(self, session_key: str) -&gt; Optional[Session]:
+        &#34;&#34;&#34;
+        :param session_key: the key for the session.  format is: &#34;{STATION_ID}:{STATION_UUID}:{STATION_START_DATE}&#34;
+            where STATION_START_DATE is the integer start date of the station in microseconds since epoch UTC.
+        :return: cloud session model matching the key or None
+        &#34;&#34;&#34;
+        if self.cloud_models:
+            for n in self.cloud_models.sessions:
+                if session_key == n.session_key():
+                    return n
+        if self.local_models:
+            for n in self.local_models.sessions:
+                if session_key == n.cloud_session.session_key():
+                    return n.cloud_session
+        return None
+
+    def get_model_by_key(
+        self, station_id: str, uuid: Optional[str] = None, start_date: Optional[int] = None
+    ) -&gt; Optional[Session]:
+        &#34;&#34;&#34;
+        :param station_id: id of the station to get
+        :param uuid: uuid of station to get.  if None, gets the first station that matches other parameters.  Default
+                None
+        :param start_date: start date in epoch microseconds since epoch UTC of station.  if None, gets first station
+                that matches other parameters.  Default None
+        :return: First session that matches parameters or None
+        &#34;&#34;&#34;
+        # if uuid or start date given, check that it matches, if both given, check if both match
+        key_check_func = (
+            lambda x: (not uuid and not start_date)
+            or (uuid and x.uuid == uuid and not start_date)
+            or (start_date and x.start_ts == start_date and not uuid)
+            or (uuid and x.uuid == uuid and start_date and x.start_ts == start_date)
+        )
+        if self.cloud_models:
+            for n in self.cloud_models.sessions:
+                if n.id == station_id:
+                    if self._model_operation(n, key_check_func):
+                        return n
+        if self.local_models:
+            for n in self.local_models.sessions:
+                if n.cloud_session.id == station_id:
+                    if self._model_operation(n.cloud_session, key_check_func):
+                        return n.cloud_session
+        return None
+
+    def get_all_models(self) -&gt; List[Session]:
+        &#34;&#34;&#34;
+        :return: all session models in the container
+        &#34;&#34;&#34;
+        models = []
+        if self.cloud_models:
+            for n in self.cloud_models.sessions:
+                models.append(n)
+        if self.local_models:
+            for n in self.local_models.sessions:
+                models.append(n.cloud_session)
+        return models
+
+    def get_dynamic_session(self, key: str) -&gt; Optional[DynamicSession]:
+        &#34;&#34;&#34;
+        :param key: key to the dynamic session, formatted as: ID:UUID:SESSION_START_DATE:DYNAMIC_START:DYNAMIC_END
+                    where START and END values times as microseconds since epoch UTC.
+        :return: DynamicSession matching the key or None
+        &#34;&#34;&#34;
+        key_parts = key.split(&#34;:&#34;)
+        dynamic_session: Optional[DynamicSession] = None
+        try:
+            client: cloud_client.CloudClient
+            with cloud_client() as client:
+                dynamic_session: DynamicSession = client.request_dynamic_session_model(
+                    f&#34;{key_parts[0]}:{key_parts[1]}:{key_parts[2]}&#34;, int(key_parts[3]), int(key_parts[4])
+                ).dynamic_session
+        except CloudApiError:
+            pass
+        finally:
+            if not dynamic_session:
+                for n in self.local_models.sessions:
+                    for d, s in n.dynamic_sessions.items():
+                        if d == key:
+                            return s
+        return dynamic_session
+
+    def set_cloud_session(self, cloud_resp: SessionModelsResp):
+        &#34;&#34;&#34;
+        Set the cloud_models to the cloud_resp
+        :param cloud_resp: The new SessionModelsResp from a cloud query
+        &#34;&#34;&#34;
+        self.cloud_models = cloud_resp
+
+    def add_cloud_session(self, new_session: Session):
+        &#34;&#34;&#34;
+        Add a cloud Session to the container.  Does nothing if you try to add an existing key
+        :param new_session: session to add
+        &#34;&#34;&#34;
+        if self.cloud_models:
+            if self.get_model(new_session.session_key()):
+                self._errors.append(f&#34;Attempted to add existing key {new_session.session_key()}&#34;)
+            else:
+                self.cloud_models.sessions.append(new_session)
+        else:
+            self.set_cloud_session(SessionModelsResp(err=None, sessions=[new_session]))
+
+    def search_cloud_session(
+        self,
+        id_uuids: Optional[List[str]] = None,
+        owner: Optional[str] = None,
+        start_ts: Optional[int] = None,
+        end_ts: Optional[int] = None,
+        include_public: bool = False,
+    ):
+        &#34;&#34;&#34;
+        Search the cloud for a range of Session models and overwrites existing cloud_models if there are results.
+        Raises any exception found.
+
+        * All defaults are None except for include_public, which is False.
+        * Without any inputs, this function may add a large number of results.  We recommend you set at least one of
+          the parameters to reduce the number of results.
+
+        :param id_uuids: An optional list of IDs or ID:UUIDs.
+        :param owner: An optional owner.
+        :param start_ts: An optional start timestamp in microseconds since epoch UTC.
+        :param end_ts: An optional end timestamp in microseconds since epoch UTC.
+        :param include_public: Additionally include public sessions that may not be the same as the owner.
+        &#34;&#34;&#34;
+        try:
+            resp: Optional[SessionModelsResp]
+            with cloud_client() as client:
+                resp = client.request_session_models(id_uuids, owner, start_ts, end_ts, include_public)
+                if len(resp.sessions) &gt; 0:
+                    self.cloud_models = resp
+        except (CloudApiError, Exception):
+            raise
+
+    def set_local_session(self, local_sessions: List[SessionModel]):
+        &#34;&#34;&#34;
+        Set the local_models to the local_sessions
+        :param local_sessions: The list of new local SessionModel created from files
+        &#34;&#34;&#34;
+        self.local_models = local_sessions
+
+    def add_local_session(self, new_session: SessionModel):
+        &#34;&#34;&#34;
+        Add a local SessionModel to the container.  Does nothing if you try to add an existing key
+        :param new_session: session to add
+        &#34;&#34;&#34;
+        new_session_key = new_session.cloud_session.session_key()
+        if self.local_models:
+            if self.get_model(new_session_key):
+                self._errors.append(f&#34;Attempted to add existing key {new_session_key}&#34;)
+                return
+        else:
+            self.local_models = LocalSessionModels()
+        self.local_models.sessions.append(new_session)
+
+    def errors(self) -&gt; RedVoxExceptions:
+        &#34;&#34;&#34;
+        :return: errors from the ModelsContainer
+        &#34;&#34;&#34;
+        return self._errors
+
+    def list_keys(self) -&gt; List[str]:
+        &#34;&#34;&#34;
+        :return: all top-level session keys of the models
+        &#34;&#34;&#34;
+        keys = []
+        if self.cloud_models:
+            for k in self.cloud_models.sessions:
+                keys.append(k.session_key())
+        if self.local_models:
+            for k in self.local_models.sessions:
+                keys.append(k.cloud_session.session_key())
+        return keys
+
+    def list_ids(self) -&gt; List[str]:
+        &#34;&#34;&#34;
+        :return: all station ids in the models
+        &#34;&#34;&#34;
+        ids = []
+        if self.cloud_models:
+            for k in self.cloud_models.sessions:
+                if k.id not in ids:
+                    ids.append(k.id)
+        if self.local_models:
+            for k in self.local_models.sessions:
+                if k.cloud_session.id not in ids:
+                    ids.append(k.cloud_session.id)
+        return ids</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.common.reader_session_model.ModelsContainer.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>in_dict: dict) ‑> <a title="redvox.common.reader_session_model.ModelsContainer" href="#redvox.common.reader_session_model.ModelsContainer">ModelsContainer</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param in_dict: dictionary to convert into a ModelsContainer
+:return: the ModelsContainer described by the dictionary</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def from_dict(in_dict: dict) -&gt; &#34;ModelsContainer&#34;:
+    &#34;&#34;&#34;
+    :param in_dict: dictionary to convert into a ModelsContainer
+    :return: the ModelsContainer described by the dictionary
+    &#34;&#34;&#34;
+    result = ModelsContainer(
+        SessionModelsResp.from_dict(in_dict[&#34;cloud_models&#34;]) if &#34;cloud_models&#34; in in_dict.keys() else None,
+        LocalSessionModels.from_dict(in_dict[&#34;local_models&#34;]) if &#34;local_models&#34; in in_dict.keys() else None,
+    )
+    if &#34;errors&#34; in in_dict.keys():
+        result._errors = in_dict[&#34;errors&#34;]
+    return result</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.common.reader_session_model.ModelsContainer.add_cloud_session"><code class="name flex">
+<span>def <span class="ident">add_cloud_session</span></span>(<span>self, new_session: <a title="redvox.cloud.session_model_api.Session" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.Session">Session</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a cloud Session to the container.
+Does nothing if you try to add an existing key
+:param new_session: session to add</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_cloud_session(self, new_session: Session):
+    &#34;&#34;&#34;
+    Add a cloud Session to the container.  Does nothing if you try to add an existing key
+    :param new_session: session to add
+    &#34;&#34;&#34;
+    if self.cloud_models:
+        if self.get_model(new_session.session_key()):
+            self._errors.append(f&#34;Attempted to add existing key {new_session.session_key()}&#34;)
+        else:
+            self.cloud_models.sessions.append(new_session)
+    else:
+        self.set_cloud_session(SessionModelsResp(err=None, sessions=[new_session]))</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.add_local_session"><code class="name flex">
+<span>def <span class="ident">add_local_session</span></span>(<span>self, new_session: <a title="redvox.common.session_model.SessionModel" href="session_model.html#redvox.common.session_model.SessionModel">SessionModel</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a local SessionModel to the container.
+Does nothing if you try to add an existing key
+:param new_session: session to add</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_local_session(self, new_session: SessionModel):
+    &#34;&#34;&#34;
+    Add a local SessionModel to the container.  Does nothing if you try to add an existing key
+    :param new_session: session to add
+    &#34;&#34;&#34;
+    new_session_key = new_session.cloud_session.session_key()
+    if self.local_models:
+        if self.get_model(new_session_key):
+            self._errors.append(f&#34;Attempted to add existing key {new_session_key}&#34;)
+            return
+    else:
+        self.local_models = LocalSessionModels()
+    self.local_models.sessions.append(new_session)</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.as_dict"><code class="name flex">
+<span>def <span class="ident">as_dict</span></span>(<span>self) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: ModelsContainer as a dictionary</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def as_dict(self) -&gt; dict:
+    &#34;&#34;&#34;
+    :return: ModelsContainer as a dictionary
+    &#34;&#34;&#34;
+    return {
+        &#34;cloud_models&#34;: self.cloud_models.to_dict() if self.cloud_models else None,
+        &#34;local_models&#34;: self.local_models.as_dict() if self.local_models else None,
+        &#34;errors&#34;: self._errors.as_dict(),
+    }</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.errors"><code class="name flex">
+<span>def <span class="ident">errors</span></span>(<span>self) ‑> <a title="redvox.common.errors.RedVoxExceptions" href="errors.html#redvox.common.errors.RedVoxExceptions">RedVoxExceptions</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: errors from the ModelsContainer</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def errors(self) -&gt; RedVoxExceptions:
+    &#34;&#34;&#34;
+    :return: errors from the ModelsContainer
+    &#34;&#34;&#34;
+    return self._errors</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.get_all_models"><code class="name flex">
+<span>def <span class="ident">get_all_models</span></span>(<span>self) ‑> List[<a title="redvox.cloud.session_model_api.Session" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.Session">Session</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: all session models in the container</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_all_models(self) -&gt; List[Session]:
+    &#34;&#34;&#34;
+    :return: all session models in the container
+    &#34;&#34;&#34;
+    models = []
+    if self.cloud_models:
+        for n in self.cloud_models.sessions:
+            models.append(n)
+    if self.local_models:
+        for n in self.local_models.sessions:
+            models.append(n.cloud_session)
+    return models</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.get_dynamic_session"><code class="name flex">
+<span>def <span class="ident">get_dynamic_session</span></span>(<span>self, key: str) ‑> Optional[<a title="redvox.cloud.session_model_api.DynamicSession" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.DynamicSession">DynamicSession</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param key: key to the dynamic session, formatted as: ID:UUID:SESSION_START_DATE:DYNAMIC_START:DYNAMIC_END
+where START and END values times as microseconds since epoch UTC.
+:return: DynamicSession matching the key or None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_dynamic_session(self, key: str) -&gt; Optional[DynamicSession]:
+    &#34;&#34;&#34;
+    :param key: key to the dynamic session, formatted as: ID:UUID:SESSION_START_DATE:DYNAMIC_START:DYNAMIC_END
+                where START and END values times as microseconds since epoch UTC.
+    :return: DynamicSession matching the key or None
+    &#34;&#34;&#34;
+    key_parts = key.split(&#34;:&#34;)
+    dynamic_session: Optional[DynamicSession] = None
+    try:
+        client: cloud_client.CloudClient
+        with cloud_client() as client:
+            dynamic_session: DynamicSession = client.request_dynamic_session_model(
+                f&#34;{key_parts[0]}:{key_parts[1]}:{key_parts[2]}&#34;, int(key_parts[3]), int(key_parts[4])
+            ).dynamic_session
+    except CloudApiError:
+        pass
+    finally:
+        if not dynamic_session:
+            for n in self.local_models.sessions:
+                for d, s in n.dynamic_sessions.items():
+                    if d == key:
+                        return s
+    return dynamic_session</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.get_model"><code class="name flex">
+<span>def <span class="ident">get_model</span></span>(<span>self, session_key: str) ‑> Optional[<a title="redvox.cloud.session_model_api.Session" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.Session">Session</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param session_key: the key for the session.
+format is: "{STATION_ID}:{STATION_UUID}:{STATION_START_DATE}"
+where STATION_START_DATE is the integer start date of the station in microseconds since epoch UTC.
+:return: cloud session model matching the key or None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_model(self, session_key: str) -&gt; Optional[Session]:
+    &#34;&#34;&#34;
+    :param session_key: the key for the session.  format is: &#34;{STATION_ID}:{STATION_UUID}:{STATION_START_DATE}&#34;
+        where STATION_START_DATE is the integer start date of the station in microseconds since epoch UTC.
+    :return: cloud session model matching the key or None
+    &#34;&#34;&#34;
+    if self.cloud_models:
+        for n in self.cloud_models.sessions:
+            if session_key == n.session_key():
+                return n
+    if self.local_models:
+        for n in self.local_models.sessions:
+            if session_key == n.cloud_session.session_key():
+                return n.cloud_session
+    return None</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.get_model_by_key"><code class="name flex">
+<span>def <span class="ident">get_model_by_key</span></span>(<span>self, station_id: str, uuid: Optional[str] = None, start_date: Optional[int] = None) ‑> Optional[<a title="redvox.cloud.session_model_api.Session" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.Session">Session</a>]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param station_id: id of the station to get
+:param uuid: uuid of station to get.
+if None, gets the first station that matches other parameters.
+Default
+None
+:param start_date: start date in epoch microseconds since epoch UTC of station.
+if None, gets first station
+that matches other parameters.
+Default None
+:return: First session that matches parameters or None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_model_by_key(
+    self, station_id: str, uuid: Optional[str] = None, start_date: Optional[int] = None
+) -&gt; Optional[Session]:
+    &#34;&#34;&#34;
+    :param station_id: id of the station to get
+    :param uuid: uuid of station to get.  if None, gets the first station that matches other parameters.  Default
+            None
+    :param start_date: start date in epoch microseconds since epoch UTC of station.  if None, gets first station
+            that matches other parameters.  Default None
+    :return: First session that matches parameters or None
+    &#34;&#34;&#34;
+    # if uuid or start date given, check that it matches, if both given, check if both match
+    key_check_func = (
+        lambda x: (not uuid and not start_date)
+        or (uuid and x.uuid == uuid and not start_date)
+        or (start_date and x.start_ts == start_date and not uuid)
+        or (uuid and x.uuid == uuid and start_date and x.start_ts == start_date)
+    )
+    if self.cloud_models:
+        for n in self.cloud_models.sessions:
+            if n.id == station_id:
+                if self._model_operation(n, key_check_func):
+                    return n
+    if self.local_models:
+        for n in self.local_models.sessions:
+            if n.cloud_session.id == station_id:
+                if self._model_operation(n.cloud_session, key_check_func):
+                    return n.cloud_session
+    return None</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.list_ids"><code class="name flex">
+<span>def <span class="ident">list_ids</span></span>(<span>self) ‑> List[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: all station ids in the models</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def list_ids(self) -&gt; List[str]:
+    &#34;&#34;&#34;
+    :return: all station ids in the models
+    &#34;&#34;&#34;
+    ids = []
+    if self.cloud_models:
+        for k in self.cloud_models.sessions:
+            if k.id not in ids:
+                ids.append(k.id)
+    if self.local_models:
+        for k in self.local_models.sessions:
+            if k.cloud_session.id not in ids:
+                ids.append(k.cloud_session.id)
+    return ids</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.list_keys"><code class="name flex">
+<span>def <span class="ident">list_keys</span></span>(<span>self) ‑> List[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: all top-level session keys of the models</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def list_keys(self) -&gt; List[str]:
+    &#34;&#34;&#34;
+    :return: all top-level session keys of the models
+    &#34;&#34;&#34;
+    keys = []
+    if self.cloud_models:
+        for k in self.cloud_models.sessions:
+            keys.append(k.session_key())
+    if self.local_models:
+        for k in self.local_models.sessions:
+            keys.append(k.cloud_session.session_key())
+    return keys</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.search_cloud_session"><code class="name flex">
+<span>def <span class="ident">search_cloud_session</span></span>(<span>self, id_uuids: Optional[List[str]] = None, owner: Optional[str] = None, start_ts: Optional[int] = None, end_ts: Optional[int] = None, include_public: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Search the cloud for a range of Session models and overwrites existing cloud_models if there are results.
+Raises any exception found.</p>
+<ul>
+<li>All defaults are None except for include_public, which is False.</li>
+<li>Without any inputs, this function may add a large number of results.
+We recommend you set at least one of
+the parameters to reduce the number of results.</li>
+</ul>
+<p>:param id_uuids: An optional list of IDs or ID:UUIDs.
+:param owner: An optional owner.
+:param start_ts: An optional start timestamp in microseconds since epoch UTC.
+:param end_ts: An optional end timestamp in microseconds since epoch UTC.
+:param include_public: Additionally include public sessions that may not be the same as the owner.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def search_cloud_session(
+    self,
+    id_uuids: Optional[List[str]] = None,
+    owner: Optional[str] = None,
+    start_ts: Optional[int] = None,
+    end_ts: Optional[int] = None,
+    include_public: bool = False,
+):
+    &#34;&#34;&#34;
+    Search the cloud for a range of Session models and overwrites existing cloud_models if there are results.
+    Raises any exception found.
+
+    * All defaults are None except for include_public, which is False.
+    * Without any inputs, this function may add a large number of results.  We recommend you set at least one of
+      the parameters to reduce the number of results.
+
+    :param id_uuids: An optional list of IDs or ID:UUIDs.
+    :param owner: An optional owner.
+    :param start_ts: An optional start timestamp in microseconds since epoch UTC.
+    :param end_ts: An optional end timestamp in microseconds since epoch UTC.
+    :param include_public: Additionally include public sessions that may not be the same as the owner.
+    &#34;&#34;&#34;
+    try:
+        resp: Optional[SessionModelsResp]
+        with cloud_client() as client:
+            resp = client.request_session_models(id_uuids, owner, start_ts, end_ts, include_public)
+            if len(resp.sessions) &gt; 0:
+                self.cloud_models = resp
+    except (CloudApiError, Exception):
+        raise</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.set_cloud_session"><code class="name flex">
+<span>def <span class="ident">set_cloud_session</span></span>(<span>self, cloud_resp: <a title="redvox.cloud.session_model_api.SessionModelsResp" href="../cloud/session_model_api.html#redvox.cloud.session_model_api.SessionModelsResp">SessionModelsResp</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the cloud_models to the cloud_resp
+:param cloud_resp: The new SessionModelsResp from a cloud query</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_cloud_session(self, cloud_resp: SessionModelsResp):
+    &#34;&#34;&#34;
+    Set the cloud_models to the cloud_resp
+    :param cloud_resp: The new SessionModelsResp from a cloud query
+    &#34;&#34;&#34;
+    self.cloud_models = cloud_resp</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.reader_session_model.ModelsContainer.set_local_session"><code class="name flex">
+<span>def <span class="ident">set_local_session</span></span>(<span>self, local_sessions: List[<a title="redvox.common.session_model.SessionModel" href="session_model.html#redvox.common.session_model.SessionModel">SessionModel</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the local_models to the local_sessions
+:param local_sessions: The list of new local SessionModel created from files</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_local_session(self, local_sessions: List[SessionModel]):
+    &#34;&#34;&#34;
+    Set the local_models to the local_sessions
+    :param local_sessions: The list of new local SessionModel created from files
+    &#34;&#34;&#34;
+    self.local_models = local_sessions</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="redvox.common" href="index.html">redvox.common</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="redvox.common.reader_session_model.ModelsContainer" href="#redvox.common.reader_session_model.ModelsContainer">ModelsContainer</a></code></h4>
+<ul class="">
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.add_cloud_session" href="#redvox.common.reader_session_model.ModelsContainer.add_cloud_session">add_cloud_session</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.add_local_session" href="#redvox.common.reader_session_model.ModelsContainer.add_local_session">add_local_session</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.as_dict" href="#redvox.common.reader_session_model.ModelsContainer.as_dict">as_dict</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.errors" href="#redvox.common.reader_session_model.ModelsContainer.errors">errors</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.from_dict" href="#redvox.common.reader_session_model.ModelsContainer.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.get_all_models" href="#redvox.common.reader_session_model.ModelsContainer.get_all_models">get_all_models</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.get_dynamic_session" href="#redvox.common.reader_session_model.ModelsContainer.get_dynamic_session">get_dynamic_session</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.get_model" href="#redvox.common.reader_session_model.ModelsContainer.get_model">get_model</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.get_model_by_key" href="#redvox.common.reader_session_model.ModelsContainer.get_model_by_key">get_model_by_key</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.list_ids" href="#redvox.common.reader_session_model.ModelsContainer.list_ids">list_ids</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.list_keys" href="#redvox.common.reader_session_model.ModelsContainer.list_keys">list_keys</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.search_cloud_session" href="#redvox.common.reader_session_model.ModelsContainer.search_cloud_session">search_cloud_session</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.set_cloud_session" href="#redvox.common.reader_session_model.ModelsContainer.set_cloud_session">set_cloud_session</a></code></li>
+<li><code><a title="redvox.common.reader_session_model.ModelsContainer.set_local_session" href="#redvox.common.reader_session_model.ModelsContainer.set_local_session">set_local_session</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>redvox.common.station_model API documentation</title>
-<meta name="description" content="Prototype class
-In Development …" />
+<meta name="description" content="Prototype functions for station location and timing summary
+Provides an example of how to access the information from a Station object
+This module …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,142 +24,148 @@ In Development …" />
 <h1 class="title">Module <code>redvox.common.station_model</code></h1>
 </header>
 <section id="section-intro">
-<p>Prototype class
-In Development</p>
-<p>Class representing the Station information that can be used to convert Station into another format.</p>
+<p>Prototype functions for station location and timing summary
+Provides an example of how to access the information from a Station object
+This module will contain methods to summarize a single Station</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
-Prototype class
-In Development
-
-Class representing the Station information that can be used to convert Station into another format.
+Prototype functions for station location and timing summary
+Provides an example of how to access the information from a Station object
+This module will contain methods to summarize a single Station
 &#34;&#34;&#34;
+from typing import List, Optional
+import math
 
-# from typing import List
-#
-# import numpy as np
-#
-# import redvox
-# from redvox.common.session_model import SessionModel
-# from redvox.common.date_time_utils import datetime_from_epoch_microseconds_utc
-#
-#
-# class StationModel:
-#     &#34;&#34;&#34;
-#     Model for a station.  Does not include data.
-#
-#     Properties:
-#         id: string, the id of the station.  Users can change this
-#
-#         uuid: string, the uuid of the station.  This is set by the app when it is installed on a device
-#
-#         audio_sample_rate_hz: int, the audio sample rate in hz of the station
-#
-#         sessions: List of SessionModel: the sessions used to create the StationModel
-#
-#         app: string, name of the app
-#
-#         app_version: string, version of the app
-#
-#         api: float, the api version of the data
-#
-#         sub_api: float, the sub api of the data
-#
-#         make: string, make of the station
-#
-#         model: string, model of the station
-#
-#         num_sessions: int, number of sessions in the model
-#
-#         sdk_version: string, version of SDK used to create the model
-#
-#         start_date: float, timestamp of first station data point in microseconds since epoch UTC
-#
-#         end_date: float, timestamp of last station data point in microseconds since epoch UTC
-#
-#         changelog: List of str, list of all changes to station during lifetime
-#     &#34;&#34;&#34;
-#     def __init__(self,
-#                  station_id: str = &#34;&#34;,
-#                  uuid: str = &#34;&#34;,
-#                  app_name: str = &#34;Redvox&#34;,
-#                  api: float = np.nan,
-#                  sub_api: float = np.nan,
-#                  make: str = &#34;&#34;,
-#                  model: str = &#34;&#34;,
-#                  app_version: str = &#34;&#34;,
-#                  start_date: float = np.nan,
-#                  end_date: float = np.nan
-#                  ):
-#         self.id: str = station_id
-#         self.uuid: str = uuid
-#         self.app_name: str = app_name
-#         self.api: float = api
-#         self.sub_api: float = sub_api
-#         self.make: str = make
-#         self.model: str = model
-#         self.app_version: str = app_version
-#         self.num_sessions: int = 0
-#         self.sdk_version: str = redvox.version()
-#         self.start_date: float = start_date
-#         self.end_date: float = end_date
-#         self.changelog: List[str] = []
-#
-#     def add_session(self, session: SessionModel):
-#         &#34;&#34;&#34;
-#         Add a new session to the StationModel.  id and uuid must match; no change if no match
-#
-#         :param session: Session to add
-#         &#34;&#34;&#34;
-#         if self.id == session.id and self.uuid == session.uuid:
-#             self.num_sessions += 1
-#             if self.start_date &gt; session.start_date:
-#                 self.start_date = session.start_date
-#             if self.end_date &lt; session.last_data_timestamp:
-#                 self.end_date = session.last_data_timestamp
-#             first_timestamp = np.nan if np.isnan(session.first_data_timestamp) \
-#                 else datetime_from_epoch_microseconds_utc(
-#                 session.first_data_timestamp).strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
-#             last_timestamp = np.nan if np.isnan(session.last_data_timestamp) \
-#                 else datetime_from_epoch_microseconds_utc(
-#                 session.last_data_timestamp).strftime(&#39;%Y-%m-%dT%H:%M:%S.%fZ&#39;)
-#             self.changelog.append(f&#34;session from {first_timestamp}: {last_timestamp}&#34;)
-#
-#     @staticmethod
-#     def create_from_session(session: SessionModel) -&gt; &#34;StationModel&#34;:
-#         &#34;&#34;&#34;
-#         Create StationModel from a single session
-#
-#         :param session: SessionModel to create StationModel from
-#         :return: StationModel
-#         &#34;&#34;&#34;
-#         try:
-#             result = StationModel(session.id, session.uuid, session.app_name, session.api, session.sub_api,
-#                                   session.make, session.model, session.app_version, session.start_date,
-#                                   session.last_data_timestamp
-#                                   )
-#         except Exception as e:
-#             raise e
-#         return result
-#
-#     @staticmethod
-#     def create_from_sessions(sessions: List[SessionModel]) -&gt; &#34;StationModel&#34;:
-#         &#34;&#34;&#34;
-#         create StationModel from a list of sessions.  Uses the first SessionModel as the base for the StationModel,
-#         and will ignore any SessionModel that does not align with the first SessionModel
-#
-#         :param sessions: sessions to create StationModel from
-#         :return: StationModel
-#         &#34;&#34;&#34;
-#         p1 = sessions.pop(0)
-#         model = StationModel.create_from_session(p1)
-#         for p in sessions:
-#             model.add_session(p)
-#         sessions.insert(0, p1)
-#         return model</code></pre>
+from dataclasses import dataclass
+from dataclasses_json import dataclass_json
+import numpy as np
+
+from redvox.common.station import Station
+from redvox.api1000.wrapped_redvox_packet.sensors.location import LocationProvider
+
+
+LOCATION_PROVIDER_IDX: int = 10
+LATITUDE_IDX: int = 1
+LONGITUDE_IDX: int = 2
+ALTITUDE_IDX: int = 3
+
+
+@dataclass_json
+@dataclass
+class LocationSummary:
+    &#34;&#34;&#34;
+    Summary of a Location.  Includes the location sensor&#39;s name, source of data (provider), number of points,
+    and the mean and standard deviation of latitude, longitude, and altitude.
+    &#34;&#34;&#34;
+
+    name: str
+    provider: str
+    latitude_mean: float
+    latitude_standard_deviation: float
+    longitude_mean: float
+    longitude_standard_deviation: float
+    altitude_mean: Optional[float]
+    altitude_standard_deviation: float
+    num_pts: int
+
+    @staticmethod
+    def from_station(stn: Station) -&gt; Optional[List[&#34;LocationSummary&#34;]]:
+        &#34;&#34;&#34;
+        :param stn: Station to get data from
+        :return: List of LocationSummary grouped by provider or None
+        &#34;&#34;&#34;
+        loc = stn.find_loc_for_stats()
+        if loc:
+            samples: np.ndarray = loc.samples()
+
+            if loc.num_samples() == 1:
+                return [
+                    LocationSummary(
+                        loc.name,
+                        LocationProvider(int(samples[LOCATION_PROVIDER_IDX][0])).name,
+                        samples[LATITUDE_IDX][0],
+                        0.0,
+                        samples[LONGITUDE_IDX][0],
+                        0.0,
+                        samples[ALTITUDE_IDX][0],
+                        0.0,
+                        1,
+                    )
+                ]
+
+            # for each provider, create a new entry in the dictionary or append new data
+            loc_prov_to_data: dict = {}
+            lat_samples: np.ndarray = samples[LATITUDE_IDX]
+            lng_samples: np.ndarray = samples[LONGITUDE_IDX]
+            for j in range(min(len(lat_samples), len(lng_samples))):
+                if (not math.isnan(lat_samples[j])) and (not math.isnan(lng_samples[j])):
+                    prov = LocationProvider(int(samples[LOCATION_PROVIDER_IDX][j])).name
+                    data = np.array(
+                        [
+                            [samples[LATITUDE_IDX][j]],
+                            [samples[LONGITUDE_IDX][j]],
+                            [samples[ALTITUDE_IDX][j]],
+                        ]
+                    )
+                    loc_prov_to_data[prov] = (
+                        data
+                        if prov not in loc_prov_to_data.keys()
+                        else np.concatenate([loc_prov_to_data[prov], data], 1)
+                    )
+
+            loc_sums = []
+            for provider, loc_data in loc_prov_to_data.items():
+                loc_sums.append(
+                    LocationSummary(
+                        loc.name,
+                        provider,
+                        loc_data[0].mean(),
+                        loc_data[0].std(),
+                        loc_data[1].mean(),
+                        loc_data[1].std(),
+                        loc_data[2].mean(),
+                        loc_data[2].std(),
+                        len(loc_data[0]),
+                    )
+                )
+            return loc_sums
+        return None
+
+
+def example_of_print_loc_and_timing_summary(stn: Station):
+    &#34;&#34;&#34;
+    An example function that show how you can access location, GNSS, and time sync information and prints it
+    :param stn: Station to get data from
+    &#34;&#34;&#34;
+    print(f&#34;station_id: {stn.id()}&#34;)
+    loc_summary = LocationSummary.from_station(stn)
+    if loc_summary:
+        for m in loc_summary:
+            print(
+                &#34;-----------------------------\n&#34;
+                f&#34;location_provider: {m.provider}, num_pts: {m.num_pts}\n&#34;
+                f&#34;latitude  mean: {m.latitude_mean}, std_dev: {m.latitude_standard_deviation}\n&#34;
+                f&#34;longitude mean: {m.longitude_mean}, std_dev: {m.longitude_standard_deviation}\n&#34;
+                f&#34;altitude  mean: {m.altitude_mean}, std_dev: {m.altitude_standard_deviation}&#34;
+            )
+        print(
+            f&#34;-----------------------------\nGNSS timing:\n&#34;
+            f&#34;GNSS offset at start: {stn.gps_offset_model().intercept}\n&#34;
+            f&#34;slope: {stn.gps_offset_model().slope}\n&#34;
+            f&#34;GNSS estimated latency: {stn.gps_offset_model().mean_latency}\n&#34;
+            f&#34;num_pts: {len(stn.location_sensor().get_gps_timestamps_data())}&#34;
+        )
+    else:
+        print(&#34;location data not found.&#34;)
+    print(
+        f&#34;-----------------------------\ntimesync:\n&#34;
+        f&#34;best_offset: {stn.timesync_data().best_offset()}, offset_std: {stn.timesync_data().offset_std()}\n&#34;
+        f&#34;best_latency: {stn.timesync_data().best_latency()}, latency_std: {stn.timesync_data().latency_std()}\n&#34;
+        f&#34;num_pts: {stn.timesync_data().num_tri_messages()}\n*****************************\n&#34;
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -166,8 +173,398 @@ Class representing the Station information that can be used to convert Station i
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="redvox.common.station_model.example_of_print_loc_and_timing_summary"><code class="name flex">
+<span>def <span class="ident">example_of_print_loc_and_timing_summary</span></span>(<span>stn: <a title="redvox.common.station.Station" href="station.html#redvox.common.station.Station">Station</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An example function that show how you can access location, GNSS, and time sync information and prints it
+:param stn: Station to get data from</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def example_of_print_loc_and_timing_summary(stn: Station):
+    &#34;&#34;&#34;
+    An example function that show how you can access location, GNSS, and time sync information and prints it
+    :param stn: Station to get data from
+    &#34;&#34;&#34;
+    print(f&#34;station_id: {stn.id()}&#34;)
+    loc_summary = LocationSummary.from_station(stn)
+    if loc_summary:
+        for m in loc_summary:
+            print(
+                &#34;-----------------------------\n&#34;
+                f&#34;location_provider: {m.provider}, num_pts: {m.num_pts}\n&#34;
+                f&#34;latitude  mean: {m.latitude_mean}, std_dev: {m.latitude_standard_deviation}\n&#34;
+                f&#34;longitude mean: {m.longitude_mean}, std_dev: {m.longitude_standard_deviation}\n&#34;
+                f&#34;altitude  mean: {m.altitude_mean}, std_dev: {m.altitude_standard_deviation}&#34;
+            )
+        print(
+            f&#34;-----------------------------\nGNSS timing:\n&#34;
+            f&#34;GNSS offset at start: {stn.gps_offset_model().intercept}\n&#34;
+            f&#34;slope: {stn.gps_offset_model().slope}\n&#34;
+            f&#34;GNSS estimated latency: {stn.gps_offset_model().mean_latency}\n&#34;
+            f&#34;num_pts: {len(stn.location_sensor().get_gps_timestamps_data())}&#34;
+        )
+    else:
+        print(&#34;location data not found.&#34;)
+    print(
+        f&#34;-----------------------------\ntimesync:\n&#34;
+        f&#34;best_offset: {stn.timesync_data().best_offset()}, offset_std: {stn.timesync_data().offset_std()}\n&#34;
+        f&#34;best_latency: {stn.timesync_data().best_latency()}, latency_std: {stn.timesync_data().latency_std()}\n&#34;
+        f&#34;num_pts: {stn.timesync_data().num_tri_messages()}\n*****************************\n&#34;
+    )</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="redvox.common.station_model.LocationSummary"><code class="flex name class">
+<span>class <span class="ident">LocationSummary</span></span>
+<span>(</span><span>name: str, provider: str, latitude_mean: float, latitude_standard_deviation: float, longitude_mean: float, longitude_standard_deviation: float, altitude_mean: Optional[float], altitude_standard_deviation: float, num_pts: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Summary of a Location.
+Includes the location sensor's name, source of data (provider), number of points,
+and the mean and standard deviation of latitude, longitude, and altitude.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@dataclass_json
+@dataclass
+class LocationSummary:
+    &#34;&#34;&#34;
+    Summary of a Location.  Includes the location sensor&#39;s name, source of data (provider), number of points,
+    and the mean and standard deviation of latitude, longitude, and altitude.
+    &#34;&#34;&#34;
+
+    name: str
+    provider: str
+    latitude_mean: float
+    latitude_standard_deviation: float
+    longitude_mean: float
+    longitude_standard_deviation: float
+    altitude_mean: Optional[float]
+    altitude_standard_deviation: float
+    num_pts: int
+
+    @staticmethod
+    def from_station(stn: Station) -&gt; Optional[List[&#34;LocationSummary&#34;]]:
+        &#34;&#34;&#34;
+        :param stn: Station to get data from
+        :return: List of LocationSummary grouped by provider or None
+        &#34;&#34;&#34;
+        loc = stn.find_loc_for_stats()
+        if loc:
+            samples: np.ndarray = loc.samples()
+
+            if loc.num_samples() == 1:
+                return [
+                    LocationSummary(
+                        loc.name,
+                        LocationProvider(int(samples[LOCATION_PROVIDER_IDX][0])).name,
+                        samples[LATITUDE_IDX][0],
+                        0.0,
+                        samples[LONGITUDE_IDX][0],
+                        0.0,
+                        samples[ALTITUDE_IDX][0],
+                        0.0,
+                        1,
+                    )
+                ]
+
+            # for each provider, create a new entry in the dictionary or append new data
+            loc_prov_to_data: dict = {}
+            lat_samples: np.ndarray = samples[LATITUDE_IDX]
+            lng_samples: np.ndarray = samples[LONGITUDE_IDX]
+            for j in range(min(len(lat_samples), len(lng_samples))):
+                if (not math.isnan(lat_samples[j])) and (not math.isnan(lng_samples[j])):
+                    prov = LocationProvider(int(samples[LOCATION_PROVIDER_IDX][j])).name
+                    data = np.array(
+                        [
+                            [samples[LATITUDE_IDX][j]],
+                            [samples[LONGITUDE_IDX][j]],
+                            [samples[ALTITUDE_IDX][j]],
+                        ]
+                    )
+                    loc_prov_to_data[prov] = (
+                        data
+                        if prov not in loc_prov_to_data.keys()
+                        else np.concatenate([loc_prov_to_data[prov], data], 1)
+                    )
+
+            loc_sums = []
+            for provider, loc_data in loc_prov_to_data.items():
+                loc_sums.append(
+                    LocationSummary(
+                        loc.name,
+                        provider,
+                        loc_data[0].mean(),
+                        loc_data[0].std(),
+                        loc_data[1].mean(),
+                        loc_data[1].std(),
+                        loc_data[2].mean(),
+                        loc_data[2].std(),
+                        len(loc_data[0]),
+                    )
+                )
+            return loc_sums
+        return None</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="redvox.common.station_model.LocationSummary.altitude_mean"><code class="name">var <span class="ident">altitude_mean</span> : Optional[float]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.altitude_standard_deviation"><code class="name">var <span class="ident">altitude_standard_deviation</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.latitude_mean"><code class="name">var <span class="ident">latitude_mean</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.latitude_standard_deviation"><code class="name">var <span class="ident">latitude_standard_deviation</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.longitude_mean"><code class="name">var <span class="ident">longitude_mean</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.longitude_standard_deviation"><code class="name">var <span class="ident">longitude_standard_deviation</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.num_pts"><code class="name">var <span class="ident">num_pts</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.provider"><code class="name">var <span class="ident">provider</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="redvox.common.station_model.LocationSummary.from_dict"><code class="name flex">
+<span>def <span class="ident">from_dict</span></span>(<span>kvs: Union[dict, list, str, int, float, bool, ForwardRef(None)], *, infer_missing=False) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_dict(cls: Type[A],
+              kvs: Json,
+              *,
+              infer_missing=False) -&gt; A:
+    return _decode_dataclass(cls, kvs, infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.from_json"><code class="name flex">
+<span>def <span class="ident">from_json</span></span>(<span>s: Union[str, bytes, bytearray], *, parse_float=None, parse_int=None, parse_constant=None, infer_missing=False, **kw) ‑> ~A</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def from_json(cls: Type[A],
+              s: JsonData,
+              *,
+              parse_float=None,
+              parse_int=None,
+              parse_constant=None,
+              infer_missing=False,
+              **kw) -&gt; A:
+    kvs = json.loads(s,
+                     parse_float=parse_float,
+                     parse_int=parse_int,
+                     parse_constant=parse_constant,
+                     **kw)
+    return cls.from_dict(kvs, infer_missing=infer_missing)</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.from_station"><code class="name flex">
+<span>def <span class="ident">from_station</span></span>(<span>stn: <a title="redvox.common.station.Station" href="station.html#redvox.common.station.Station">Station</a>) ‑> Optional[List[<a title="redvox.common.station_model.LocationSummary" href="#redvox.common.station_model.LocationSummary">LocationSummary</a>]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param stn: Station to get data from
+:return: List of LocationSummary grouped by provider or None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def from_station(stn: Station) -&gt; Optional[List[&#34;LocationSummary&#34;]]:
+    &#34;&#34;&#34;
+    :param stn: Station to get data from
+    :return: List of LocationSummary grouped by provider or None
+    &#34;&#34;&#34;
+    loc = stn.find_loc_for_stats()
+    if loc:
+        samples: np.ndarray = loc.samples()
+
+        if loc.num_samples() == 1:
+            return [
+                LocationSummary(
+                    loc.name,
+                    LocationProvider(int(samples[LOCATION_PROVIDER_IDX][0])).name,
+                    samples[LATITUDE_IDX][0],
+                    0.0,
+                    samples[LONGITUDE_IDX][0],
+                    0.0,
+                    samples[ALTITUDE_IDX][0],
+                    0.0,
+                    1,
+                )
+            ]
+
+        # for each provider, create a new entry in the dictionary or append new data
+        loc_prov_to_data: dict = {}
+        lat_samples: np.ndarray = samples[LATITUDE_IDX]
+        lng_samples: np.ndarray = samples[LONGITUDE_IDX]
+        for j in range(min(len(lat_samples), len(lng_samples))):
+            if (not math.isnan(lat_samples[j])) and (not math.isnan(lng_samples[j])):
+                prov = LocationProvider(int(samples[LOCATION_PROVIDER_IDX][j])).name
+                data = np.array(
+                    [
+                        [samples[LATITUDE_IDX][j]],
+                        [samples[LONGITUDE_IDX][j]],
+                        [samples[ALTITUDE_IDX][j]],
+                    ]
+                )
+                loc_prov_to_data[prov] = (
+                    data
+                    if prov not in loc_prov_to_data.keys()
+                    else np.concatenate([loc_prov_to_data[prov], data], 1)
+                )
+
+        loc_sums = []
+        for provider, loc_data in loc_prov_to_data.items():
+            loc_sums.append(
+                LocationSummary(
+                    loc.name,
+                    provider,
+                    loc_data[0].mean(),
+                    loc_data[0].std(),
+                    loc_data[1].mean(),
+                    loc_data[1].std(),
+                    loc_data[2].mean(),
+                    loc_data[2].std(),
+                    len(loc_data[0]),
+                )
+            )
+        return loc_sums
+    return None</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.schema"><code class="name flex">
+<span>def <span class="ident">schema</span></span>(<span>*, infer_missing: bool = False, only=None, exclude=(), many: bool = False, context=None, load_only=(), dump_only=(), partial: bool = False, unknown=None) ‑> dataclasses_json.mm.SchemaF[~A]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def schema(cls: Type[A],
+           *,
+           infer_missing: bool = False,
+           only=None,
+           exclude=(),
+           many: bool = False,
+           context=None,
+           load_only=(),
+           dump_only=(),
+           partial: bool = False,
+           unknown=None) -&gt; SchemaType:
+    Schema = build_schema(cls, DataClassJsonMixin, infer_missing, partial)
+
+    if unknown is None:
+        undefined_parameter_action = _undefined_parameter_action_safe(cls)
+        if undefined_parameter_action is not None:
+            # We can just make use of the same-named mm keywords
+            unknown = undefined_parameter_action.name.lower()
+
+    return Schema(only=only,
+                  exclude=exclude,
+                  many=many,
+                  context=context,
+                  load_only=load_only,
+                  dump_only=dump_only,
+                  partial=partial,
+                  unknown=unknown)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="redvox.common.station_model.LocationSummary.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, encode_json=False) ‑> Dict[str, Union[dict, list, str, int, float, bool, ForwardRef(None)]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, encode_json=False) -&gt; Dict[str, Json]:
+    return _asdict(self, encode_json=encode_json)</code></pre>
+</details>
+</dd>
+<dt id="redvox.common.station_model.LocationSummary.to_json"><code class="name flex">
+<span>def <span class="ident">to_json</span></span>(<span>self, *, skipkeys: bool = False, ensure_ascii: bool = True, check_circular: bool = True, allow_nan: bool = True, indent: Union[int, str, ForwardRef(None)] = None, separators: Tuple[str, str] = None, default: Callable = None, sort_keys: bool = False, **kw) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_json(self,
+            *,
+            skipkeys: bool = False,
+            ensure_ascii: bool = True,
+            check_circular: bool = True,
+            allow_nan: bool = True,
+            indent: Optional[Union[int, str]] = None,
+            separators: Tuple[str, str] = None,
+            default: Callable = None,
+            sort_keys: bool = False,
+            **kw) -&gt; str:
+    return json.dumps(self.to_dict(encode_json=False),
+                      cls=_ExtendedEncoder,
+                      skipkeys=skipkeys,
+                      ensure_ascii=ensure_ascii,
+                      check_circular=check_circular,
+                      allow_nan=allow_nan,
+                      indent=indent,
+                      separators=separators,
+                      default=default,
+                      sort_keys=sort_keys,
+                      **kw)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -179,6 +576,35 @@ Class representing the Station information that can be used to convert Station i
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="redvox.common" href="index.html">redvox.common</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="redvox.common.station_model.example_of_print_loc_and_timing_summary" href="#redvox.common.station_model.example_of_print_loc_and_timing_summary">example_of_print_loc_and_timing_summary</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="redvox.common.station_model.LocationSummary" href="#redvox.common.station_model.LocationSummary">LocationSummary</a></code></h4>
+<ul class="">
+<li><code><a title="redvox.common.station_model.LocationSummary.altitude_mean" href="#redvox.common.station_model.LocationSummary.altitude_mean">altitude_mean</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.altitude_standard_deviation" href="#redvox.common.station_model.LocationSummary.altitude_standard_deviation">altitude_standard_deviation</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.from_dict" href="#redvox.common.station_model.LocationSummary.from_dict">from_dict</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.from_json" href="#redvox.common.station_model.LocationSummary.from_json">from_json</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.from_station" href="#redvox.common.station_model.LocationSummary.from_station">from_station</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.latitude_mean" href="#redvox.common.station_model.LocationSummary.latitude_mean">latitude_mean</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.latitude_standard_deviation" href="#redvox.common.station_model.LocationSummary.latitude_standard_deviation">latitude_standard_deviation</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.longitude_mean" href="#redvox.common.station_model.LocationSummary.longitude_mean">longitude_mean</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.longitude_standard_deviation" href="#redvox.common.station_model.LocationSummary.longitude_standard_deviation">longitude_standard_deviation</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.name" href="#redvox.common.station_model.LocationSummary.name">name</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.num_pts" href="#redvox.common.station_model.LocationSummary.num_pts">num_pts</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.provider" href="#redvox.common.station_model.LocationSummary.provider">provider</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.schema" href="#redvox.common.station_model.LocationSummary.schema">schema</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.to_dict" href="#redvox.common.station_model.LocationSummary.to_dict">to_dict</a></code></li>
+<li><code><a title="redvox.common.station_model.LocationSummary.to_json" href="#redvox.common.station_model.LocationSummary.to_json">to_json</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

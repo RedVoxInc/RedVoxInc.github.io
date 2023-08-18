@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>redvox.common.sensor_io API documentation</title>
-<meta name="description" content="This module provides IO primitives for working with sensor data." />
+<title>redvox.tests.session_model_test API documentation</title>
+<meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,52 +19,74 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>redvox.common.sensor_io</code></h1>
+<h1 class="title">Module <code>redvox.tests.session_model_test</code></h1>
 </header>
 <section id="section-intro">
-<p>This module provides IO primitives for working with sensor data.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;
-This module provides IO primitives for working with sensor data.
-&#34;&#34;&#34;
-from pathlib import Path
-import json
-from typing import (
-    Optional,
-    TYPE_CHECKING,
-)
-
-if TYPE_CHECKING:
-    from redvox.common.sensor_data import SensorData
+<pre><code class="python">from redvox.cloud.client import CloudClient, cloud_client
+from redvox.cloud.session_model_api import Session, DynamicSession, SessionModelsResp
+from redvox.cloud.errors import CloudApiError
+import redvox.common.date_time_utils as dtu
 
 
-def to_json(
-    sensor: &#34;SensorData&#34;,
-) -&gt; str:
-    &#34;&#34;&#34;
-    :return: sensor as json string
-    &#34;&#34;&#34;
-    return json.dumps(sensor.as_dict())
+def main() -&gt; None:
+    # Create a cloud client, make sure your .redvox.toml is where you want it
+    client: CloudClient
+
+    try:
+        with cloud_client() as client:
+            # Session models can be queried by owner, id, id:uuid, start_ts (us) end_ts (us)
+            # At least one filter must be included, lets look at session models for redvoxcore
+            resp: SessionModelsResp = client.request_session_models(
+                owner=&#34;redvoxcore@gmail.com&#34;,
+                start_ts=int(dtu.datetime_to_epoch_microseconds_utc(dtu.now() - dtu.timedelta(days=2, minutes=30))),
+                end_ts=int(dtu.datetime_to_epoch_microseconds_utc(dtu.now() - dtu.timedelta(days=2)))
+                # 1686771282618112.0
+            )
+
+            # This will give you the top level sessions which encapsulate an entire recording session
+            # Let&#39;s just pick the first one as an example.
+            session: Session = resp.sessions[0]
+            print(session)
+
+            # Top level sessions also contain links to dynamic sessions which encapsulate a given time range.
+            # Additional requests are made to retrieve dynamic sessions.
+            # We currently support daily dynamic sessions and hourly dynamic sessions.
+            # - Top level sessions contain links to daily dynamic sessions.
+            # - Daily dynamic sessions contain links to hourly dynamic sessions.
+            # - Hourly dynamic sessions contain links to individual packets.
+
+            daily_dynamic_session: DynamicSession = session.query_dynamic_session(
+                client, session.sub[0]
+            ).dynamic_session
+
+            print(daily_dynamic_session)
+
+            hourly_dynamic_session: DynamicSession = session.query_dynamic_session(
+                client, daily_dynamic_session.sub[0]
+            ).dynamic_session
+
+            print(hourly_dynamic_session)
+
+            print(&#34;timing:&#34;, session.timing.mean_lat, session.timing.mean_off)
+
+            # Let&#39;s get at least one packet name
+            station_id: str = session.id
+            packet_name: str = f&#34;{station_id}_{hourly_dynamic_session.sub[0]}.rdvxm&#34;
+            print(packet_name)
+    except CloudApiError as e:
+        print(e)
+        exit(2)
+    except Exception as e:
+        print(e)
+        exit(3)
 
 
-def to_json_file(sensor: &#34;SensorData&#34;, file_name: Optional[str] = None) -&gt; Path:
-    &#34;&#34;&#34;
-    saves the sensor as json and data in the same directory.
-
-    :param sensor: SensorData to save
-    :param file_name: the optional base file name.  Do not include a file extension.
-                        If None, a default file name is created using this format:
-                        [sensor_type]_[first_timestamp].json
-    :return: path to json file
-    &#34;&#34;&#34;
-    _file_name: str = file_name if file_name is not None else sensor.file_name()
-    file_path: Path = sensor.fs_writer().json_path()
-    with open(file_path, &#34;w&#34;) as f_p:
-        f_p.write(to_json(sensor))
-        return file_path.resolve(False)</code></pre>
+if __name__ == &#34;__main__&#34;:
+    main()</code></pre>
 </details>
 </section>
 <section>
@@ -74,54 +96,66 @@ def to_json_file(sensor: &#34;SensorData&#34;, file_name: Optional[str] = None) 
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="redvox.common.sensor_io.to_json"><code class="name flex">
-<span>def <span class="ident">to_json</span></span>(<span>sensor: SensorData) ‑> str</span>
+<dt id="redvox.tests.session_model_test.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:return: sensor as json string</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def to_json(
-    sensor: &#34;SensorData&#34;,
-) -&gt; str:
-    &#34;&#34;&#34;
-    :return: sensor as json string
-    &#34;&#34;&#34;
-    return json.dumps(sensor.as_dict())</code></pre>
-</details>
-</dd>
-<dt id="redvox.common.sensor_io.to_json_file"><code class="name flex">
-<span>def <span class="ident">to_json_file</span></span>(<span>sensor: SensorData, file_name: Optional[str] = None) ‑> pathlib.Path</span>
-</code></dt>
-<dd>
-<div class="desc"><p>saves the sensor as json and data in the same directory.</p>
-<p>:param sensor: SensorData to save
-:param file_name: the optional base file name.
-Do not include a file extension.
-If None, a default file name is created using this format:
-[sensor_type]_[first_timestamp].json
-:return: path to json file</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def to_json_file(sensor: &#34;SensorData&#34;, file_name: Optional[str] = None) -&gt; Path:
-    &#34;&#34;&#34;
-    saves the sensor as json and data in the same directory.
+<pre><code class="python">def main() -&gt; None:
+    # Create a cloud client, make sure your .redvox.toml is where you want it
+    client: CloudClient
 
-    :param sensor: SensorData to save
-    :param file_name: the optional base file name.  Do not include a file extension.
-                        If None, a default file name is created using this format:
-                        [sensor_type]_[first_timestamp].json
-    :return: path to json file
-    &#34;&#34;&#34;
-    _file_name: str = file_name if file_name is not None else sensor.file_name()
-    file_path: Path = sensor.fs_writer().json_path()
-    with open(file_path, &#34;w&#34;) as f_p:
-        f_p.write(to_json(sensor))
-        return file_path.resolve(False)</code></pre>
+    try:
+        with cloud_client() as client:
+            # Session models can be queried by owner, id, id:uuid, start_ts (us) end_ts (us)
+            # At least one filter must be included, lets look at session models for redvoxcore
+            resp: SessionModelsResp = client.request_session_models(
+                owner=&#34;redvoxcore@gmail.com&#34;,
+                start_ts=int(dtu.datetime_to_epoch_microseconds_utc(dtu.now() - dtu.timedelta(days=2, minutes=30))),
+                end_ts=int(dtu.datetime_to_epoch_microseconds_utc(dtu.now() - dtu.timedelta(days=2)))
+                # 1686771282618112.0
+            )
+
+            # This will give you the top level sessions which encapsulate an entire recording session
+            # Let&#39;s just pick the first one as an example.
+            session: Session = resp.sessions[0]
+            print(session)
+
+            # Top level sessions also contain links to dynamic sessions which encapsulate a given time range.
+            # Additional requests are made to retrieve dynamic sessions.
+            # We currently support daily dynamic sessions and hourly dynamic sessions.
+            # - Top level sessions contain links to daily dynamic sessions.
+            # - Daily dynamic sessions contain links to hourly dynamic sessions.
+            # - Hourly dynamic sessions contain links to individual packets.
+
+            daily_dynamic_session: DynamicSession = session.query_dynamic_session(
+                client, session.sub[0]
+            ).dynamic_session
+
+            print(daily_dynamic_session)
+
+            hourly_dynamic_session: DynamicSession = session.query_dynamic_session(
+                client, daily_dynamic_session.sub[0]
+            ).dynamic_session
+
+            print(hourly_dynamic_session)
+
+            print(&#34;timing:&#34;, session.timing.mean_lat, session.timing.mean_off)
+
+            # Let&#39;s get at least one packet name
+            station_id: str = session.id
+            packet_name: str = f&#34;{station_id}_{hourly_dynamic_session.sub[0]}.rdvxm&#34;
+            print(packet_name)
+    except CloudApiError as e:
+        print(e)
+        exit(2)
+    except Exception as e:
+        print(e)
+        exit(3)</code></pre>
 </details>
 </dd>
 </dl>
@@ -137,13 +171,12 @@ If None, a default file name is created using this format:
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="redvox.common" href="index.html">redvox.common</a></code></li>
+<li><code><a title="redvox.tests" href="index.html">redvox.tests</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="redvox.common.sensor_io.to_json" href="#redvox.common.sensor_io.to_json">to_json</a></code></li>
-<li><code><a title="redvox.common.sensor_io.to_json_file" href="#redvox.common.sensor_io.to_json_file">to_json_file</a></code></li>
+<li><code><a title="redvox.tests.session_model_test.main" href="#redvox.tests.session_model_test.main">main</a></code></li>
 </ul>
 </li>
 </ul>
